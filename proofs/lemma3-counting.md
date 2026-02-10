@@ -262,6 +262,8 @@ $$\#\{\text{bad}\} \le \frac{2m_0}{2^{D/36}} + \frac{2p^D}{2^{D/36}}. \qquad\squ
 
 ## Part E: Union Bound Over All Small Primes
 
+For a detailed arithmetic proof of the bounds in this section suitable for direct formalization, see `proofs/lemma3-union-bound.md`.
+
 This is the central result. We state it with **explicit bounds** on $m_0$ in terms of $k$.
 
 ### Definition E0 (Parameter choices)
