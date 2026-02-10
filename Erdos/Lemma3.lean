@@ -8,6 +8,9 @@ import Mathlib.MeasureTheory.Integral.Lebesgue.Map
 import Mathlib.Algebra.Order.Field.Basic
 import Mathlib.MeasureTheory.Measure.Dirac
 import Mathlib.Data.ENNReal.Basic
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.MeasureTheory.Measure.Count
+import Mathlib.Order.Interval.Finset.Nat
 
 open Real MeasureTheory ProbabilityTheory
 open scoped Nat BigOperators ENNReal Classical
@@ -65,7 +68,81 @@ noncomputable def probHigh (p : ℕ) : ℝ :=
   (p / 2 : ℕ) / p
 
 lemma expectation_highIndicator (i : Fin D) :
-    (probDigitSpace D p)[highIndicator i] = probHigh p := sorry
+    (probDigitSpace D p)[highIndicator i] = probHigh p := by
+  -- Unfold definitions
+  dsimp [probHigh]
+  
+  -- Use measure preserving property
+  let proj : DigitSpace D p → Fin p := fun m => m i
+  have h_meas : MeasurePreserving proj (probDigitSpace D p) (probFin p) :=
+    measurePreserving_eval (fun _ => probFin p) i
+  
+  -- Function composition
+  let f : Fin p → ℝ := fun d => if isHigh p d then 1 else 0
+  have h_comp : highIndicator i = f ∘ proj := rfl
+  rw [h_comp]
+  
+  -- Integral composition
+  change ∫ x, f (x i) ∂(probDigitSpace D p) = _
+  rw [← integral_map (measurable_pi_apply i).aemeasurable]
+  rotate_left
+  · -- Proof of AEStronglyMeasurable
+    rw [h_meas.map_eq]
+    exact Integrable.of_finite.aestronglyMeasurable
+  
+  -- Main goal
+  rw [h_meas.map_eq]
+  
+  -- Integral over Fin p
+  rw [probFin]
+  rw [integral_smul_measure]
+  rw [integral_count]
+  
+  -- Sum over Fin p
+  simp_rw [f]
+  rw [Finset.sum_ite]
+  simp only [Finset.sum_const_zero, add_zero]
+  rw [Finset.sum_const]
+  rw [nsmul_eq_mul, mul_one]
+  
+  -- Cardinality
+  have h_card : (Finset.filter (isHigh p) Finset.univ).card = p / 2 := by
+    rw [← Finset.card_map Fin.valEmbedding]
+    
+    -- Rewrite predicate
+    have h_p : isHigh p = (fun n => (p + 1) / 2 ≤ n) ∘ Fin.valEmbedding := rfl
+    simp_rw [h_p]
+    rw [← Finset.filter_map]
+    
+    -- Map univ to range p
+    have h_map : Finset.map Fin.valEmbedding (Finset.univ : Finset (Fin p)) = Finset.range p := by
+      ext x
+      simp only [Finset.mem_map, Finset.mem_univ, true_and, Finset.mem_range]
+      constructor
+      · rintro ⟨y, rfl⟩; exact y.is_lt
+      · intro hx; use ⟨x, hx⟩; rfl
+
+    rw [h_map]
+    
+    -- Identify the filter with Ico
+    have h_ico : Finset.filter (fun x => (p + 1) / 2 ≤ x) (Finset.range p) = Finset.Ico ((p + 1) / 2) p := by
+      ext x
+      simp only [Finset.mem_filter, Finset.mem_range, Finset.mem_Ico]
+      tauto
+      
+    rw [h_ico]
+    rw [Nat.card_Ico]
+    -- p - (p+1)/2 = p/2
+    omega
+
+  rw [h_card]
+  
+  -- Arithmetic on reals
+  rw [ENNReal.toReal_inv]
+  rw [ENNReal.toReal_natCast]
+  rw [smul_eq_mul]
+  rw [inv_mul_eq_div]
+
 
 lemma indep_highIndicator :
     iIndepFun (fun i => highIndicator i) (probDigitSpace D p) := by
