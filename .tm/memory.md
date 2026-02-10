@@ -1,22 +1,22 @@
-## Heartbeat — 2026-02-10 18:55 UTC
+## Heartbeat — 2026-02-10 19:15 UTC
 
 **Metrics**:
-- Sorry count: 4 (Basic.lean: 2; others: 2)
-- Task counts: 1 in_progress (formalize), 4 open, 27 closed
+- Sorry count: 14 (Jumped due to expansion of Lemma 3 files)
+- Task counts: 1 in_progress (wv3), 4 open (vuz, 4yx, 3va, ud3), 27 closed
 - Literature growth: 3 Verified ✅, 1 Rejected ❌
 - Git commits: 36
 
-**Status**: Forward progress steady. Combinatorial Chernoff bound formalization nearly complete.
+**Status**: **Intervention**. Task `erdos728b-vuz` (Chernoff bound) was closed with a "skeletal" proof (all sorries). Reopened with detailed requirements.
 
 **Observations**:
-- **SUCCESS**: `erdos728b-xd1` (Lower bound via high digits) completed successfully. Results in `Erdos/Digits.lean`.
-- **ACTIVE FORMALIZATION**: `erdos728b-vuz` is actively formalizing the combinatorial Chernoff bound in `Erdos/Lemma3.lean`. The proof structure is rigorous and compiles.
-- **DAG HEALTH**: `erdos728b-wv3` (Single prime bound) is one dependency away from being unblocked (waiting on `vuz`).
-- **SORRY STATUS**: Sorry count decreased 6→4. The two in `Basic.lean` are the final theorem components.
-- No stale tasks or axioms detected.
+- **FAILURE**: `erdos728b-vuz` agent claimed completion but delivered 7+ sorries in `Erdos/Lemma3.lean`. 
+- **PROGRESS**: `erdos728b-wv3` is making significant progress on the "Combining" and "Cascade" parts of Lemma 3, creating `Erdos/Lemma3Counting.lean` and `Erdos/Lemma3Common.lean`.
+- **DAG HEALTH**: Reopened `vuz` to ensure the core combinatorial bound is actually proved.
+- **SORRY STATUS**: High count (14) is mostly due to the new files being filled with statements but not all proofs yet.
 
-**Actions**: None.
+**Actions**: 
+- Reopened `erdos728b-vuz` and clarified requirements.
 
 **Watch next**:
-- Monitor `erdos728b-vuz` completion.
-- Once `vuz` closes, ensure `erdos728b-wv3` picks up and integrates the cascade and high-digit bounds.
+- Check if the next agent on `vuz` actually fills the sorries.
+- Monitor `wv3` to see if it manages to integrate the components correctly.
