@@ -1,27 +1,26 @@
-## Heartbeat — 2026-02-10 15:58 UTC
+## Heartbeat — 2026-02-10 16:06 UTC
 
 **Metrics**:
 - Sorry count: 1
-- Task counts: 1 open (explore), 1 in_progress (explore), 6 closed
-- Literature growth: 0 Verified ✅, 1 Rejected ❌
-- Git commits: 6 (last was manual poke about scope creep)
+- Task counts: 3 open (verify, verify, planner), 0 in_progress, 11 closed
+- Literature growth: 0 Verified ✅ (2 Drafts waiting review)
+- Git commits: 12 (including task closures)
 
-**Status**: Explore task showing significant scope creep. Human already flagged it.
+**Status**: Forward progress restored. Explorer produced a promising probabilistic proof.
 
 **Observations**:
-- **CONCERNING**: Task `erdos728b-epq` has pivoted through 9+ different proof approaches in 14 minutes
-- This violates the "one task = one thing" principle
-- Human intervention already occurred: `.tm/poke.md` created to monitor scope
-- The poke note says: "if it produces a single focused proof, fine. If it pivots again, kill it."
-- Librarian task `erdos728b-an4` completed successfully, found standard construction (n=m!, a=m!-1, b=m, k=m-1)
-- The explorer is trying to prove existence "for ALL C" which matches the theorem statement (∀ C > 0), so scope is correct
-- **The issue is method thrashing, not goal misalignment**
+- **SUCCESS**: Explorer `erdos728b-epq` stayed focused on the probabilistic approach after the human/overseer pokes and produced `proofs/erdos728_v2.md`.
+- **STALL**: The backlog became empty because the planner hadn't yet run to review the new drafts.
+- **HUMAN POKE**: Human asked "why are there no tasks".
+- Created two `verify` tasks and a high-priority `planner` task to unblock the pipeline.
+- The new proof approach (m, m+k, 2m) is much better than the previous m! construction as it avoids the CRT modulus bottleneck.
 
 **Actions**: 
-- Monitoring `erdos728b-epq` per the poke note
-- If it pivots one more time, I should intervene by closing it as failed and creating a planner task to decompose
+- Created `erdos728b-poe` (Verify erdos728_v2.md)
+- Created `erdos728b-hp6` (Verify sieve-lemma.md)
+- Created `erdos728b-a84` (Planner gap analysis)
 
 **Watch next**:
-- If `erdos728b-epq` completes with a focused probabilistic proof → good
-- If it pivots to yet another approach → close as failed, escalate to planner for decomposition
-- The agent has committed to "probabilistic existence proof over random m" - this should be the final approach
+- If `verify` tasks find flaws, ensure the `planner` redirects back to `explore` with the specific feedback.
+- If `verify` succeeds, expect the `planner` to create a series of `formalize` tasks for the Carry Dominance Lemma and the Probabilistic Bound.
+- Watch for the "reformulation trap" in the formalization of the probabilistic part (Lean might struggle with probabilistic existence).
