@@ -140,15 +140,41 @@ lemma valuation_le_cascade (m : ℕ) (hk : k ≥ 1) (hm : m < p ^ D) :
     · apply card_le_card; intro x hx; simp at hx ⊢; exact ⟨hx.1.1, hx.2⟩
     · simp
   have h_large : S_large.card ≤ cascade_length (p:=p) k D m := by
-    apply card_le_of_subset
-    intro i hi
-    simp [S_large, S, carry_cond] at hi
-    let ⟨⟨hi_ge1, hi_leD⟩, h_carry, hi_gt_s⟩ := hi
-    rw [cascade_length, List.length_takeWhile]
-    have h_digits : ∀ j, s + 1 ≤ j → j ≤ i - 1 → digit p m j = p - 1 := by
-      intro j hj_ge hj_le
-      sorry -- decreasing induction
-    sorry
+    let L := cascade_length (p:=p) k D m
+    have h_sub : S_large ⊆ Ico (s + 2) (s + 2 + L) := by
+      intro i hi
+      simp [S_large, S, carry_cond] at hi
+      let ⟨⟨hi_ge1, hi_leD⟩, h_carry, hi_gt_s⟩ := hi
+      rw [mem_Ico]
+      constructor
+      · omega
+      · rw [cascade_length]
+        have h_digits : ∀ j, s + 1 ≤ j → j ≤ i - 1 → digit p m j = p - 1 := by
+          intro j hj_ge hj_le
+          let diff := i - 1 - j
+          have h_ind : ∀ d, d ≤ diff → digit p m (i - 1 - d) = p - 1 ∧ carry_cond p k m (i - 1 - d) := by
+            intro d hd
+            induction d with
+            | zero =>
+                simp
+                apply carry_propagate m i hi_gt_s h_carry hk
+            | succ d ih =>
+                simp
+                have h_prev := ih (le_trans (le_succ d) hd)
+                let prev := i - 1 - d
+                have h_prev_gt : prev > log p k + 1 := by simp [prev, s] at *; omega
+                apply carry_propagate m prev h_prev_gt h_prev.2 hk
+          exact (h_ind diff (le_refl _)).1
+        have h_len : i - (s + 1) - 1 ≤ (List.range (D - (s + 1))).takeWhile (fun i_1 => digit p m (s + 1 + i_1) = p - 1) |>.length := by
+          apply List.takeWhile_length_ge_iff.mpr
+          intro x hx
+          rw [List.mem_take, List.mem_range, List.length_range] at hx
+          have h_idx : s + 1 + x ≤ i - 1 := by omega
+          apply h_digits (s + 1 + x) (by omega) h_idx
+        omega
+    trans (Ico (s + 2) (s + 2 + L)).card
+    · exact card_le_of_subset h_sub
+    · simp
   linarith
 
 lemma count_large_cascade (T : ℕ) (hT : T ≤ D - (log p k + 1)) :
