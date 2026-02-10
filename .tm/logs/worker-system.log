@@ -1768,3 +1768,57 @@ $ cd /home/jarred/code/erdos-728b && tm update erdos728b-o2q --status "Complete 
 (E) Union bound over primes p ≤ 2k: choosing D_p = ⌊log_p(m₀)/2⌋ makes boundary terms O(√m₀), and main terms decay as m₀^{1 - c/log log m₀}, giving total < m₀ for m₀ large.
 
 (F) Formalization strategy: 6 independent Lean lemma targets with recommended ordering. Hardest piece is the Chernoff bound (F2/B4'); cleanest Lean approach may be sorry placeholder for that bound initially.
+[2026-02-10T16:39:42.474Z] ✅ Closed task erdos728b-o2q
+
+[2026-02-10T16:39:42.541Z] 🔄 Checking git status...
+[2026-02-10T16:39:42.555Z] 📝 Committing changes...
+[2026-02-10T16:39:42.582Z] 🚀 Pushing to remote...
+[2026-02-10T16:39:44.340Z] 
+================================================================================
+[2026-02-10T16:39:44.340Z] 📌 Processing task: erdos728b-or8 - Find specific Chernoff bound in Mathlib for Lemma 3
+[2026-02-10T16:39:44.340Z]    Role: librarian | Priority: 2 
+[2026-02-10T16:39:44.340Z] ================================================================================
+
+[2026-02-10T16:39:44.342Z] ✓ Claimed task erdos728b-or8
+
+[2026-02-10T16:39:44.342Z] 🤖 Using agent: librarian with models: google-antigravity/gemini-3-pro-high:high, google-antigravity/claude-opus-4-6-thinking
+
+[2026-02-10T16:39:44.342Z] 💭 Starting pi agent session with model: google-antigravity/gemini-3-pro-high:high...
+[2026-02-10T16:39:44.357Z] 📸 Capturing file state before agent execution...
+[2026-02-10T16:39:44.370Z] ✓ Captured state: 45 tracked, 1 untracked files
+
+[2026-02-10T16:39:50.395Z] 
+$ tm update erdos728b-or8 --status "Searching Mathlib for Chernoff bounds"
+[2026-02-10T16:39:50.568Z] 
+$ ls -F artifacts/
+[2026-02-10T16:39:50.574Z] 
+$ grep -r "Chernoff" .lake/packages/mathlib/Mathlib/ --include="*.lean" -l
+[2026-02-10T16:39:55.891Z] 
+$ grep -C 5 "Chernoff" .lake/packages/mathlib/Mathlib/Probability/Moments/SubGaussian.lean
+[2026-02-10T16:40:00.746Z] 
+$ grep -r "Hoeffding" .lake/packages/mathlib/Mathlib/ --include="*.lean" -l
+[2026-02-10T16:40:04.135Z] 
+🛠️  Executing tool: read...
+[2026-02-10T16:40:23.880Z] 
+$ ls -R .lake/packages/mathlib/Mathlib/Probability
+[2026-02-10T16:40:27.983Z] 
+🛠️  Executing tool: read...
+[2026-02-10T16:40:40.996Z] 
+🛠️  Executing tool: read...
+[2026-02-10T16:40:49.682Z] 
+$ ls .lake/packages/mathlib/Mathlib/Probability/Distributions
+[2026-02-10T16:41:03.926Z] 
+$ find .lake/packages/mathlib/Mathlib -name "*Chernoff*"
+[2026-02-10T16:41:22.096Z] 
+🛠️  Executing tool: write...
+[2026-02-10T16:41:26.547Z] 
+$ tm update erdos728b-or8 --status "Found specific Chernoff bound in Mathlib: measure_sum_ge_le_of_iIndepFun (SubGaussian)"
+[2026-02-10T16:41:34.036Z] 
+
+📝 Agent response complete.
+
+[2026-02-10T16:41:34.036Z] 📄 Log saved to .tm/logs/worker-erdos728b-or8.md
+[2026-02-10T16:41:34.036Z] 
+📊 Task erdos728b-or8 completed:
+[2026-02-10T16:41:34.036Z]    Summary: Located specific Chernoff-Hoeffding bounds in Mathlib suitable for Lemma 3. The primary theorem is `ProbabilityTheory.HasSubgaussianMGF.measure_sum_ge_le_of_iIndepFun` in `Mathlib.Probability.Moments.SubGaussian`.
+[2026-02-10T16:41:34.036Z]    Details: The bound Pr[X < mu/2] <= exp(-mu/8) corresponds to the standard Chernoff bound for sums of independent Bernoulli trials. In Mathlib, this is derived using sub-Gaussian concentration inequalities. Specifically, a Bernoulli(p) variable X_i is sub-Gaussian with parameter 1/4 (after centering). Applying `measure_sum_ge_le_of_iIndepFun` to the sum of n such variables gives a bound of exp(-2(mu/2)^2/n) = exp(-mu^2/(2n)). For p=1/2 (digits), mu=n/2, yielding exp(-n/8) = exp(-mu/4), which is stronger than the requested exp(-mu/8). For general p, the bound is exp(-mu p/2). I have documented these findings in `artifacts/mathlib-coverage.md`.
