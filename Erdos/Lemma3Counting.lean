@@ -119,7 +119,7 @@ lemma carry_propagate (m i : ℕ) (hi : i > log p k + 1) (h_carry : carry_cond p
   · rw [carry_cond, mod_eq_of_lt hk_lt]; linarith
 
 lemma valuation_le_cascade (m : ℕ) (hk : k ≥ 1) (hm : m < p ^ D) :
-    padicValNat p ((m + k).choose k) ≤ (log p k + 1) + cascade_length hp k D m := by
+    padicValNat p ((m + k).choose k) ≤ (log p k + 1) + cascade_length (p:=p) k D m := by
   let s := log p k
   rw [factorization_choose' hp (lt_succ_of_lt (lt_of_lt_of_le (log_lt_of_lt_pow (by omega) (by
       calc m + k < p^D + p^D := add_lt_add_of_lt_of_le hm (pow_le_pow_right hp.one_lt.le (le_trans (log_le_iff_pow_le_right (by omega) (by omega) |>.mp (le_refl _)) (by omega)))
@@ -139,7 +139,7 @@ lemma valuation_le_cascade (m : ℕ) (hk : k ≥ 1) (hm : m < p ^ D) :
     trans (Ico 1 (s + 2)).card
     · apply card_le_card; intro x hx; simp at hx ⊢; exact ⟨hx.1.1, hx.2⟩
     · simp
-  have h_large : S_large.card ≤ cascade_length hp k D m := by
+  have h_large : S_large.card ≤ cascade_length (p:=p) k D m := by
     apply card_le_of_subset
     intro i hi
     simp [S_large, S, carry_cond] at hi
@@ -152,7 +152,7 @@ lemma valuation_le_cascade (m : ℕ) (hk : k ≥ 1) (hm : m < p ^ D) :
   linarith
 
 lemma count_large_cascade (T : ℕ) (hT : T ≤ D - (log p k + 1)) :
-    ((range (p^D)).filter (fun m => cascade_length hp k D m ≥ T)).card ≤ p ^ (D - T) := by
+    ((range (p^D)).filter (fun m => cascade_length (p:=p) k D m ≥ T)).card ≤ p ^ (D - T) := by
   let s := log p k
   let indices (k : Fin T) : Fin D := ⟨s + 1 + k, by
     apply lt_of_lt_of_le _ (sub_le_iff_le_add.mp hT)
@@ -214,5 +214,32 @@ lemma count_bad_single_prime (hD : D ≥ 12 * (log p k + 1) + 6) (hp_ge_3 : p �
   sorry
 
 end SinglePrime
+
+section ResidueCounting
+
+variable {p : ℕ} (hp : p.Prime) (D : ℕ) (k : ℕ)
+
+lemma count_congruent_le (a b K r : ℕ) (hK : K > 0) :
+    ((Ico a b).filter (fun m => m % K = r)).card ≤ (b - a) / K + 1 := by
+  sorry
+
+lemma residue_count_interval {R : Finset ℕ} (hR : ∀ r ∈ R, r < p^D) (a b : ℕ) (h_ba : a ≤ b) :
+    ((Ico a b).filter (fun m => m % p^D ∈ R)).card ≤ R.card * ((b - a) / p^D + 1) := by
+  sorry
+
+lemma bad_residue_sets (hD : D ≥ 16 * (log p (k + 1)) + 16) :
+    (∀ m, padicValNat p ((m + k).choose k) > D/6 → 
+      m % p^D ∈ (range (p^D)).filter (fun r => cascade_length (p:=p) k D r ≥ D/6 - log p k)) ∧
+    (∀ m, padicValNat p ((2 * m).choose m) < D/6 → 
+      m % p^D ∈ (range (p^D)).filter (fun r => count_high_digits p r D < D/6)) := by
+  sorry
+
+corollary count_bad_interval (m0 : ℕ) (hm0 : m0 ≥ p^D) (hD : D ≥ 16 * (log p (k + 1)) + 16)
+    (hp_ge_3 : p ≥ 3) (hk : k ≥ 1) :
+    ((Ico m0 (2 * m0)).filter (fun m => padicValNat p ((m + k).choose k) > padicValNat p ((2 * m).choose m))).card
+    ≤ (2 * m0) / 2 ^ (D / 36) + (2 * p^D) / 2 ^ (D / 36) := by
+  sorry
+
+end ResidueCounting
 
 end Erdos728
