@@ -1,0 +1,14 @@
+[2026-02-10T17:22:59.120Z] ▶ Overseer started (interval: 15m, model: medium)
+[2026-02-10T17:22:59.120Z] 💓 Heartbeat starting...
+[2026-02-10T17:22:59.237Z] Created new overseer session
+[2026-02-10T17:22:59.238Z] Running with model: google-antigravity/claude-sonnet-4-5-thinking
+[2026-02-10T17:23:49.238Z] 📝 Cleared poke messages
+[2026-02-10T17:23:49.238Z] 💓 Heartbeat #0 complete: No intervention needed. System healthy.
+[2026-02-10T17:38:49.255Z] 💓 Heartbeat starting...
+[2026-02-10T17:38:49.281Z] Running with model: google-antigravity/gemini-3-flash
+[2026-02-10T17:39:40.143Z] 📝 Cleared poke messages
+[2026-02-10T17:39:40.143Z] 💓 Heartbeat #1 complete: No intervention needed. DAG health improved by adding a missing verify task.
+[2026-02-10T17:54:40.169Z] 💓 Heartbeat starting...
+[2026-02-10T17:54:40.192Z] Running with model: google-antigravity/gemini-3-flash
+[2026-02-10T17:55:27.363Z] 📝 Cleared poke messages
+[2026-02-10T17:55:27.363Z] 💓 Heartbeat #2 complete: Recovered one stale task. Skeleton for Lemma 3 created.
