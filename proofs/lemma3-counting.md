@@ -1,6 +1,7 @@
 # Lemma 3: Counting Bound for Small Primes (Deterministic Version)
 
-**Status:** Draft ✏️
+**Status:** Under review 🔍
+**Reviewed by:** erdos728b-d0o
 **Statement:** Let $p$ be a prime with $p \le 2k$. Let $D \ge 1$ be an integer, and let $N = p^D$. Among the $N$ integers $m \in \{0, 1, \ldots, N-1\}$, the number of $m$ satisfying $v_p(\binom{m+k}{k}) > v_p(\binom{2m}{m})$ is at most $N / p^{\lfloor D/40 \rfloor}$, provided $D \ge 16 \lfloor \log_p(k+1) \rfloor + 16$.
 **Dependencies:** None
 **Confidence:** High
@@ -501,3 +502,55 @@ Actually, this is getting complicated. For the Lean formalization, the cleanest 
 - Kummer's theorem for $p$-adic valuation of binomial coefficients.
 - Chernoff bound for binomial tails (standard combinatorial inequality).
 - Builds on `proofs/erdos728_v2.md` (Lemma 3, probabilistic version).
+
+---
+
+## Review Notes
+
+**Reviewed by:** erdos728b-d0o (2026-02-10)
+
+**Overall Assessment:** The proof structure is mathematically sound with well-organized parts (A: cascades, B: high digits, C: combining, D: tiling, E: union bound, F: formalization strategy). Parts A, B (structure), and C are correct. However, there are gaps that need addressing before verification.
+
+**Issues Requiring Revision:**
+
+1. **Part E - Relationship between $k$ and $m_0$ not explicit (MAJOR)**:
+   - The theorem statement says "$m_0$ sufficiently large (in terms of $k$)" but the proof in Part E relies on $k = O(\log m_0)$ (implicit assumption)
+   - The verification that $D_p \ge 16\log_p(k+1) + 16$ uses asymptotic arguments without explicit bounds
+   - **Fix needed**: Either (a) add explicit condition like "$m_0 \ge 2^{2^{32k}}$" or similar constructive bound, OR (b) split into two parts: existence theorem ("for all $k$, there exists $M_0(k)$ such that...") and then give a separate constructive bound for $M_0(k)$
+
+2. **Lemma B4' - Chernoff bound incomplete (MAJOR)**:
+   - The bound $\#\{m : H(m) < D/6\} \le p^D/2^{D/36}$ is stated but relies on "Chernoff bound with $\mu = D/3$ and $t = D/6$"
+   - The proof correctly identifies this as non-trivial and provides formalization strategies in Part F
+   - **Status**: This is acceptable for Draft → Under Review transition since Part F explicitly flags it as needing separate formalization
+   - **Recommendation**: Create a separate lemma "Chernoff bound for binomial tails" with this as a dependency
+   - Alternative: Use the cruder explicit bound mentioned in Part F (partition into blocks of 6, use $(2/3)^6$ bound)
+
+3. **Corollary A4 - Minor inconsistency**:
+   - First statement says "$\le N/p^T$" but the sharper bound $(\star)$ gives "$\le N/p^{T+1}$"
+   - The $(\star)$ version is what's actually used later, so the loose bound is harmless but confusing
+   - **Fix**: Remove the weaker statement or clarify which bound is being used where
+
+4. **Part D exposition - Minor**:
+   - Lemma D1 is introduced, then noted to not apply, then D2 is attempted, then D3 is the real proof
+   - This "working out loud" style is fine for draft but could be cleaned up for final version
+   - **Suggestion**: Move the dead-end exploration to a remark or appendix
+
+**Dependencies:**
+- None from other proofs (this is self-contained)
+- Requires: Kummer's theorem (standard), basic binomial coefficient properties
+- Requires (to be formalized): Chernoff/Hoeffding bound for binomial tails OR explicit combinatorial substitute
+
+**Verification Status:** Cannot verify until Issues 1 and 2 are addressed.
+
+**Formalization Impact:** 
+- Parts A and B (cascade structure, high digit forcing) can proceed immediately
+- Part C (combining bounds) can proceed assuming B4' as a lemma
+- Parts D/E (tiling/union) should wait until the $k$ vs $m_0$ relationship is clarified
+
+
+**Related Tasks:**
+- Revision needed: erdos728b-pbc (explicit k vs m_0 bounds)
+- Chernoff bound formalization: erdos728b-vuz (already tracked)
+
+**Recommendation:** Request revision via erdos728b-pbc. Once Issues #1 and #2 are addressed, this proof can be re-reviewed for verification.
+

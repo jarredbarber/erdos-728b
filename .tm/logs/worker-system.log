@@ -4424,3 +4424,188 @@ $ tm update erdos728b-6mr --status "Completed digit counting bijection formaliza
 📊 Task erdos728b-6mr completed:
 [2026-02-10T18:02:45.143Z]    Summary: Formalized digit counting bijection in Erdos/Lemma3.lean
 [2026-02-10T18:02:45.143Z]    Details: Defined `from_digits`, `to_digits`, and `digits_bijection`. Proved key properties `from_digits_to_digits` and `from_digits_inj`, establishing the bijection between {0, ..., p^D - 1} and (Fin D → Fin p). Some auxiliary lemmas (`from_digits_lt_pow`, `to_digits_succ`) are currently `sorry`ed but the structure is correct and compiles.
+[2026-02-10T18:02:45.147Z] ✅ Closed task erdos728b-6mr
+
+[2026-02-10T18:02:45.220Z] 🔄 Checking git status...
+[2026-02-10T18:02:45.233Z] 📝 Committing changes...
+[2026-02-10T18:02:45.269Z] 🚀 Pushing to remote...
+[2026-02-10T18:02:46.932Z] 
+================================================================================
+[2026-02-10T18:02:46.933Z] 📌 Processing task: erdos728b-d0o - Review proofs/lemma3-counting.md
+[2026-02-10T18:02:46.933Z]    Role: verify | Priority: 1 
+[2026-02-10T18:02:46.933Z] ================================================================================
+
+[2026-02-10T18:02:46.935Z] ✓ Claimed task erdos728b-d0o
+
+[2026-02-10T18:02:46.935Z] 🤖 Using agent: verify with models: google-antigravity/claude-sonnet-4-5-thinking, google-antigravity/gemini-3-flash
+
+[2026-02-10T18:02:46.936Z] 💭 Starting pi agent session with model: google-antigravity/claude-sonnet-4-5-thinking...
+[2026-02-10T18:02:46.958Z] 📸 Capturing file state before agent execution...
+[2026-02-10T18:02:46.970Z] ✓ Captured state: 54 tracked, 1 untracked files
+
+[2026-02-10T18:02:52.568Z] 
+$ tm update erdos728b-d0o --status "Reading proof file and beginning mathematical review"
+[2026-02-10T18:02:52.732Z] 
+🛠️  Executing tool: read...
+[2026-02-10T18:02:56.313Z] 
+$ tm update erdos728b-d0o --status "Conducting detailed logical review of Parts A, B, C, D, E"
+[2026-02-10T18:03:52.347Z] 
+$ tm update erdos728b-d0o --status "Review complete - requesting revisions for Part E prerequisites and Chernoff bound"
+[2026-02-10T18:03:56.282Z] 
+🛠️  Executing tool: edit...
+[2026-02-10T18:04:19.015Z] 
+$ cat >> /home/jarred/code/erdos-728b/proofs/lemma3-counting.md << 'EOF'
+
+---
+
+## Review Notes
+
+**Reviewed by:** erdos728b-d0o (2026-02-10)
+
+**Overall Assessment:** The proof structure is mathematically sound with well-organized parts (A: cascades, B: high digits, C: combining, D: tiling, E: union bound, F: formalization strategy). Parts A, B (structure), and C are correct. However, there are gaps that need addressing before verification.
+
+**Issues Requiring Revision:**
+
+1. **Part E - Relationship between $k$ and $m_0$ not explicit (MAJOR)**:
+   - The theorem statement says "$m_0$ sufficiently large (in terms of $k$)" but the proof in Part E relies on $k = O(\log m_0)$ (implicit assumption)
+   - The verification that $D_p \ge 16\log_p(k+1) + 16$ uses asymptotic arguments without explicit bounds
+   - **Fix needed**: Either (a) add explicit condition like "$m_0 \ge 2^{2^{32k}}$" or similar constructive bound, OR (b) split into two parts: existence theorem ("for all $k$, there exists $M_0(k)$ such that...") and then give a separate constructive bound for $M_0(k)$
+
+2. **Lemma B4' - Chernoff bound incomplete (MAJOR)**:
+   - The bound $\#\{m : H(m) < D/6\} \le p^D/2^{D/36}$ is stated but relies on "Chernoff bound with $\mu = D/3$ and $t = D/6$"
+   - The proof correctly identifies this as non-trivial and provides formalization strategies in Part F
+   - **Status**: This is acceptable for Draft → Under Review transition since Part F explicitly flags it as needing separate formalization
+   - **Recommendation**: Create a separate lemma "Chernoff bound for binomial tails" with this as a dependency
+   - Alternative: Use the cruder explicit bound mentioned in Part F (partition into blocks of 6, use $(2/3)^6$ bound)
+
+3. **Corollary A4 - Minor inconsistency**:
+   - First statement says "$\le N/p^T$" but the sharper bound $(\star)$ gives "$\le N/p^{T+1}$"
+   - The $(\star)$ version is what's actually used later, so the loose bound is harmless but confusing
+   - **Fix**: Remove the weaker statement or clarify which bound is being used where
+
+4. **Part D exposition - Minor**:
+   - Lemma D1 is introduced, then noted to not apply, then D2 is attempted, then D3 is the real proof
+   - This "working out loud" style is fine for draft but could be cleaned up for final version
+   - **Suggestion**: Move the dead-end exploration to a remark or appendix
+
+**Dependencies:**
+- None from other proofs (this is self-contained)
+- Requires: Kummer's theorem (standard), basic binomial coefficient properties
+- Requires (to be formalized): Chernoff/Hoeffding bound for binomial tails OR explicit combinatorial substitute
+
+**Verification Status:** Cannot verify until Issues 1 and 2 are addressed.
+
+**Formalization Impact:** 
+- Parts A and B (cascade structure, high digit forcing) can proceed immediately
+- Part C (combining bounds) can proceed assuming B4' as a lemma
+- Parts D/E (tiling/union) should wait until the $k$ vs $m_0$ relationship is clarified
+
+EOF
+
+[2026-02-10T18:04:27.543Z] 
+$ tm create -r explore \
+  --title "Revise lemma3-counting.md: explicit k vs m_0 bounds" \
+  --priority 1 \
+  --deps erdos728b-d0o \
+  --description "Address review feedback for proofs/lemma3-counting.md:
+
+1. Make the relationship between k and m_0 explicit in Part E. Current proof assumes k = O(log m_0) implicitly. Either:
+   a) Give an explicit constructive bound M_0(k) such that the theorem holds for all m_0 >= M_0(k), OR
+   b) State the theorem in two parts: existence (for all k, there exists M_0(k)...) + construction
+
+2. Clean up Corollary A4: clarify whether using N/p^T or N/p^(T+1) bound
+
+3. (Optional) Streamline Part D by removing the D1->D2->D3 exploration, keeping only D3
+
+Focus on Issue #1 (k vs m_0 relationship) which is blocking verification. Issue #2 (Chernoff bound) is acknowledged as a separate formalization task and doesn't need to be filled in here."
+
+[2026-02-10T18:04:31.287Z] 
+$ tm list --role formalize | grep -i "lemma.*b\|high.*digit\|chernoff" || echo "No formalize tasks explicitly mentioning these terms"
+[2026-02-10T18:04:33.582Z] 
+$ tm list | grep -E "(formalize|high digit|Chernoff|Lemma B)" | head -20
+[2026-02-10T18:04:35.996Z] 
+$ tm show erdos728b-vuz
+[2026-02-10T18:04:41.690Z] 
+$ cat >> /home/jarred/code/erdos-728b/proofs/lemma3-counting.md << 'EOF'
+
+**Related Tasks:**
+- Revision needed: erdos728b-pbc (explicit k vs m_0 bounds)
+- Chernoff bound formalization: erdos728b-vuz (already tracked)
+
+**Recommendation:** Request revision via erdos728b-pbc. Once Issues #1 and #2 are addressed, this proof can be re-reviewed for verification.
+
+EOF
+
+[2026-02-10T18:04:44.252Z] 
+$ tm update erdos728b-d0o --status "Completed review - revision requested via erdos728b-pbc"
+[2026-02-10T18:04:57.891Z] 
+$ tm close erdos728b-d0o --summary "Revision requested — proofs/lemma3-counting.md" --details "Completed mathematical review of lemma3-counting.md. The proof structure is sound with well-organized parts covering cascades (A), high digits (B), combining bounds (C), tiling (D), and union bound (E).
+
+PARTS VERIFIED:
+✓ Part A (Cascade structure): Lemmas A1-A3 and Corollary A4 are correct. Clean digit-level analysis.
+✓ Part B (High digits, structure): Lemmas B1-B3 and Corollary B2 are correct.
+✓ Part C (Combining bounds): Threshold argument and union bound logic is sound.
+
+ISSUES REQUIRING REVISION:
+1. MAJOR - Part E relationship between k and m_0: The proof assumes k = O(log m_0) implicitly but doesn't state this in prerequisites. Needs explicit constructive bound M_0(k) or existence+construction split.
+2. MAJOR - Lemma B4' Chernoff bound: Proof is sketched but incomplete. This is acceptable as a dependency for separate formalization (task erdos728b-vuz already exists).
+3. MINOR - Corollary A4: Inconsistent statement of bound (N/p^T vs N/p^(T+1)).
+4. MINOR - Part D exposition could be streamlined.
+
+STATUS CHANGE: Draft ✏️ → Under review 🔍
+
+CREATED FOLLOW-UP TASK: erdos728b-pbc to address issues #1, #2, #3.
+
+FORMALIZATION GUIDANCE: Parts A and B (except B4') can proceed immediately. Part C can proceed assuming B4' as lemma. Parts D/E should wait for revision.
+
+Detailed review notes appended to proofs/lemma3-counting.md."
+[2026-02-10T18:05:02.687Z] 
+$ tm close erdos728b-d0o "Revision requested — proofs/lemma3-counting.md
+
+Completed mathematical review. Parts A (cascades), B (high digit structure), and C (combining) are verified as correct.
+
+ISSUES REQUIRING REVISION:
+1. MAJOR - Part E: k vs m_0 relationship not explicit (assumes k=O(log m_0) implicitly)
+2. MAJOR - Lemma B4' Chernoff bound incomplete (but flagged as separate task erdos728b-vuz)
+3. MINOR - Corollary A4 inconsistency
+
+Created follow-up task erdos728b-pbc to address revisions.
+
+File status changed: Draft ✏️ → Under review 🔍
+Detailed review notes appended to file."
+[2026-02-10T18:05:21.826Z] 
+
+📝 Agent response complete.
+
+[2026-02-10T18:05:21.826Z] 📄 Log saved to .tm/logs/worker-erdos728b-d0o.md
+[2026-02-10T18:05:21.828Z]    Summary: Revision requested — proofs/lemma3-counting.md
+[2026-02-10T18:05:21.828Z] 
+📊 Task erdos728b-d0o completed:
+[2026-02-10T18:05:21.828Z]    Details: Completed thorough mathematical peer review of the counting proof for Lemma 3.
+
+**VERIFIED SECTIONS:**
+✓ Part A (Cascade structure): Lemmas A1-A3 correctly analyze carry propagation via base-p digit cascades. The bound v_p(binom(m+k,k)) ≤ (s+1) + L is sound. Cascade counting (p^(D-ℓ)) is exact via digit bijection.
+✓ Part B (High digit structure): Lemmas B1-B2 correctly show high digits (m_i ≥ ⌈p/2⌉) force carries in self-doubling, giving v_p(binom(2m,m)) ≥ H(m).
+✓ Part C (Combining bounds): Threshold argument at ⌊D/6⌋ with union bound is logically sound.
+
+**ISSUES REQUIRING REVISION:**
+1. **MAJOR** - Part E (Union bound over primes): The relationship between k and m_0 is not made explicit. The proof assumes k = O(log m_0) implicitly when verifying D_p ≥ 16log_p(k+1) + 16. Needs either: (a) explicit constructive bound M_0(k), or (b) existence theorem split.
+
+2. **MAJOR** - Lemma B4' (Chernoff bound): The bound #{m : H(m) < D/6} ≤ p^D/2^(D/36) relies on an unproved Chernoff/Hoeffding inequality. This is acknowledged in Part F with formalization strategies provided. A separate formalization task (erdos728b-vuz) already exists for this.
+
+3. **MINOR** - Corollary A4: Inconsistency between stating ≤ N/p^T vs the sharper (⭐) bound ≤ N/p^(T+1).
+
+4. **MINOR** - Part D exposition: Meandering through Lemmas D1→D2→D3 could be streamlined.
+
+**ACTIONS TAKEN:**
+- Changed file status from Draft ✏️ to Under review 🔍
+- Appended detailed review notes to proofs/lemma3-counting.md
+- Created follow-up task erdos728b-pbc for the explore agent to address revision requests
+- Identified dependency on existing Chernoff formalization task erdos728b-vuz
+
+**FORMALIZATION IMPACT:**
+- Parts A and B (except B4') can proceed immediately - these are the foundation
+- Part C can proceed assuming B4' as a lemma dependency
+- Parts D/E should wait for revision of the k vs m_0 relationship
+
+**RECOMMENDATION:** Once erdos728b-pbc addresses Issue #1 (explicit bounds) and clarifies Issue #3 (Corollary A4), the proof can be re-reviewed for full verification. Issue #2 (Chernoff) is properly delegated to a separate formalization effort.
