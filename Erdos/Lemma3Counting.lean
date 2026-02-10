@@ -311,10 +311,91 @@ lemma count_bad_single_prime (hD : D ≥ 12 * (log p k + 1) + 6) (hp_ge_3 : p �
     ((range (p^D)).filter (fun m => padicValNat p ((m + k).choose k) > padicValNat p ((2 * m).choose m))).card
     ≤ (p^D) / p^(D/6 - log p k) + (p^D) / 2^(D/36) := by
   let s := log p k
-  let T0 := D/6 - s - 1
-  let Bad1 := {m ∈ range (p^D) | padicValNat p ((m + k).choose k) > D/6}
-  let Bad2 := {m ∈ range (p^D) | padicValNat p ((2 * m).choose m) < D/6}
-  sorry
+  let T_val := D/6
+  let T_casc := T_val - s
+  let Bad1 := (range (p^D)).filter (fun m => padicValNat p ((m + k).choose k) > T_val)
+  let Bad2 := (range (p^D)).filter (fun m => padicValNat p ((2 * m).choose m) < T_val)
+
+  have h_T_val : 2 * s + 3 ≤ T_val := by
+    dsimp [T_val]
+    rw [← Nat.div_le_div_right (c := 6) (by omega)] at hD
+    convert hD using 1
+    rw [Nat.add_div (by omega)]
+    norm_num
+    ring
+
+  have h_subset : (range (p^D)).filter (fun m => padicValNat p ((m + k).choose k) > padicValNat p ((2 * m).choose m)) ⊆ Bad1 ∪ Bad2 := by
+    intro m hm
+    simp at hm ⊢
+    by_contra h_not
+    push_neg at h_not
+    have h1 : padicValNat p ((m + k).choose k) ≤ T_val := h_not.1
+    have h2 : T_val ≤ padicValNat p ((2 * m).choose m) := h_not.2
+    linarith [hm.2]
+
+  apply le_trans (card_le_of_subset h_subset)
+  apply le_trans (card_union_le Bad1 Bad2)
+  apply add_le_add
+
+  -- Bound Bad1
+  · have h_casc_bound : Bad1.card ≤ p ^ (D - T_casc) := by
+      let Bad_casc := (range (p^D)).filter (fun m => cascade_length (p:=p) k D m ≥ T_casc)
+      have h_sub : Bad1 ⊆ Bad_casc := by
+        intro m hm
+        simp [Bad1] at hm
+        simp [Bad_casc]
+        refine ⟨hm.1, ?_⟩
+        have h_val := valuation_le_cascade m hk hm.1
+        have h_ineq : T_val < s + 1 + cascade_length (p:=p) k D m := lt_of_lt_of_le hm.2 h_val
+        have : T_casc ≤ cascade_length (p:=p) k D m := by
+          dsimp [T_casc]
+          -- T_val < s + 1 + L => L > T_val - s - 1 => L >= T_val - s
+          omega
+        exact this
+      apply le_trans (card_le_of_subset h_sub)
+      apply count_large_cascade
+      -- Prove condition for count_large_cascade: T_casc <= D - (s + 1)
+      dsimp [T_casc]
+      rw [le_sub_iff_add_le]
+      · calc T_val - s + (s + 1) = T_val + 1 := by omega
+             _ ≤ D := by
+               apply le_trans (add_le_add_right (Nat.div_le_self D 6) 1)
+               calc D/6 + 1 ≤ D/6 + D/6 := by
+                      gcongr
+                      exact OneLe_div_iff.mpr (by linarith)
+                    _ ≤ D := by
+                      have : 2 * (D/6) ≤ 6 * (D/6) := by gcongr; exact le_refl _; norm_num
+                      apply le_trans this (Nat.mul_div_le D 6)
+      · apply le_trans (by apply le_add_right (le_refl _)) (sub_le_self D _)
+
+    convert h_casc_bound using 1
+    -- Target is p^D / p^(D/6 - s) = p^(D - (D/6 - s))
+    rw [Nat.div_pow]
+    congr
+    -- Goal: p^(D/6 - s) divides p^D.
+    apply pow_dvd_pow
+    apply le_trans (Nat.sub_le _ _) (Nat.div_le_self D 6)
+
+  -- Bound Bad2
+  · have h_high_bound : Bad2.card ≤ p^D / 2^(D/36) := by
+      let Bad_high := (range (p^D)).filter (fun m => count_high_digits p m D < T_val)
+      have h_sub : Bad2 ⊆ Bad_high := by
+        intro m hm
+        simp [Bad2] at hm
+        simp [Bad_high]
+        refine ⟨hm.1, ?_⟩
+        by_cases h_m0 : m = 0
+        · subst h_m0; simp [count_high_digits]; simp at hm; assumption
+        · have h_log : log p (2*m) < D + 1 := by
+             apply log_lt_of_lt_pow (by omega)
+             calc 2 * m < 2 * p^D := by gcongr; exact hm.1
+                  _ < p * p^D := by gcongr; exact hp_ge_3
+                  _ = p^(D+1) := by rw [pow_succ]
+          have h_val := valuation_ge_high_digits hp D m h_log
+          linarith
+      apply le_trans (card_le_of_subset h_sub)
+      apply count_few_high_digits hp T_val (le_refl _) hp_ge_3
+    exact h_high_bound
 
 end SinglePrime
 
