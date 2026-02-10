@@ -652,3 +652,82 @@ This reduces the Erdős 728 factorial divisibility condition
 a!b! | n!(a+b-n)! to binomial coefficient divisibility under
 the substitution a=m, b=m+k, n=2m."
 ```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm finish erdos728b-jq5
+```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm complete erdos728b-jq5
+```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm --help 2>&1 | head -20
+```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm close erdos728b-jq5 "Closed sorry in reduction_lemma and choose_centralBinom_factorial_identity. lake build succeeds with 0 new sorry warnings."
+```
+Task completed. Here's the summary:
+
+```json
+{
+  "status": "completed",
+  "summary": "Closed both sorry holes (choose_centralBinom_factorial_identity, reduction_lemma). lake build succeeds.",
+  "details": "Created Erdos/Lemmas.lean with two fully-proved lemmas:\n\n1. **choose_centralBinom_factorial_identity**: The product identity\n   choose(2m,m) * m! * (m+k)! = choose(m+k,k) * (2m)! * k!\n   Proved by expanding both binomial coefficients via choose_mul_factorial_mul_factorial\n   and simplifying with ring.\n\n2. **reduction_lemma**: The iff equivalence\n   choose(m+k,k) | choose(2m,m) ↔ m!(m+k)! | (2m)!k!\n   Proved by using the product identity as a common factored expression,\n   then canceling positive factors (mul_left_cancel₀ / mul_right_cancel₀)\n   in each direction.\n\nNo new sorry holes introduced. The only sorry in the project remains the\nmain theorem in Erdos/Basic.lean (unchanged, as required)."
+}
+```
+
+## What was done
+
+I formalized **Lemma 1** from `proofs/erdos728_v2.md` in a new file `Erdos/Lemmas.lean`. The proof proceeds in two steps:
+
+### 1. `choose_centralBinom_factorial_identity`
+Proves the product identity:
+```
+choose(2m, m) * m! * (m+k)! = choose(m+k, k) * (2m)! * k!
+```
+This follows from expanding both binomial coefficients using `Nat.choose_mul_factorial_mul_factorial` and simplifying with `ring`.
+
+### 2. `reduction_lemma`
+Proves the iff equivalence:
+```
+choose(m+k, k) ∣ choose(2m, m)  ↔  m! * (m+k)! ∣ (2m)! * k!
+```
+Each direction substitutes the divisibility witness into the product identity, then cancels the common positive factor (`mul_left_cancel₀` / `mul_right_cancel₀`).
+
+**Build status**: `lake build` succeeds. No new sorry holes introduced. The only remaining sorry is the main theorem in `Basic.lean`.
+
+## Final Result
+
+Task completed. Here's the summary:
+
+```json
+{
+  "status": "completed",
+  "summary": "Closed both sorry holes (choose_centralBinom_factorial_identity, reduction_lemma). lake build succeeds.",
+  "details": "Created Erdos/Lemmas.lean with two fully-proved lemmas:\n\n1. **choose_centralBinom_factorial_identity**: The product identity\n   choose(2m,m) * m! * (m+k)! = choose(m+k,k) * (2m)! * k!\n   Proved by expanding both binomial coefficients via choose_mul_factorial_mul_factorial\n   and simplifying with ring.\n\n2. **reduction_lemma**: The iff equivalence\n   choose(m+k,k) | choose(2m,m) ↔ m!(m+k)! | (2m)!k!\n   Proved by using the product identity as a common factored expression,\n   then canceling positive factors (mul_left_cancel₀ / mul_right_cancel₀)\n   in each direction.\n\nNo new sorry holes introduced. The only sorry in the project remains the\nmain theorem in Erdos/Basic.lean (unchanged, as required)."
+}
+```
+
+## What was done
+
+I formalized **Lemma 1** from `proofs/erdos728_v2.md` in a new file `Erdos/Lemmas.lean`. The proof proceeds in two steps:
+
+### 1. `choose_centralBinom_factorial_identity`
+Proves the product identity:
+```
+choose(2m, m) * m! * (m+k)! = choose(m+k, k) * (2m)! * k!
+```
+This follows from expanding both binomial coefficients using `Nat.choose_mul_factorial_mul_factorial` and simplifying with `ring`.
+
+### 2. `reduction_lemma`
+Proves the iff equivalence:
+```
+choose(m+k, k) ∣ choose(2m, m)  ↔  m! * (m+k)! ∣ (2m)! * k!
+```
+Each direction substitutes the divisibility witness into the product identity, then cancels the common positive factor (`mul_left_cancel₀` / `mul_right_cancel₀`).
+
+**Build status**: `lake build` succeeds. No new sorry holes introduced. The only remaining sorry is the main theorem in `Basic.lean`.
+
+End Time: 2026-02-10T16:19:12.021Z
