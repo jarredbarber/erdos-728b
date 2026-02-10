@@ -16,7 +16,7 @@ modelStrategy: random
 overseer:
   enabled: true
   interval: 15
-  model: heavy
+  model: medium
 defaults:
   priority: 2
   size: medium
