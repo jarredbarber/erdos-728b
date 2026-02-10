@@ -1,0 +1,5 @@
+{
+  "status": "completed",
+  "summary": "Closed sorry in highDigitCount_eq. Proof uses Finset.card_bij.",
+  "details": "Unfolded definitions of highDigitCount and count_high_digits. Constructed a bijection between filtered Fin D and filtered range D using the natural mapping i -> i.val. The predicates match exactly after unfolding definitions."
+}

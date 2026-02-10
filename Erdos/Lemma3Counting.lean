@@ -14,9 +14,9 @@ section Common
 
 variable {p : ℕ} (hp : p.Prime) (D : ℕ)
 
-def toDigitSpace (m : Fin (p^D)) : DigitSpace D p := fun i => ⟨digit p m i, digit_lt p m i⟩
+def toDigitSpace (m : Fin (p^D)) : DigitSpace D p := fun i => ⟨digit p m i, Nat.mod_lt _ hp.pos⟩
 
-lemma toDigitSpace_bijective : Function.Bijective (toDigitSpace (p:=p) D) := by
+lemma toDigitSpace_bijective : Function.Bijective (toDigitSpace hp D) := by
   constructor
   · intro m1 m2 h
     funext i
@@ -212,15 +212,27 @@ lemma valuation_ge_high_digits (m : ℕ) (h_log : log p (2*m) < D + 1) :
   lower_bound_valuation_by_high_digits p m D hp h_log
 
 lemma highDigitCount_eq (m : Fin (p^D)) :
-    highDigitCount (toDigitSpace D m) = count_high_digits p m D := by
-  simp [highDigitCount, count_high_digits, high_digits_finset, isHigh, toDigitSpace]
-  sorry
+    highDigitCount (toDigitSpace hp D m) = count_high_digits p m D := by
+  simp only [highDigitCount, count_high_digits, high_digits_finset, isHigh, is_high_digit, toDigitSpace]
+  apply Finset.card_bij (fun (i : Fin D) _ => i.val)
+  · intro i hi
+    simp only [mem_filter, mem_univ, true_and] at hi ⊢
+    constructor
+    · exact mem_range.mpr i.isLt
+    · exact hi
+  · intro i j _ _ h
+    exact Fin.eq_of_val_eq h
+  · intro b hb
+    simp only [mem_filter, mem_range] at hb
+    refine ⟨⟨b, hb.1⟩, ?_, rfl⟩
+    simp only [mem_filter, mem_univ, true_and]
+    exact hb.2
 
 lemma count_few_high_digits_bound (t : ℝ) (ht : t < (D * probHigh p)) :
     (Finset.univ.filter (fun m : DigitSpace D p => (highDigitCount m : ℝ) ≤ t)).card ≤
     p ^ D * exp (-2 * ((D * probHigh p) - t)^2 / D) := sorry -- Citation axiom
 
-lemma count_few_high_digits (t : ℕ) (ht : t ≤ D/6) (hp_ge_3 : p ≥ 3) :
+lemma count_few_high_digits (hp : p.Prime) (t : ℕ) (ht : t ≤ D/6) (hp_ge_3 : p ≥ 3) :
     ((range (p^D)).filter (fun m => count_high_digits p m D < t)).card ≤ p^D / 2^(D/36) := by
   let bij := toDigitSpace_bijective hp D
   let equiv := Equiv.ofBijective _ bij
@@ -228,7 +240,7 @@ lemma count_few_high_digits (t : ℕ) (ht : t ≤ D/6) (hp_ge_3 : p ≥ 3) :
   have h_card : ((range (p^D)).filter (fun m => count_high_digits p m D < t)).card = Fintype.card S' := by
     rw [← Fintype.card_coe]
     let iso : {m : Fin (p^D) | count_high_digits p m D < t} ≃ S' :=
-      Equiv.subtypeEquiv equiv (by intro m; simp [highDigitCount_eq hp D]; rfl)
+      Equiv.subtypeEquiv equiv (by intro m; dsimp [equiv]; simp [highDigitCount_eq hp D]; rfl)
     exact Fintype.card_congr iso
   rw [h_card]
   sorry
