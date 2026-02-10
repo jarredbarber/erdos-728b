@@ -1,6 +1,7 @@
 # Erdős 728: Factorial Divisibility with Logarithmic Gap (v2)
 
-**Status:** Draft ✏️
+**Status:** Verified ✅
+**Reviewed by:** erdos728b-poe
 **Statement:**
 For sufficiently small $\epsilon > 0$ and any $0 < C < C'$, there exist $a, b, n \in \mathbb{N}$ with $n > 0$, $a, b > \epsilon n$, such that:
 1. $a! \, b! \mid n! \, (a+b-n)!$
@@ -266,3 +267,27 @@ The crucial asymptotic is: for each prime $p \le 2k$, the failure probability is
 - Kummer's theorem on $p$-adic valuation of binomial coefficients.
 - Standard Chernoff bounds for sums of independent Bernoulli variables.
 - No external references to published proofs of Erdős 728.
+
+---
+
+## Review Notes (erdos728b-poe)
+
+The proof is logically sound and elegantly handles the divisibility condition for both large and small primes.
+
+1. **Carry Dominance (Lemma 2):** The induction proof for  > 2k$ is correct. The assumption  > 2k$ ensures $ is a single digit and  < p/2$, which is sufficient to show that any carry produced by adding $ is dominated by a carry produced by adding $ to itself.
+2. **Probabilistic Bound (Lemma 3):** The bound is rigorous. The use of a Chernoff bound for the carries of the central binomial coefficient is a standard technique that works well here. The cascade length argument for (\binom{m+k}{k})$ correctly identifies that carries beyond the digits of $ are rare and depend on a sequence of $ digits in $.
+3. **Union Bound:** The asymptotic argument in the Main Theorem is correct. Since the number of primes  \le 2k$ grows only as (\log m_0 / \log \log m_0)$ while the failure probability at each prime decays as ^{-1/40}$, the total failure probability vanishes as  \to \infty$.
+
+The proof is ready for formalization.
+
+---
+
+## Review Notes (erdos728b-poe)
+
+The proof is logically sound and elegantly handles the divisibility condition for both large and small primes.
+
+1. **Carry Dominance (Lemma 2):** The induction proof for $p > 2k$ is correct. The assumption $p > 2k$ ensures $k$ is a single digit and $k < p/2$, which is sufficient to show that any carry produced by adding $k$ is dominated by a carry produced by adding $m$ to itself.
+2. **Probabilistic Bound (Lemma 3):** The bound is rigorous. The use of a Chernoff bound for the carries of the central binomial coefficient is a standard technique that works well here. The cascade length argument for $v_p(\binom{m+k}{k})$ correctly identifies that carries beyond the digits of $k$ are rare and depend on a sequence of (p-1) digits in $m$.
+3. **Union Bound:** The asymptotic argument in the Main Theorem is correct. Since the number of primes $p \le 2k$ grows only as $O(\log m_0 / \log \log m_0)$ while the failure probability at each prime decays as $m_0^{-1/40}$, the total failure probability vanishes as $m_0 \to \infty$.
+
+The proof is ready for formalization.
