@@ -235,3 +235,35 @@
 - Monitor `erdos728b-6d5` for the commit of Carry Dominance Lemma.
 - Once Lemma 2 is in, the pipeline will hit Lemma 3. This is the hardest part to formalize. Watch for "Surrender" or "Reformulation Trap" here.
 - Check if the formalization of the Chernoff bound/counting argument is becoming too complex; might need further decomposition.
+
+## Heartbeat — 2026-02-10 16:47 UTC
+
+**Metrics**:
+- Sorry count: 1
+- Task counts: 6 open (formalize), 1 in_progress (formalize), 16 closed
+- Literature growth: 2 Verified ✅
+- Git commits: 19
+
+**Status**: Formalization pipeline unblocked and decomposed.
+
+**Observations**:
+- **STALL**: Project was stalled on `erdos728b-ud3` (Main Theorem) which was trying to formalize everything at once, while Lemma 3 (Counting Bound) had no dedicated formalize task.
+- **SUCCESS**: Lemma 2 (Carry Dominance) is closed and in `Erdos/Lemmas.lean`.
+- **SUCCESS**: Detailed natural language proof for the counting bound is in `proofs/lemma3-counting.md`.
+- **INTERVENTION**: Created 6 new formalization tasks to decompose Lemma 3 into manageable pieces:
+  1. `erdos728b-6mr`: Digit counting bijection.
+  2. `erdos728b-ljs`: Cascade length bound.
+  3. `erdos728b-xd1`: Lower bound via high digits.
+  4. `erdos728b-vuz`: Combinatorial Chernoff bound.
+  5. `erdos728b-wv3`: Lemma 3 (Single prime bound).
+  6. `erdos728b-4yx`: Tiling argument.
+- **DAG HEALTH**: Wired `erdos728b-ud3` to depend on these new tasks.
+
+**Actions**: 
+- Created 6 formalize tasks (`erdos728b-6mr` through `erdos728b-4yx`).
+- Set dependencies for `erdos728b-ud3` and between the new tasks.
+
+**Watch next**:
+- The worker should now pick up `erdos728b-6mr` (the leaf node).
+- Check if `erdos728b-ud3` stops spinning and yields to its dependencies.
+- Monitor `erdos728b-vuz` (Chernoff bound) — this is the most mathematically intense part to formalize.
