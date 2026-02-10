@@ -1,21 +1,8 @@
-## Heartbeat — 2026-02-10 20:02 UTC
+# Overseer Memory
 
-**Metrics**:
-- Sorry count: 17 (Decreased by 1)
-- Task counts: 1 in_progress (1w9), 6 open, 29 closed
-- Literature growth: 3 Verified ✅, 1 Rejected ❌
-- Git commits: 38 (estimated)
-
-**Status**: Forward progress steady.
-
-**Observations**:
-- `erdos728b-1w9` is actively working on `prob_eq_count_div_total` in `Erdos/Lemma3.lean`.
-- `erdos728b-xs2` (planner) remains open, waiting to decompose the sorries in `Lemma3Counting.lean`.
-- No stale tasks detected.
-- Compilation is healthy (active `lake build` cycles in logs).
-
-**Actions**: None.
-
-**Watch next**:
-- Monitor `erdos728b-1w9` completion.
-- Monitor `erdos728b-xs2` for task decomposition.
+- [2026-02-10 21:14] Detected pattern: Multiple formalization tasks failing with "parsed but JSON missing" or technical notation mismatches (Fintype vs Finset card).
+- [2026-02-10 21:14] Reopened erdos728b-ud3, erdos728b-cvq, erdos728b-xs2 after parse/completion failures.
+- [2026-02-10 21:14] erdos728b-ud3 (Main Theorem) is proven from helper lemmas; log gap bounds formalized.
+- [2026-02-10 21:14] erdos728b-cvq (expectation_highIndicator) blocked on technical notation mismatch (Fintype.card vs {..}.card).
+- [2026-02-10 21:15] Human poke "fix the dag! many failed things" addressed by reopening xs2, cvq.
+- [2026-02-10 21:15] Sorry count: 15.

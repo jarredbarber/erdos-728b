@@ -46,3 +46,19 @@
 [2026-02-10T20:49:05.982Z] Running with model: google-antigravity/claude-sonnet-4-5-thinking
 [2026-02-10T20:49:28.368Z] 📝 Cleared poke messages
 [2026-02-10T20:49:28.369Z] 💓 Heartbeat #13 complete: No intervention needed. Forward progress steady.
+[2026-02-10T21:13:46.626Z] ▶ Overseer started (interval: 15m, model: medium)
+[2026-02-10T21:13:46.626Z] 💓 Heartbeat starting...
+[2026-02-10T21:13:46.787Z] Created new overseer session
+[2026-02-10T21:13:46.787Z] Running with model: google-antigravity/claude-sonnet-4-5-thinking
+[2026-02-10T21:14:13.000Z] ▶ Overseer started (interval: 3m, model: light)
+[2026-02-10T21:14:13.000Z] 💓 Heartbeat starting...
+[2026-02-10T21:14:13.164Z] Created new overseer session
+[2026-02-10T21:14:13.164Z] Running with model: google-antigravity/gemini-3-flash
+[2026-02-10T21:14:33.987Z] 💓 Heartbeat starting...
+[2026-02-10T21:14:35.132Z] Created new overseer session
+[2026-02-10T21:14:35.132Z] Running with model: google-antigravity/gemini-3-flash
+[2026-02-10T21:15:04.147Z] 📝 Cleared poke messages
+[2026-02-10T21:15:04.148Z] 💓 Heartbeat #0 complete: Intervened on multiple parse/completion failures. Reopened 3 tasks with improved guidance.
+[2026-02-10T21:15:47.647Z] 📝 Cleared poke messages
+[2026-02-10T21:18:04.161Z] 💓 Heartbeat starting...
+[2026-02-10T21:18:04.191Z] Running with model: google-antigravity/gemini-3-flash

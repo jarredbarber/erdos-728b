@@ -38,15 +38,61 @@ lemma exists_m_choose_dvd_uniform :
       ∃ m : ℕ, m₀ ≤ m ∧ m ≤ 2 * m₀ ∧ (m + k).choose k ∣ (2 * m).choose m := by
   sorry
 
+-- Helper lemmas for log_gap_bounds
+
+private lemma log_le_sub_one {x : ℝ} (hx : 1 ≤ x) : Real.log x ≤ x - 1 := by
+  calc Real.log x ≤ Real.log (Real.exp (x - 1)) := by
+        apply Real.log_le_log (by linarith : 0 < x)
+        linarith [Real.add_one_le_exp (x - 1)]
+      _ = x - 1 := Real.log_exp (x - 1)
+
+/-- A * log(2n) → ∞ as n → ∞ -/
+private lemma tendsto_const_mul_log {A : ℝ} (hA : 0 < A) :
+    Filter.Tendsto (fun n : ℕ => A * Real.log (2 * (n : ℝ))) Filter.atTop Filter.atTop :=
+  Filter.Tendsto.const_mul_atTop hA
+    (Real.tendsto_log_atTop.comp
+      (Filter.Tendsto.const_mul_atTop (by norm_num : (0:ℝ) < 2) tendsto_natCast_atTop_atTop))
+
+/-- A * log(2n) ≤ n eventually -/
+private lemma eventually_log_le_id {A : ℝ} (hA : 0 < A) :
+    ∀ᶠ n : ℕ in Filter.atTop, A * Real.log (2 * (n : ℝ)) ≤ (n : ℝ) := by
+  rw [Filter.eventually_atTop]
+  refine ⟨⌈8 * A ^ 2⌉₊ + 2, fun n hn => ?_⟩
+  have hn_pos : (0 : ℝ) < (n : ℝ) := by exact_mod_cast show 0 < n by omega
+  have h2n_nn : (0 : ℝ) ≤ 2 * (n : ℝ) := by linarith
+  have h2n_ge1 : (1 : ℝ) ≤ 2 * (n : ℝ) := by exact_mod_cast show 1 ≤ 2 * n by omega
+  have hlog_bound : Real.log (2 * ↑n) ≤ 2 * Real.sqrt (2 * ↑n) := by
+    have hsx : 1 ≤ Real.sqrt (2 * ↑n) := by
+      rw [← Real.sqrt_one]; exact Real.sqrt_le_sqrt h2n_ge1
+    calc Real.log (2 * ↑n) 
+        = Real.log (Real.sqrt (2 * ↑n) ^ 2) := by rw [Real.sq_sqrt h2n_nn]
+      _ = 2 * Real.log (Real.sqrt (2 * ↑n)) := by rw [Real.log_pow]; ring
+      _ ≤ 2 * (Real.sqrt (2 * ↑n) - 1) := by
+          apply mul_le_mul_of_nonneg_left _ (by norm_num : (0:ℝ) ≤ 2)
+          calc Real.log (Real.sqrt (2 * ↑n))
+              ≤ Real.log (Real.exp (Real.sqrt (2 * ↑n) - 1)) := by
+                apply Real.log_le_log (by positivity)
+                linarith [Real.add_one_le_exp (Real.sqrt (2 * ↑n) - 1)]
+            _ = Real.sqrt (2 * ↑n) - 1 := Real.log_exp _
+      _ ≤ 2 * Real.sqrt (2 * ↑n) := by linarith
+  have hsqrt_bound : 2 * A * Real.sqrt (2 * ↑n) ≤ (n : ℝ) := by
+    have h_sq : (2 * A * Real.sqrt (2 * ↑n)) ^ 2 ≤ (n : ℝ) ^ 2 := by
+      rw [mul_pow, mul_pow, Real.sq_sqrt h2n_nn]
+      have : 8 * A ^ 2 ≤ (n : ℝ) := by
+        calc 8 * A ^ 2 ≤ ↑(⌈8 * A ^ 2⌉₊ + 2) := by push_cast; linarith [Nat.le_ceil (8 * A ^ 2)]
+          _ ≤ ↑n := (Nat.cast_le (α := ℝ)).mpr hn
+      nlinarith
+    nlinarith [sq_abs (2 * A * Real.sqrt (2 * ↑n)), sq_abs (n : ℝ),
+               abs_of_nonneg (show 0 ≤ 2 * A * Real.sqrt (2 * ↑n) from by positivity),
+               abs_of_nonneg (show 0 ≤ (n : ℝ) from by linarith)]
+  calc A * Real.log (2 * ↑n)
+      ≤ A * (2 * Real.sqrt (2 * ↑n)) := mul_le_mul_of_nonneg_left hlog_bound (le_of_lt hA)
+    _ = 2 * A * Real.sqrt (2 * ↑n) := by ring
+    _ ≤ ↑n := hsqrt_bound
+
 /-- **Log gap selection**: For 0 < C < C', the choice k = ⌊(C+C')/2 · log(2m₀)⌋₊
 gives 1 ≤ k ≤ m₀ and C·log(2m) < k < C'·log(2m) for all m ∈ [m₀, 2m₀],
-provided m₀ is large enough.
-
-The proof uses:
-- log(2m)/log(2m₀) ∈ [1, 1 + log(2)/log(2m₀)] for m ∈ [m₀, 2m₀]
-- (C+C')/2 is strictly between C and C'
-- Floor loses at most 1, which is absorbed by the margin for large m₀
-- k = O(log m₀) ≤ m₀ for large m₀ -/
+provided m₀ is large enough. -/
 lemma log_gap_bounds (C C' : ℝ) (hC : 0 < C) (hCC' : C < C') :
     ∃ M₀ : ℕ, ∀ m₀ : ℕ, M₀ ≤ m₀ →
       let k := ⌊(C + C') / 2 * Real.log (2 * ↑m₀)⌋₊
@@ -54,44 +100,62 @@ lemma log_gap_bounds (C C' : ℝ) (hC : 0 < C) (hCC' : C < C') :
       ∀ m : ℕ, m₀ ≤ m → m ≤ 2 * m₀ →
         C * Real.log (2 * ↑m) < ↑k ∧
         (↑k : ℝ) < C' * Real.log (2 * ↑m) := by
-  let M := (C + C') / 2
-  have hCM : C < M := by dsimp [M]; linarith
-  have hMC' : M < C' := by dsimp [M]; linarith
-  have hM_pos : 0 < M := by dsimp [M]; linarith
-
-  have h_unbounded : Tendsto (fun m₀ : ℕ => 2 * (m₀ : ℝ)) atTop atTop := by
-    apply Filter.Tendsto.const_mul_atTop (by norm_num : (0 : ℝ) < 2)
-    exact tendsto_natCast_atTop_atTop
-
-  have h1 : ∀ᶠ m₀ : ℕ in atTop, 1 ≤ ⌊M * Real.log (2 * ↑m₀)⌋₊ := by
-    have h_tendsto : Tendsto (fun m₀ : ℕ => M * Real.log (2 * ↑m₀)) atTop atTop := by
-      apply Filter.Tendsto.const_mul_atTop hM_pos
-      apply Filter.Tendsto.comp (g := Real.log) Real.tendsto_log_atTop
-      exact h_unbounded
-    filter_upwards [h_tendsto (eventually_ge_atTop 1)] with m₀ hm₀
-    rw [Nat.le_floor_iff]
-    · exact_mod_cast hm₀
-    · exact le_trans (by norm_num) hm₀
-
-  have h2 : ∀ᶠ m₀ : ℕ in atTop, ⌊M * Real.log (2 * ↑m₀)⌋₊ ≤ m₀ := by
-    sorry
-
-  have h3 : ∀ᶠ m₀ : ℕ in atTop, ∀ m : ℕ, m₀ ≤ m → m ≤ 2 * m₀ →
-      C * Real.log (2 * ↑m) < ↑⌊M * Real.log (2 * ↑m₀)⌋₊ := by
-    sorry
-
-  have h4 : ∀ᶠ m₀ : ℕ in atTop, ∀ m : ℕ, m₀ ≤ m → m ≤ 2 * m₀ →
-      (↑⌊M * Real.log (2 * ↑m₀)⌋₊ : ℝ) < C' * Real.log (2 * ↑m) := by
-    sorry
-
-  obtain ⟨S, hS_and⟩ := (h1.and (h2.and (h3.and h4))).exists_mem
-  obtain ⟨hS_mem, hS_forall⟩ := hS_and
-  obtain ⟨M₀, hM₀⟩ := mem_atTop_sets.mp hS_mem
-  exists M₀
-  intro m₀ hm₀_ge
-  specialize hS_forall m₀ (hM₀ m₀ hm₀_ge)
-  rcases hS_forall with ⟨h_k_ge, h_k_le, h_cond3, h_cond4⟩
-  refine ⟨h_k_ge, h_k_le, fun m hm hm' => ⟨h_cond3 m hm hm', h_cond4 m hm hm'⟩⟩
+  set avg := (C + C') / 2 with avg_def
+  have hC_avg : C < avg := by linarith
+  have havg_C' : avg < C' := by linarith
+  have havg_pos : 0 < avg := by linarith
+  have hgap : 0 < avg - C := by linarith
+  -- Three eventually-true conditions
+  have cond1 : ∀ᶠ m₀ : ℕ in Filter.atTop, 1 ≤ avg * Real.log (2 * ↑m₀) :=
+    (tendsto_const_mul_log havg_pos).eventually_ge_atTop 1
+  have cond2 : ∀ᶠ m₀ : ℕ in Filter.atTop,
+      2 + C * Real.log 2 ≤ (avg - C) * Real.log (2 * ↑m₀) :=
+    (tendsto_const_mul_log hgap).eventually_ge_atTop _
+  have cond3 : ∀ᶠ m₀ : ℕ in Filter.atTop, avg * Real.log (2 * ↑m₀) ≤ ↑m₀ :=
+    eventually_log_le_id havg_pos
+  have cond4 : ∀ᶠ m₀ : ℕ in Filter.atTop, (1 : ℕ) ≤ m₀ :=
+    Filter.eventually_atTop.mpr ⟨1, fun _ h => h⟩
+  -- Combine
+  rw [Filter.eventually_atTop] at cond1 cond2 cond3 cond4
+  obtain ⟨N₁, hN₁⟩ := cond1; obtain ⟨N₂, hN₂⟩ := cond2
+  obtain ⟨N₃, hN₃⟩ := cond3; obtain ⟨N₄, hN₄⟩ := cond4
+  refine ⟨max (max N₁ N₂) (max N₃ N₄), fun m₀ hm₀ => ?_⟩
+  have h1 := hN₁ m₀ (by omega); have h2 := hN₂ m₀ (by omega)
+  have h3 := hN₃ m₀ (by omega); have h4 := hN₄ m₀ (by omega)
+  set k := ⌊avg * Real.log (2 * ↑m₀)⌋₊ with k_def
+  have hm₀_pos : (0 : ℝ) < (m₀ : ℝ) := by exact_mod_cast show 0 < m₀ by omega
+  have h2m₀_pos : (0 : ℝ) < 2 * (m₀ : ℝ) := by linarith
+  have hlog_pos : 0 < Real.log (2 * ↑m₀) := Real.log_pos (by linarith)
+  have hk_le : (k : ℝ) ≤ avg * Real.log (2 * ↑m₀) := Nat.floor_le (by positivity)
+  have hk_lb : avg * Real.log (2 * ↑m₀) - 1 < (k : ℝ) := Nat.sub_one_lt_floor _
+  refine ⟨?_, ?_, ?_⟩
+  · rwa [Nat.one_le_floor_iff]
+  · rw [← Nat.cast_le (α := ℝ)]; linarith
+  · intro m hm_lb hm_ub
+    have hm_pos : (0 : ℝ) < (m : ℝ) := by exact_mod_cast show 0 < m by omega
+    have h2m_pos : (0 : ℝ) < 2 * (m : ℝ) := by linarith
+    have hlog_mono : Real.log (2 * ↑m₀) ≤ Real.log (2 * ↑m) :=
+      Real.log_le_log h2m₀_pos (by linarith [(Nat.cast_le (α := ℝ)).mpr hm_lb])
+    have hlog_2m_pos : 0 < Real.log (2 * ↑m) := lt_of_lt_of_le hlog_pos hlog_mono
+    have hlog_ub : Real.log (2 * ↑m) ≤ Real.log (4 * ↑m₀) := by
+      apply Real.log_le_log h2m_pos
+      have : (m : ℝ) ≤ 2 * m₀ := by exact_mod_cast hm_ub
+      linarith
+    have hlog_split : Real.log (4 * (m₀ : ℝ)) = Real.log 2 + Real.log (2 * ↑m₀) := by
+      rw [show (4 : ℝ) * ↑m₀ = 2 * (2 * ↑m₀) from by ring]
+      rw [Real.log_mul (by norm_num) (by linarith)]
+    constructor
+    · -- C * log(2m) < k
+      calc C * Real.log (2 * ↑m)
+          ≤ C * Real.log (4 * ↑m₀) := mul_le_mul_of_nonneg_left hlog_ub (le_of_lt hC)
+        _ = C * (Real.log 2 + Real.log (2 * ↑m₀)) := by rw [hlog_split]
+        _ = C * Real.log (2 * ↑m₀) + C * Real.log 2 := by ring
+        _ < avg * Real.log (2 * ↑m₀) - 1 := by nlinarith
+        _ < ↑k := hk_lb
+    · -- k < C' * log(2m)
+      calc (k : ℝ) ≤ avg * Real.log (2 * ↑m₀) := hk_le
+        _ ≤ avg * Real.log (2 * ↑m) := mul_le_mul_of_nonneg_left hlog_mono (le_of_lt havg_pos)
+        _ < C' * Real.log (2 * ↑m) := mul_lt_mul_of_pos_right havg_C' hlog_2m_pos
 
 /-- **Combined existence**: For 0 < C < C' and m₀ sufficiently large,
 there exist m ∈ [m₀, 2m₀] and k ≥ 1 with C(m+k,k) | C(2m,m) and
