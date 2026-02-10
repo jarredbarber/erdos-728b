@@ -1,7 +1,6 @@
 # Lemma 3: Counting Bound for Small Primes (Deterministic Version)
 
-**Status:** Under review 🔍
-**Reviewed by:** erdos728b-d0o
+**Status:** Draft ✏️
 **Statement:** Let $p$ be a prime with $p \le 2k$. Let $D \ge 1$ be an integer, and let $N = p^D$. Among the $N$ integers $m \in \{0, 1, \ldots, N-1\}$, the number of $m$ satisfying $v_p(\binom{m+k}{k}) > v_p(\binom{2m}{m})$ is at most $N / p^{\lfloor D/40 \rfloor}$, provided $D \ge 16 \lfloor \log_p(k+1) \rfloor + 16$.
 **Dependencies:** None
 **Confidence:** High
@@ -74,16 +73,10 @@ $$\#\{m : L(m) \ge \ell\} = p^{D - \ell} = \frac{N}{p^\ell}. \qquad\square$$
 ### Corollary A4 (Counting $m$ with large $v_p(\binom{m+k}{k})$)
 
 For any $T \ge 0$:
-$$\#\{m \in \{0, \ldots, N-1\} : v_p(\binom{m+k}{k}) > s + 1 + T\} \le \frac{N}{p^T}.$$
+$$\#\{m \in \{0, \ldots, N-1\} : v_p(\binom{m+k}{k}) > s + 1 + T\} \le \frac{N}{p^{T+1}}.$$
 
-**Proof.** By Lemma A2, $v_p(\binom{m+k}{k}) > s + 1 + T$ implies $L > T$, i.e., $L \ge T + 1$. But actually we need to be more careful: Lemma A2 gives $v_p(\binom{m+k}{k}) \le s + 1 + L$, so $v_p(\binom{m+k}{k}) > s + 1 + T$ implies $L > T$, i.e., $L \ge T + 1$. By Lemma A3:
-$$\#\{m : L \ge T+1\} \le \frac{N}{p^{T+1}} \le \frac{N}{p^T}. \qquad\square$$
-
-**Sharper version.** Actually from Lemma A3 directly: $L \ge T + 1$ gives count $\le N/p^{T+1}$. But we also need to handle the case where all $s+1$ positions $0, \ldots, s$ produce carries simultaneously with $L = T+1$ exactly. The bound $N/p^T$ (rather than $N/p^{T+1}$) provides a cleaner and still sufficient estimate.
-
-Wait — let me be more precise. We have $v_p(\binom{m+k}{k}) \le (s+1) + L$. So $v_p(\binom{m+k}{k}) > (s+1) + T$ requires $L > T$, hence $L \ge T+1$. By Lemma A3, the count is $\le N/p^{T+1} \le N/p^T$. So indeed:
-
-$$\#\{m : v_p(\binom{m+k}{k}) > s + 1 + T\} \le \frac{N}{p^{T+1}}. \tag{$\star$}$$
+**Proof.** By Lemma A2, $v_p(\binom{m+k}{k}) \le s + 1 + L$. Therefore $v_p(\binom{m+k}{k}) > s + 1 + T$ implies $L > T$, i.e., $L \ge T + 1$. By Lemma A3:
+$$\#\{m : v_p(\binom{m+k}{k}) > s + 1 + T\} \le \#\{m : L \ge T+1\} \le \frac{N}{p^{T+1}}. \qquad\square$$
 
 ---
 
@@ -121,13 +114,8 @@ $$v_p\!\left(\binom{2m}{m}\right) \ge H(m) := \#\{i \in \{0, \ldots, D-1\} : m_i
 
 **Proof.** Each position with $m_i \ge \lceil p/2 \rceil$ contributes $c^{(2)}_i = 1$ (by Lemma B1). These are $H(m)$ positions, each contributing 1 to the total $\sum c^{(2)}_i$. The remaining positions contribute $\ge 0$. $\square$
 
-### Lemma B3 (Counting $m$ with few high digits — explicit binomial bound)
+### Lemma B3 (Exact count of $m$ with given number of high digits)
 
-$$\#\{m \in \{0, \ldots, N-1\} : H(m) < t\} \le \binom{D}{< t} \cdot q^{D}$$
-
-Wait — this isn't quite right. Let me be more precise.
-
-**Lemma B3 (Counting $m$ with few high digits).**
 For any $0 \le t \le D$:
 $$\#\{m \in \{0, \ldots, N-1\} : H(m) < t\} = \sum_{j=0}^{t-1} \binom{D}{j} q^j (p - q)^{D-j}.$$
 
@@ -135,59 +123,29 @@ $$\#\{m \in \{0, \ldots, N-1\} : H(m) < t\} = \sum_{j=0}^{t-1} \binom{D}{j} q^j 
 
 Summing over $j = 0, \ldots, t-1$ gives the count. $\square$
 
-### Lemma B4 (Binomial tail bound — deterministic)
-
-For $q/p \ge 1/3$ (which holds for all primes $p \ge 2$) and $t \le D \cdot q/(2p)$:
-
-$$\sum_{j=0}^{t-1} \binom{D}{j} q^j (p-q)^{D-j} \le N \cdot e^{-2D(q/p - t/D)^2}.$$
-
-**Proof.** This is the Hoeffding/Chernoff bound applied to the exact multinomial count. Write $\alpha = q/p$ (the fraction of "high" values). The sum $\sum_{j < t} \binom{D}{j} \alpha^j (1-\alpha)^{D-j}$ is the CDF of a $\text{Binomial}(D, \alpha)$ random variable at $t - 1$.
-
-More precisely, for the **counting** version: the number of tuples $(m_0, \ldots, m_{D-1}) \in \{0, \ldots, p-1\}^D$ with fewer than $t$ "high" digits is:
-$$p^D \cdot \Pr[\text{Bin}(D, \alpha) < t].$$
-
-By the multiplicative Chernoff bound, for $t \le \alpha D$:
-$$\Pr[\text{Bin}(D, \alpha) < t] \le \exp\!\left(-\frac{(\alpha D - t)^2}{2\alpha D}\right).$$
-
-This bound is **purely combinatorial** — it follows from comparing the binomial sum with a geometric bound term by term. It can be proved in Lean via the entropy method or via an explicit induction on $D$.
-
-Actually, for Lean formalization, we can use a cruder but cleaner bound. Let me state a self-contained combinatorial lemma.
-
-### Lemma B4' (Crude but clean digit-counting bound)
+### Lemma B4' (Counting $m$ with few high digits)
 
 For integers $D \ge 1$, $p \ge 2$, and $q = \lfloor p/2 \rfloor \ge 1$, let $\alpha = q/p$. For $t = \lfloor D/6 \rfloor$:
 
 $$\#\{m \in \{0, \ldots, p^D - 1\} : H(m) < t\} \le \frac{p^D}{2^{D/36}}.$$
 
-**Proof sketch.** We have $\alpha = q/p \ge 1/3$ for all $p \ge 2$ (since $q = \lfloor p/2 \rfloor \ge p/2 - 1/2$, so $q/p \ge 1/2 - 1/(2p) \ge 1/4$ for $p \ge 2$; more precisely, for $p = 2$: $\alpha = 1/2$; for $p = 3$: $\alpha = 1/3$; for $p \ge 5$: $\alpha \ge 2/5$).
+**Proof.** We have $\alpha = q/p \ge 1/3$ for all primes $p \ge 2$ (since for $p = 2$: $\alpha = 1/2$; for $p = 3$: $\alpha = 1/3$; for $p \ge 5$: $\alpha = \lfloor p/2 \rfloor/p \ge (p-1)/(2p) \ge 2/5$).
 
 The fraction of tuples with $H < D/6$ among all $p^D$ tuples is at most $\Pr[\text{Bin}(D, 1/3) < D/6]$ (since $\alpha \ge 1/3$, stochastic dominance applies). By the Chernoff bound with $\mu = D/3$ and $t = D/6 = \mu/2$:
 
 $$\Pr[\text{Bin}(D, 1/3) < D/6] \le e^{-\mu/8} = e^{-D/24}.$$
 
-Since $e^{-1/24} < 2^{-1/36}$ (because $1/24 > \ln 2 / 36 \approx 0.0193$ — actually $1/24 \approx 0.0417$ and $\ln 2/36 \approx 0.0193$, so yes), we get:
+Since $e^{-1/24} < 2^{-1/36}$ (because $1/24 \approx 0.0417 > \ln 2/36 \approx 0.0193$):
 
 $$\#\{m : H(m) < D/6\} \le p^D \cdot e^{-D/24} \le p^D \cdot 2^{-D/36}. \qquad\square$$
 
-**Remark for formalization.** The Chernoff bound $\Pr[\text{Bin}(n, \alpha) < \alpha n/2] \le e^{-\alpha n/8}$ can be proved purely combinatorially as follows:
-
-1. The moment generating function approach: $\Pr[X < t] \le e^{\lambda t} \cdot \mathbb{E}[e^{-\lambda X}]$ for any $\lambda > 0$.
-2. For $X \sim \text{Bin}(n, \alpha)$: $\mathbb{E}[e^{-\lambda X}] = (1 - \alpha + \alpha e^{-\lambda})^n$.
-3. Optimize $\lambda$ to get the bound.
-
-This is entirely an inequality about finite sums and exponentials, and is formalizable. However, it requires exponential/logarithmic functions. An alternative purely combinatorial approach uses the **entropy bound**:
-
-$$\sum_{j \le \beta n} \binom{n}{j} \le 2^{n H(\beta)}$$
-
-where $H(\beta) = -\beta \log_2 \beta - (1-\beta) \log_2(1-\beta)$ is the binary entropy. This is proved by a simple induction.
-
-For the Lean formalization, the cleanest approach may be to establish the bound as a standalone lemma about `Finset.card` of a filtered set, avoiding probability theory entirely.
+**Remark.** The Chernoff bound used here ($\Pr[\text{Bin}(n, \alpha) < \alpha n/2] \le e^{-\alpha n/8}$) is a standard combinatorial inequality. Its formalization in Lean is tracked as a separate task. For the structure of this proof, it can be taken as a citation axiom; see `artifacts/chernoff-bound.md` (if available) for Mathlib coverage.
 
 ---
 
 ## Part C: Combining the Bounds
 
-### Theorem (Counting bound for a single prime)
+### Theorem C1 (Counting bound for a single prime, over $\{0,\ldots,p^D-1\}$)
 
 Let $p$ be a prime, $k \ge 1$, $s = \lfloor \log_p k \rfloor$, and $D \ge 1$ with $D \ge 12(s+1) + 6$. Set $N = p^D$. Then:
 
@@ -205,12 +163,12 @@ If $v_p(\binom{m+k}{k}) > v_p(\binom{2m}{m})$, then either:
 
 (If neither holds, then $v_p(\binom{m+k}{k}) \le \lfloor D/6 \rfloor \le v_p(\binom{2m}{m})$.)
 
-**Bounding $|\text{Bad}_1|$:** By Corollary A4 with $T = T_0 = \lfloor D/6 \rfloor - s - 1 \ge 0$ (since $D \ge 12(s+1) + 6$ implies $\lfloor D/6 \rfloor \ge 2(s+1)$ implies $T_0 \ge s + 1 \ge 1$):
-$$|\text{Bad}_1| = \#\{m : v_p(\binom{m+k}{k}) > s + 1 + T_0\} = \#\{m : v_p(\binom{m+k}{k}) > \lfloor D/6 \rfloor\}.$$
+**Bounding $|\text{Bad}_1|$:** We check that $s + 1 + T_0 = \lfloor D/6 \rfloor$. Indeed: $T_0 = \lfloor D/6 \rfloor - s - 1$, so $s + 1 + T_0 = \lfloor D/6 \rfloor$. ✓
 
-Wait: $s + 1 + T_0 = s + 1 + \lfloor D/6 \rfloor - s - 1 = \lfloor D/6 \rfloor$. ✓
+Also $T_0 \ge 0$: since $D \ge 12(s+1) + 6$, we have $\lfloor D/6 \rfloor \ge 2(s+1)$, so $T_0 \ge s + 1 \ge 1$. ✓
 
-By ($\star$): $|\text{Bad}_1| \le N/p^{T_0+1}$.
+By Corollary A4:
+$$|\text{Bad}_1| = \#\{m : v_p(\binom{m+k}{k}) > s + 1 + T_0\} \le \frac{N}{p^{T_0+1}}.$$
 
 **Bounding $|\text{Bad}_2|$:** By Corollary B2, $v_p(\binom{2m}{m}) \ge H(m)$, so $v_p(\binom{2m}{m}) < \lfloor D/6 \rfloor$ implies $H(m) < \lfloor D/6 \rfloor$. By Lemma B4':
 $$|\text{Bad}_2| \le N / 2^{D/36}.$$
@@ -218,213 +176,169 @@ $$|\text{Bad}_2| \le N / 2^{D/36}.$$
 **Combining:** By the union bound:
 $$\#\{m : v_p(\binom{m+k}{k}) > v_p(\binom{2m}{m})\} \le |\text{Bad}_1| + |\text{Bad}_2| \le \frac{N}{p^{T_0+1}} + \frac{N}{2^{D/36}}. \qquad\square$$
 
-### Corollary (Simplified bound)
+### Corollary C2 (Simplified single-prime bound)
 
-Under the additional assumption $D \ge 16 \log_p(k+1) + 16$ (which implies $D \ge 12(s+1) + 6$ and also $T_0 \ge D/12$):
-
-$$\#\{m \in \{0, \ldots, p^D - 1\} : v_p(\binom{m+k}{k}) > v_p(\binom{2m}{m})\} \le \frac{2N}{2^{D/36}} \le \frac{N}{p^{D/40}}.$$
-
-**Proof.** Since $s \le \log_p k < \log_p(k+1)$ and $D \ge 16 \log_p(k+1) + 16$:
-$$T_0 = \lfloor D/6 \rfloor - s - 1 \ge D/6 - 1 - \log_p(k+1) - 1 \ge D/6 - D/16 - 2 = 5D/48 - 2 \ge D/12$$
-for $D \ge 48$.
-
-So $p^{T_0+1} \ge p^{D/12} \ge 2^{D/12}$, and:
-$$\frac{N}{p^{T_0+1}} + \frac{N}{2^{D/36}} \le \frac{N}{2^{D/12}} + \frac{N}{2^{D/36}} \le \frac{2N}{2^{D/36}}.$$
-
-For $D \ge 40$ (and $p \ge 2$): $2/2^{D/36} \le 1/p^{D/40}$ because $2^{D/36 - 1} \ge p^{D/40}$ when $D(1/36 - \log_2 p/40) \ge 1$. 
-
-Let me verify this more carefully. We need $2^{D/36}/2 \ge p^{D/40}$, i.e., $2^{D/36 - 1} \ge p^{D/40}$, i.e., $(D/36 - 1)\ln 2 \ge (D/40)\ln p$.
-
-For $p = 2$: need $D/36 - 1 \ge D/40$, i.e., $D(1/36 - 1/40) \ge 1$, i.e., $D \cdot 1/360 \ge 1$, so $D \ge 360$. This is a large constant but is fine since we need $D$ to be large anyway.
-
-Actually, let me use a cleaner path. Instead of trying to get $1/p^{D/40}$, let me just keep the bound as $2N/2^{D/36}$ and show this suffices for the union bound in the main theorem.
-
-**Cleaner Corollary.** For $D \ge 16 \log_p(k+1) + 16$:
+Under the assumption $D \ge 16 \log_p(k+1) + 16$:
 
 $$\#\{m \in \{0, \ldots, p^D - 1\} : v_p(\binom{m+k}{k}) > v_p(\binom{2m}{m})\} \le \frac{2N}{2^{D/36}}.$$
 
-This is all we need. $\square$
+**Proof.** First, $D \ge 16\log_p(k+1) + 16$ implies $D \ge 12(s+1) + 6$ (since $s \le \log_p k < \log_p(k+1)$, so $12(s+1) + 6 \le 12\log_p(k+1) + 18 \le 16\log_p(k+1) + 16 \le D$). So Theorem C1 applies.
+
+Now $T_0 = \lfloor D/6 \rfloor - s - 1$. Since $s \le \log_p(k+1) - 1$ (because $k < p^{s+1}$ implies $s+1 > \log_p k$, and $s \le \log_p k$), and $D \ge 16\log_p(k+1) + 16$:
+
+$$T_0 \ge \frac{D}{6} - 1 - \log_p(k+1) \ge \frac{D}{6} - 1 - \frac{D - 16}{16} = \frac{D}{6} - \frac{D}{16} \ge \frac{5D}{48}.$$
+
+So $p^{T_0+1} \ge p^{5D/48} \ge 2^{5D/48}$. Since $5D/48 > D/36$ for $D \ge 1$:
+
+$$\frac{N}{p^{T_0+1}} \le \frac{N}{2^{5D/48}} \le \frac{N}{2^{D/36}}.$$
+
+Therefore:
+$$\frac{N}{p^{T_0+1}} + \frac{N}{2^{D/36}} \le \frac{2N}{2^{D/36}}. \qquad\square$$
 
 ---
 
-## Part D: Tiling Argument — From $\{0, \ldots, p^D - 1\}$ to $[m_0, 2m_0]$
+## Part D: Residue Counting over $[m_0, 2m_0)$
 
 The counting bound above works over the exact interval $\{0, \ldots, p^D - 1\}$. For the main theorem, we need a bound over $[m_0, 2m_0)$.
 
-### Lemma D1 (Tiling)
+### Lemma D1 (Residue class counting in an interval)
 
-Let $I = [m_0, 2m_0)$ with $m_0 \ge p^D$. For any property $\mathcal{P}$ of integers, if:
-- the fraction of $m \in \{0, \ldots, p^D - 1\}$ satisfying $\mathcal{P}$ is at most $\beta$,
-- $\mathcal{P}$ depends only on $m \bmod p^D$ (i.e., only on the lowest $D$ base-$p$ digits of $m$),
+Let $R \subseteq \{0, \ldots, p^D - 1\}$ be a set of residues, and $[a, b)$ an integer interval with $b - a = M \ge 1$. If a property $\mathcal{P}(m)$ holds iff $m \bmod p^D \in R$, then:
 
-then the fraction of $m \in I$ satisfying $\mathcal{P}$ is at most $\beta + p^D / m_0$.
+$$\#\{m \in [a, b) : \mathcal{P}(m)\} \le |R| \cdot \left(\left\lfloor \frac{M}{p^D} \right\rfloor + 1\right).$$
 
-**Proof.** The interval $I = [m_0, 2m_0)$ has length $m_0$. Partition $I$ into maximal sub-intervals that are translates of $\{0, \ldots, p^D - 1\}$, plus at most two partial intervals at the boundaries.
+**Proof.** Partition $[a, b)$ into at most $\lfloor M/p^D \rfloor + 1$ intervals of length $\le p^D$. In each such interval, the number of $m$ with $m \bmod p^D \in R$ is at most $|R|$ (since each residue class has at most one representative in an interval of length $\le p^D$). $\square$
 
-More precisely: The interval $[m_0, 2m_0)$ contains $\lfloor m_0 / p^D \rfloor$ complete copies of $\{0, \ldots, p^D - 1\}$ (shifted by multiples of $p^D$), plus at most $2 p^D$ leftover elements (at most $p^D$ at each end).
+### Lemma D2 (Application to the two "bad" events)
 
-In each complete copy, the fraction satisfying $\mathcal{P}$ is exactly $\beta$ (since $\mathcal{P}$ depends only on $m \bmod p^D$, and a complete copy covers all residues). In the leftover, at most $2p^D$ elements satisfy $\mathcal{P}$.
+Both $\text{Bad}_1$ and $\text{Bad}_2$ from Part C depend only on $m \bmod p^D$:
 
-So:
-$$\#\{m \in I : \mathcal{P}(m)\} \le \beta \cdot m_0 + 2p^D.$$
+**$\text{Bad}_1$ depends only on $m \bmod p^D$:** The event $v_p(\binom{m+k}{k}) > \lfloor D/6 \rfloor$ is equivalent (via Lemma A2) to $L(m) \ge T_0 + 1$, which requires $m_{s+1} = \cdots = m_{s+T_0+1} = p - 1$. Since $s + T_0 + 1 \le s + 1 + \lfloor D/6 \rfloor - 1 \le D - 1$ (using $\lfloor D/6 \rfloor \le D$), this is a condition on digits $0$ through $D-1$ only, hence depends only on $m \bmod p^D$.
 
-The fraction is $\le \beta + 2p^D / m_0$. $\square$
+More precisely: $v_p(\binom{m+k}{k}) = (\text{carries at positions } 0, \ldots, D-1) + (\text{carries at positions } \ge D)$. The carries at positions $\ge D$ are all part of the cascade. If $L(m) \ge T_0 + 1$, then in particular $v_p(\binom{m+k}{k}) > \lfloor D/6 \rfloor$ regardless of the higher digits. Conversely, if $L(m) \le T_0$ (measured using only the first $D$ digits), then the cascade contributes $\le L(m) \le T_0$ carries at positions $> s$, and the total carry is $\le (s+1) + T_0 = \lfloor D/6 \rfloor$, so $v_p(\binom{m+k}{k}) = \lfloor D/6 \rfloor$ only if also there are carries at positions $\ge D$. But the cascade at position $s + L + 1$ (where $L \le T_0$ and $s + L + 1 \le s + T_0 + 1 \le D - 1$) dies, so $c^{(1)}_{s+L+1} = 0$, and no carries propagate to positions $\ge D$. Therefore $v_p(\binom{m+k}{k}) \le (s+1) + L \le \lfloor D/6 \rfloor$.
 
-### Application
+Thus: $v_p(\binom{m+k}{k}) > \lfloor D/6 \rfloor$ iff the first $D$ digits of $m$ give $L \ge T_0 + 1$. This depends only on $m \bmod p^D$. ✓
 
-**Important observation:** The property $v_p(\binom{m+k}{k}) > v_p(\binom{2m}{m})$ does NOT depend only on $m \bmod p^D$ in general, because the digits of $m$ at positions $\ge D$ also contribute carries.
+**$\text{Bad}_2$ depends only on $m \bmod p^D$:** $H_D(m) = \#\{i \in \{0, \ldots, D-1\} : m_i \ge \lceil p/2 \rceil\}$ manifestly depends only on the first $D$ digits, hence on $m \bmod p^D$. And $v_p(\binom{2m}{m}) \ge H(m) \ge H_D(m)$ (Corollary B2 applied to all digits, with the first $D$ as a subset). So $v_p(\binom{2m}{m}) < \lfloor D/6 \rfloor$ implies $H_D(m) < \lfloor D/6 \rfloor$, which depends only on $m \bmod p^D$. ✓
 
-However, we can handle this as follows.
+### Corollary D3 (Counting bad $m$ in $[m_0, 2m_0)$)
 
-**Lemma D2 (Truncation).** Let $m$ have $D' > D$ base-$p$ digits (i.e., $m < p^{D'}$). Write $m = m^{\text{low}} + p^D \cdot m^{\text{high}}$ where $m^{\text{low}} = m \bmod p^D \in \{0, \ldots, p^D - 1\}$ and $m^{\text{high}} = \lfloor m / p^D \rfloor$.
+For $m_0 \ge p^D$ and $D \ge 16\log_p(k+1) + 16$:
 
-The carries in $m + k$ and $m + m$ at positions $0, 1, \ldots, D-1$ depend only on $m^{\text{low}}$ and $k$ (for $m + k$) or $m^{\text{low}}$ alone (for $m + m$), provided we also account for the carry entering position $D$ from below.
+$$\#\{m \in [m_0, 2m_0) : v_p(\binom{m+k}{k}) > v_p(\binom{2m}{m})\} \le \frac{2m_0}{2^{D/36}} + \frac{2p^D}{2^{D/36}}.$$
 
-Crucially: $v_p(\binom{m+k}{k}) = v_p(\binom{m^{\text{low}} + k}{k})$ when $D > s + L + 1$ (i.e., the cascade from $k$'s digits has died out before position $D$). This is because $k < p^{s+1} \le p^D$ implies $k$'s digits above position $s$ are all 0, and carries in positions $> s$ are purely cascading from the carry at position $s$.
+**Proof.** The "bad" set is contained in $\{m : m \bmod p^D \in R\}$ where $R$ is the union of the bad residues for $\text{Bad}_1$ and $\text{Bad}_2$. By Theorem C1:
+$$|R| \le \frac{p^D}{p^{T_0+1}} + \frac{p^D}{2^{D/36}} \le \frac{2p^D}{2^{D/36}}$$
+(using Corollary C2).
 
-For the self-doubling $m + m$: carries at positions $0, \ldots, D-1$ depend only on $(m_0, \ldots, m_{D-1})$ and their internal cascading; the carry at position $D$ goes "up" and doesn't affect positions below.
+By Lemma D1 with $M = m_0$ and $[a, b) = [m_0, 2m_0)$:
+$$\#\{m \in [m_0, 2m_0) : \text{bad}\} \le |R| \cdot \left(\left\lfloor \frac{m_0}{p^D}\right\rfloor + 1\right) \le \frac{2p^D}{2^{D/36}} \cdot \frac{m_0 + p^D}{p^D} = \frac{2(m_0 + p^D)}{2^{D/36}}.$$
 
-So for the purposes of counting carries at positions $0, \ldots, D-1$:
-- $v_p(\binom{m+k}{k})$ at positions $0, \ldots, D-1$ depends only on $m^{\text{low}}$.
-- $v_p(\binom{2m}{m})$ includes carries at ALL positions, so $v_p(\binom{2m}{m}) \ge$ (carries at positions $0, \ldots, D-1$ from $m^{\text{low}}$).
+Since $p^D \le m_0$: $\frac{2(m_0 + p^D)}{2^{D/36}} \le \frac{2m_0 + 2p^D}{2^{D/36}} \le \frac{4m_0}{2^{D/36}}.$
 
-This means:
-$$v_p(\binom{m+k}{k}) = \text{(carries in } m + k \text{ at positions } 0, \ldots, D-1) + \text{(carries at positions } \ge D)$$
-
-But for $k < p^D$ (which holds since $D \ge s+1$ and $k < p^{s+1}$), all carries in $m + k$ at positions $\ge D$ come from cascading, and these are already counted in the cascade length $L$. If $L < D - s$, then there are NO carries at positions $\ge D$ from $m+k$, and $v_p(\binom{m+k}{k})$ depends only on $m^{\text{low}}$.
-
-**The cleanest approach:** Rather than trying to make the tiling argument work with truncation, observe that $v_p(\binom{m+k}{k})$ depends only on the base-$p$ digits of $m$, all of them. But the CASCADE LENGTH $L$ is determined by the digits starting at position $s+1$.
-
-**Alternative clean approach for tiling:** Instead of tiling, use the following direct argument.
-
-### Lemma D3 (Direct counting over $[m_0, 2m_0)$)
-
-For $m_0 \ge 1$ and $D \ge 16\log_p(k+1) + 16$, with $D \le \lfloor \log_p m_0 \rfloor$ (so that $p^D \le m_0$):
-
-$$\#\{m \in [m_0, 2m_0) : v_p(\binom{m+k}{k}) > v_p(\binom{2m}{m})\} \le \frac{2m_0}{p^{T_0+1}} + \frac{m_0}{2^{D/36}} + 4p^D$$
-
-where $T_0 = \lfloor D/6 \rfloor - s - 1$ as before.
-
-**Proof.** We work directly over $[m_0, 2m_0)$ using the digit structure.
-
-**Step 1: Splitting.** If $v_p(\binom{m+k}{k}) > v_p(\binom{2m}{m})$, then either:
-- $v_p(\binom{m+k}{k}) > \lfloor D/6 \rfloor$ (event $\text{Bad}_1$), or
-- $v_p(\binom{2m}{m}) < \lfloor D/6 \rfloor$ (event $\text{Bad}_2$).
-
-**Step 2: Bounding $|\text{Bad}_1|$ via cascade.**
-
-The cascade analysis (Part A) applies to ALL $m$, not just $m < p^D$. For any $m$, $v_p(\binom{m+k}{k}) \le s + 1 + L(m)$ where $L(m)$ is the cascade length starting at position $s+1$.
-
-$v_p(\binom{m+k}{k}) > \lfloor D/6 \rfloor = s + 1 + T_0$ requires $L(m) > T_0$, i.e., $L(m) \ge T_0 + 1$.
-
-$L(m) \ge T_0 + 1$ means $m_{s+1} = m_{s+2} = \cdots = m_{s+T_0+1} = p - 1$.
-
-This is equivalent to: $m \bmod p^{s+T_0+2}$ lies in a specific set of residues where positions $s+1$ through $s+T_0+1$ are all $p-1$. The number of such residues mod $p^{s+T_0+2}$ is $p^{s+1} \cdot 1^{T_0+1} \cdot 1 = p^{s+1}$ (positions $0, \ldots, s$ are free; positions $s+1, \ldots, s+T_0+1$ are fixed to $p-1$; position $s+T_0+2$ can be anything, but we stop here).
-
-Wait — more carefully: among integers $\{0, \ldots, p^{s+T_0+2} - 1\}$, those with $m_{s+1} = \cdots = m_{s+T_0+1} = p-1$ number exactly $p^{(s+T_0+2) - (T_0+1)} = p^{s+1}$. So the fraction is $p^{s+1}/p^{s+T_0+2} = 1/p^{T_0+1}$.
-
-For $m$ in any interval of length $N$: the number of $m$ with $L(m) \ge T_0 + 1$ is at most:
-$$\frac{N}{p^{T_0+1}} + 2p^{s+T_0+2}$$
-(the $+2p^{s+T_0+2}$ is the boundary correction from at most 2 incomplete residue blocks).
-
-For $N = m_0$ (interval $[m_0, 2m_0)$): since $s + T_0 + 2 \le s + 1 + \lfloor D/6 \rfloor \le D$ (using $T_0 = \lfloor D/6 \rfloor - s - 1$), the boundary is $\le 2p^D$.
-
-$$|\text{Bad}_1| \le \frac{m_0}{p^{T_0+1}} + 2p^D.$$
-
-**Step 3: Bounding $|\text{Bad}_2|$ via high digits.**
-
-Define $H_D(m) = \#\{i \in \{0, \ldots, D-1\} : m_i \ge \lceil p/2 \rceil\}$. By Corollary B2, $v_p(\binom{2m}{m}) \ge H(m) \ge H_D(m)$ (since $m$ has $\ge D$ digits for $m \ge m_0 \ge p^D$, and more high digits can only help).
-
-$H_D(m)$ depends only on $m \bmod p^D$. By Lemma B4', the number of residues $r \in \{0, \ldots, p^D - 1\}$ with $H_D(r) < D/6$ is at most $p^D / 2^{D/36}$. Call this set $S$.
-
-For $m \in [m_0, 2m_0)$, the number with $m \bmod p^D \in S$ is at most:
-$$|S| \cdot \left(\left\lfloor \frac{m_0}{p^D}\right\rfloor + 2\right) \le |S| \cdot \frac{m_0 + 2p^D}{p^D} = |S| \cdot \frac{m_0}{p^D} + 2|S|.$$
-
-Since $|S| \le p^D/2^{D/36}$:
-$$|\text{Bad}_2| \le \frac{m_0}{2^{D/36}} + \frac{2p^D}{2^{D/36}} \le \frac{m_0}{2^{D/36}} + 2p^D.$$
-
-**Step 4: Combining.**
-$$\#\{\text{bad } m\} \le |\text{Bad}_1| + |\text{Bad}_2| \le \frac{m_0}{p^{T_0+1}} + \frac{m_0}{2^{D/36}} + 4p^D. \qquad\square$$
-
-**Remark on the boundary term.** The $4p^D$ boundary correction is negligible compared to $m_0$ whenever $m_0 \gg p^D$. Since $D = \lfloor \log_p m_0 \rfloor - c$ for some constant $c$ (chosen to satisfy the constraint $D \ge 16 \log_p(k+1) + 16$), we have $p^D \le m_0 / p^c$, so $4p^D / m_0 \le 4/p^c \to 0$ as we take $D$ slightly smaller than $\log_p m_0$. In the final union bound, we absorb this into the main terms.
+We can also write the slightly tighter bound:
+$$\#\{\text{bad}\} \le \frac{2m_0}{2^{D/36}} + \frac{2p^D}{2^{D/36}}. \qquad\square$$
 
 ---
 
 ## Part E: Union Bound Over All Small Primes
 
-### Theorem (Main counting result for the union bound)
+This is the central result. We state it with **explicit bounds** on $m_0$ in terms of $k$.
 
-Let $k \ge 2$, $m_0$ sufficiently large (in terms of $k$). Then:
+### Definition E0 (Parameter choices)
 
-$$\#\{m \in [m_0, 2m_0) : \exists p \le 2k \text{ prime}, v_p(\binom{m+k}{k}) > v_p(\binom{2m}{m})\} < m_0.$$
+For each prime $p \le 2k$, define:
+$$D_p := 36\lceil\log_2(16k)\rceil + 36\lfloor\log_p(k+1)\rfloor + 36.$$
 
-That is, not all $m$ are "bad" — there exists at least one good $m$.
+This definition has two components:
+- The $36\lceil\log_2(16k)\rceil$ term ensures $2^{D_p/36} \ge 32k$, so the Chernoff bound gives a $1/k$-quality decay per prime (needed since there are $O(k)$ primes to sum over).
+- The $36\lfloor\log_p(k+1)\rfloor + 36$ term ensures $D_p \ge 16\log_p(k+1) + 16$, the threshold needed for the cascade analysis (Theorem C1).
+
+Define the explicit threshold:
+$$M_0(k) := (2k)^{72\lceil\log_2(16k)\rceil + 72}.$$
+
+### Lemma E1 (Parameter verification)
+
+For all primes $p \le 2k$ and $m_0 \ge M_0(k)$:
+
+**(a)** $D_p \ge 16\log_p(k+1) + 16$.
+
+**(b)** $p^{D_p} \le m_0$.
+
+**Proof.**
+
+**(a)** We need $D_p \ge 16\log_p(k+1) + 16$. Since $D_p \ge 36\lfloor\log_p(k+1)\rfloor + 36$, it suffices to show $36\lfloor\log_p(k+1)\rfloor + 36 \ge 16\log_p(k+1) + 16$.
+
+Write $x = \log_p(k+1)$ and $\lfloor x \rfloor = x - \{x\}$ where $0 \le \{x\} < 1$. Then:
+$$36(x - \{x\}) + 36 = 36x + 36 - 36\{x\} \ge 36x \ge 16x + 16$$
+whenever $20x \ge 16$, i.e., $x \ge 4/5$.
+
+For $x < 4/5$: this means $k + 1 < p^{4/5} \le p$, so $k < p$. Since $p \le 2k$, we have $k \ge p/2 \ge 1$, so $x = \log_p(k+1) > 0$ and $x < 1$. In this case $16x + 16 < 16 + 16 = 32 \le 36 \le D_p$. ✓
+
+**(b)** We need $p^{D_p} \le m_0$ for all primes $p \le 2k$.
+
+First, bound $D_p$ from above. Since $\lfloor\log_p(k+1)\rfloor \le \log_p(k+1) \le \log_2(k+1) / \log_2 p \le \log_2(k+1)$ (using $p \ge 2$) and $\log_2(k+1) \le \log_2(16k)$ (for $k \ge 1$):
+
+$$D_p \le 36\lceil\log_2(16k)\rceil + 36\log_2(16k) + 36 \le 72\lceil\log_2(16k)\rceil + 36.$$
+
+(The last step uses $\log_2(16k) \le \lceil\log_2(16k)\rceil$.)
+
+Since $p \le 2k$: $p^{D_p} \le (2k)^{D_p} \le (2k)^{72\lceil\log_2(16k)\rceil + 36}$.
+
+And $M_0(k) = (2k)^{72\lceil\log_2(16k)\rceil + 72}$, so for $k \ge 1$ (hence $2k \ge 2$):
+
+$$p^{D_p} \le (2k)^{72\lceil\log_2(16k)\rceil + 36} \le (2k)^{72\lceil\log_2(16k)\rceil + 72} = M_0(k) \le m_0. \qquad\square$$
+
+### Theorem E2 (Main counting result with explicit bound)
+
+Let $k \ge 2$. Set $M_0(k) := (2k)^{72\lceil\log_2(16k)\rceil + 72}$. Then for all $m_0 \ge M_0(k)$:
+
+$$\#\{m \in [m_0, 2m_0) : \exists p \le 2k \text{ prime with } v_p(\binom{m+k}{k}) > v_p(\binom{2m}{m})\} \le \frac{m_0}{4} < m_0.$$
+
+In particular, there exists $m \in [m_0, 2m_0)$ with $v_p(\binom{m+k}{k}) \le v_p(\binom{2m}{m})$ for all primes $p \le 2k$.
 
 **Proof.** By the union bound:
 $$\#\{\text{bad } m\} \le \sum_{\substack{p \le 2k \\ p \text{ prime}}} \#\{m \in [m_0, 2m_0) : v_p(\binom{m+k}{k}) > v_p(\binom{2m}{m})\}.$$
 
-For each prime $p \le 2k$, choose $D_p = \lfloor \log_p m_0 \rfloor - 1$ (so that $p^{D_p} \le m_0/p$). For $m_0$ large enough in terms of $k$, we have $D_p \ge 16\log_p(k+1) + 16$ for all $p \le 2k$.
+For each prime $p \le 2k$, set $D = D_p$ as in Definition E0. By Lemma E1, $D_p \ge 16\log_p(k+1) + 16$ and $p^{D_p} \le m_0$, so the hypotheses of Corollary D3 are satisfied. Thus:
 
-By Lemma D3:
-$$\#\{m \in [m_0, 2m_0) : v_p(\binom{m+k}{k}) > v_p(\binom{2m}{m})\} \le \frac{m_0}{p^{T_0+1}} + \frac{m_0}{2^{D_p/36}} + 4p^{D_p}$$
+$$\#\{m \in [m_0, 2m_0) : v_p(\binom{m+k}{k}) > v_p(\binom{2m}{m})\} \le \frac{4m_0}{2^{D_p/36}}.$$
 
-where $T_0 = \lfloor D_p/6 \rfloor - s - 1 \ge D_p/12$ (as shown in Part C). Since $p^{T_0+1} \ge p^{D_p/12} \ge 2^{D_p/12}$, the first two terms are both $\le m_0/2^{D_p/36}$ (using $D_p/12 > D_p/36$).
+**Key decay estimate.** Since $D_p = 36\lceil\log_2(16k)\rceil + 36\lfloor\log_p(k+1)\rfloor + 36$, we have:
 
-Since $p^{D_p} \le m_0/p$, the boundary term $4p^{D_p} \le 4m_0/p \le 2m_0$ — but this is too large. We need to be more careful.
+$$D_p/36 \ge \lceil\log_2(16k)\rceil + 1 \ge \log_2(16k) + 1 = \log_2(32k).$$
 
-**Refined boundary handling.** Since $p^{D_p} \le m_0/p \le m_0/2$, the boundary term $4p^{D_p} \le 4m_0/p$. We can write:
-$$\#\{\text{bad for } p\} \le \frac{2m_0}{2^{D_p/36}} + \frac{4m_0}{p}.$$
+Therefore $2^{D_p/36} \ge 32k$, and each prime contributes at most:
 
-Wait — the $4m_0/p$ term doesn't decay fast enough. Let me reconsider the boundary.
+$$\frac{4m_0}{2^{D_p/36}} \le \frac{4m_0}{32k} = \frac{m_0}{8k}.$$
 
-**Better approach.** Use the tiling more carefully. For a property $\mathcal{P}$ that depends only on $m \bmod p^D$, the number of $m \in [m_0, 2m_0)$ satisfying $\mathcal{P}$ is:
-$$\le |\mathcal{P} \cap \{0, \ldots, p^D-1\}| \cdot \left\lceil \frac{m_0}{p^D} \right\rceil \le |\mathcal{P} \cap \{0, \ldots, p^D-1\}| \cdot \frac{m_0 + p^D}{p^D}.$$
+**Union bound.** The number of primes $\le 2k$ is $\pi(2k) \le 2k$ (trivially). So:
 
-For $\text{Bad}_1$ (cascade): $v_p(\binom{m+k}{k}) > \lfloor D/6 \rfloor$ depends on digits $0, \ldots, s + T_0 + 1$ only (positions where the cascade could still be active). Since $s + T_0 + 2 \le D$, this depends only on $m \bmod p^D$. The number of "bad" residues mod $p^D$ is at most $p^D/p^{T_0+1} = p^{D-T_0-1}$.
+$$\#\{\text{bad } m\} \le \sum_{p \le 2k} \frac{m_0}{8k} \le 2k \cdot \frac{m_0}{8k} = \frac{m_0}{4} < m_0. \qquad\square$$
 
-So: $|\text{Bad}_1 \cap [m_0, 2m_0)| \le p^{D-T_0-1} \cdot (m_0/p^D + 1) = m_0/p^{T_0+1} + p^{D-T_0-1}.$
+### Corollary E3 (Existence)
 
-For $\text{Bad}_2$ (few high digits): $H_D(m) < \lfloor D/6 \rfloor$ depends only on $m \bmod p^D$. The number of bad residues is $\le p^D/2^{D/36}$.
+For all $k \ge 2$ and all $m_0 \ge M_0(k)$, there exists $m \in [m_0, 2m_0)$ such that $v_p(\binom{m+k}{k}) \le v_p(\binom{2m}{m})$ for every prime $p \le 2k$.
 
-So: $|\text{Bad}_2 \cap [m_0, 2m_0)| \le (p^D/2^{D/36}) \cdot (m_0/p^D + 1) = m_0/2^{D/36} + p^D/2^{D/36}.$
+**Proof.** Since the number of "bad" $m$ is $\le m_0/4 < m_0 = |[m_0, 2m_0)|$, not all $m$ are bad. $\square$
 
-Combining:
-$$\#\{\text{bad for } p\} \le \frac{m_0}{p^{T_0+1}} + \frac{m_0}{2^{D_p/36}} + p^{D_p - T_0 - 1} + \frac{p^{D_p}}{2^{D_p/36}}.$$
+### Remark E4 (Asymptotics of $M_0(k)$)
 
-The last two terms are $\le p^{D_p}$ each (since $T_0 \ge 1$ and $2^{D_p/36} \ge 1$). And $p^{D_p} \le m_0/p$. So:
-$$\#\{\text{bad for } p\} \le \frac{2m_0}{2^{D_p/36}} + \frac{2m_0}{p}.$$
+The bound $M_0(k) = (2k)^{72\lceil\log_2(16k)\rceil + 72}$ satisfies:
 
-But the $2m_0/p$ boundary terms sum over primes $p \le 2k$ to at most $2m_0 \sum_{p \le 2k} 1/p \approx 2m_0 \log\log(2k)$. This is way too large.
+$$\log_2 M_0(k) = (72\lceil\log_2(16k)\rceil + 72) \cdot \log_2(2k) = \Theta(\log^2 k).$$
 
-**Resolution: use $D_p$ much smaller than $\log_p m_0$.** Set $D_p = \lfloor \log_p m_0 / 2 \rfloor$. Then $p^{D_p} \le \sqrt{m_0}$, and the boundary terms $p^{D_p - T_0 - 1} + p^{D_p}/2^{D_p/36} \le 2\sqrt{m_0}$.
+So $M_0(k) = 2^{\Theta(\log^2 k)}$, which is **quasi-polynomial** in $k$ — much smaller than $2^{2^k}$ (truly doubly exponential) but larger than any polynomial in $k$.
 
-With this choice:
-$$\#\{\text{bad for } p\} \le \frac{2m_0}{2^{D_p/36}} + 2\sqrt{m_0}.$$
+For the main theorem (Erdős conjecture), we only need the existence statement (Corollary E3), not the explicit bound. The explicit bound is convenient for formalization since it avoids non-constructive arguments.
 
-Now $D_p = \lfloor \log_p m_0 / 2 \rfloor \ge \log_p m_0 / 2 - 1$, so $D_p/36 \ge \log_p m_0/72 - 1/36$. Thus $2^{D_p/36} \ge 2^{\log_p m_0/72 - 1}$. And:
+### Remark E5 (Why $D_p$ depends on $\log_2(k)$, not just $\log_p(k)$)
 
-$$\frac{m_0}{2^{D_p/36}} \le \frac{2m_0}{2^{\log_p m_0 / 72}} = \frac{2m_0}{m_0^{\ln 2/(72 \ln p)}} = 2 m_0^{1 - \ln 2/(72 \ln p)}.$$
+A natural first attempt sets $D_p = 36\lfloor\log_p(k+1)\rfloor + 36$, which gives $2^{D_p/36} \ge 2$ for each prime. This is insufficient: for primes $p \in (k, 2k]$, we have $\lfloor\log_p(k+1)\rfloor = 0$, so $D_p = 36$ and $2^{D_p/36} = 2$. Since there are $\sim k/\ln k$ such primes, the per-prime saving of a factor $2$ is overwhelmed by the number of primes.
 
-For $p \le 2k$ and $k = O(\log m_0)$: $\ln p \le \ln(2k) = O(\log\log m_0)$, so $\ln 2/(72 \ln p) = \Omega(1/\log\log m_0)$.
+The fix is to add a $\log_2 k$ term to $D_p$, ensuring the Chernoff bound gives $2^{D_p/36} = \Omega(k)$, so each prime contributes $O(m_0/k)$ and the sum over $O(k)$ primes is $O(m_0)$. This is the reason for the $36\lceil\log_2(16k)\rceil$ component in $D_p$.
 
-Summing over $\pi(2k) = O(k/\log k)$ primes:
-$$\#\{\text{bad}\} \le \sum_{p \le 2k} \left(\frac{2m_0}{2^{D_p/36}} + 2\sqrt{m_0}\right) \le 2k \cdot 2 m_0^{1 - c/\log\log m_0} + 4k\sqrt{m_0}$$
-
-where $c = \ln 2/72 > 0$.
-
-For $k = O(\log m_0)$:
-- $4k\sqrt{m_0} = O(\sqrt{m_0} \log m_0) = o(m_0)$. ✓
-- $4k \cdot m_0^{1 - c/\log\log m_0} = O(\log m_0 \cdot m_0 \cdot m_0^{-c/\log\log m_0})$.
-
-Now $m_0^{c/\log\log m_0} = e^{c \ln m_0 / \log\log m_0}$. Since $\ln m_0 / \log \log m_0 \to \infty$ (it grows faster than any constant), $m_0^{c/\log\log m_0} \to \infty$. In particular, for $m_0$ large enough, $m_0^{c/\log\log m_0} > 4k$, so:
-
-$$4k \cdot m_0^{1 - c/\log\log m_0} < m_0.$$
-
-Combining both terms, $\#\{\text{bad}\} < m_0$ for $m_0$ sufficiently large. ✓
-
-**Checking $D_p \ge 16\log_p(k+1) + 16$.** We need $\log_p m_0 / 2 - 1 \ge 16 \log_p(k+1) + 16$, i.e., $\log_p m_0 \ge 32 \log_p(k+1) + 34$. For $k = O(\log m_0)$, $\log_p(k+1) = O(\log\log m_0/\log p) = O(\log\log m_0)$, while $\log_p m_0 = \log m_0 / \log p \ge \log m_0 / \log(2k)$. Since $\log m_0 / \log(2k) \gg \log\log m_0$ for large $m_0$, the condition holds. ✓
-
-Therefore $\#\{\text{bad } m\} < m_0 = |[m_0, 2m_0)|$, and there exists at least one $m \in [m_0, 2m_0)$ with $v_p(\binom{m+k}{k}) \le v_p(\binom{2m}{m})$ for all primes $p \le 2k$. $\square$
+The trade-off: larger $D_p$ requires larger $m_0$ (since we need $p^{D_p} \le m_0$). The resulting $M_0(k) = (2k)^{O(\log k)}$ is quasi-polynomial but still constructive.
 
 ---
 
@@ -440,27 +354,24 @@ The counting argument above decomposes into the following independent lemmas, ea
 - **Cascade count** (Lemma A3): The number of $m \in \{0, \ldots, p^D - 1\}$ with $L(m) \ge \ell$ is exactly $p^{D-\ell}$. This follows from the digit bijection: constraining $\ell$ specific coordinates reduces the count by $p^\ell$.
   - In Lean: This is `Finset.card_filter` on `Finset.range (p^D)`, using the bijection with `Fin D → Fin p`.
   
-- **Few high digits** (Lemma B4'): The number of $m$ with $H(m) < D/6$ is at most $p^D / 2^{D/36}$. This requires a Chernoff-type bound.
-  - In Lean: This is the hardest lemma. Options:
-    1. **Exact Chernoff via MGF.** Formalize $\Pr[\text{Bin}(D, \alpha) < t] \le e^{-(\alpha D - t)^2/(2\alpha D)}$ using the moment generating function. Requires `Real.exp` and `Real.log`.
-    2. **Entropy bound.** $\sum_{j \le \beta n} \binom{n}{j} \le 2^{nH(\beta)}$. Purely combinatorial but still needs log.
-    3. **Recursive halving.** Prove by induction on $D$ that the binomial tail ratio decreases geometrically. This avoids transcendentals entirely.
-    4. **Citation axiom.** If Mathlib already has a binomial tail bound, use it.
+- **Few high digits** (Lemma B4'): The number of $m$ with $H(m) < D/6$ is at most $p^D/2^{D/36}$. This requires a Chernoff-type bound.
+  - In Lean: This is the hardest lemma. Tracked as a separate formalization task.
 
 ### F3. Threshold argument (Part C)
 - Split the "bad" set into $\text{Bad}_1 \cup \text{Bad}_2$ using a threshold at $\lfloor D/6 \rfloor$.
 - Bound each piece using F2.
 - This is a straightforward union bound: `Finset.card_union_le`.
 
-### F4. Residue counting over intervals (Part D, revised)
+### F4. Residue counting over intervals (Part D)
 - Count elements of $[m_0, 2m_0)$ in a given set of residue classes mod $p^D$.
 - Key lemma: for a set $S \subseteq \{0, \ldots, p^D - 1\}$, $\#\{m \in [a, b) : m \bmod p^D \in S\} \le |S| \cdot (\lfloor (b-a)/p^D \rfloor + 1)$.
 - In Lean: Arithmetic on `Nat.div` and `Nat.mod`.
 
 ### F5. Union bound over primes (Part E)
-- Sum the per-prime bounds, show the total is $< m_0$.
-- Requires: enumeration of primes $\le 2k$ via `Nat.Primes`, and showing that $m_0^{c/\log\log m_0} \to \infty$.
-- This step likely requires `Real.log` and `Real.exp` properties.
+- Sum the per-prime bounds, show the total is $\le m_0/4$.
+- Requires: enumeration of primes $\le 2k$ via `Nat.Primes`, and the explicit $M_0(k)$ bound.
+- The explicit $M_0(k) = (2k)^{72\lceil\log_2(16k)\rceil + 72}$ avoids non-constructive arguments, though the Lean statement may use `Real.log` to define $M_0(k)$ or an equivalent recursive definition.
+- The key arithmetic fact is $D_p/36 \ge \log_2(32k)$ for all $p$, giving per-prime contribution $\le m_0/(8k)$ and total $\le m_0/4$.
 
 ### Recommended order for formalization:
 1. F1 (carry structure) — simplest, purely arithmetic
@@ -468,22 +379,7 @@ The counting argument above decomposes into the following independent lemmas, ea
 3. F4 residue counting — technical but standard
 4. F3 threshold argument — uses F1, F2, F4
 5. F2 high-digit count (Lemma B4') — hardest, may need `sorry` initially
-6. F5 union bound — the grand finale, may need `sorry` for transcendental bounds
-
-### Note on avoiding transcendentals
-
-For a fully elementary formalization (avoiding `Real.exp` and `Real.log`), one can replace the Chernoff bound with a weaker but sufficient recursive argument:
-
-**Claim.** For $D \ge 6$, $p \ge 2$: $\#\{m \in \{0, \ldots, p^D - 1\} : H(m) = 0\} = (p - q)^D \le (2p/3)^D$.
-
-This trivially gives $\#\{m : H(m) = 0\} / p^D \le (2/3)^D$, which decays exponentially. The full Chernoff bound is only needed to show that $H(m) < D/6$ is rare, but an inductive argument on blocks of 6 consecutive digits works: in any block of 6 digits, the probability of having no high digit is at most $(2/3)^6 < 1/8$. So having $< D/6$ high digits among $\lfloor D/6 \rfloor$ blocks requires all-but-one blocks to have zero contribution, and a counting argument bounds this.
-
-Specifically, partition the $D$ digit positions into $B = \lfloor D/6 \rfloor$ blocks of 6 (ignoring up to 5 remaining positions). In each block of 6 positions, $H_{\text{block}} = 0$ with "probability" (fraction) at most $(1 - q/p)^6 \le (2/3)^6 < 0.088$. Having $H(m) < B$ means $H_{\text{block}} = 0$ in at least one block. By an inclusion-exclusion argument, this fraction is small — but this is getting circular.
-
-**Simpler approach for Lean.** Just use: for $D$ digit positions, each independently taking $p$ values, the number of tuples with $< t$ "high" values satisfies:
-$$\text{count} = \sum_{j=0}^{t-1} \binom{D}{j} q^j (p-q)^{D-j} < p^D \cdot \frac{t \binom{D}{t}}{p^t} \cdot \left(\frac{q}{p-q}\right)^t \cdot \left(\frac{p-q}{p}\right)^D$$
-
-Actually, this is getting complicated. For the Lean formalization, the cleanest approach is likely to use a `sorry` placeholder for the Chernoff bound and focus on the structural parts (cascade, threshold, union bound).
+6. F5 union bound — the grand finale
 
 ---
 
@@ -494,63 +390,11 @@ Actually, this is getting complicated. For the Lean formalization, the cleanest 
 | Cascade count | $\#\{m : L(m) \ge \ell\} = p^{D-\ell}$ | Digit bijection |
 | High digit lb | $v_p(\binom{2m}{m}) \ge H(m)$ | Lemma B1 |
 | Few high digits | $\#\{m : H(m) < D/6\} \le p^D/2^{D/36}$ | Chernoff bound |
-| Single prime | $\#\{\text{bad } m \text{ for } p\} \le 4m_0/2^{D_p/36}$ | Threshold + union |
-| All small primes | $\sum_{p \le 2k} \#\{\text{bad for } p\} < m_0$ | Union + asymptotics |
+| Single prime | $\#\{\text{bad } m \text{ for } p\} \le 4m_0/2^{D_p/36}$ | Threshold + union + tiling |
+| All small primes | $\sum_{p \le 2k} \#\{\text{bad for } p\} \le m_0/4$ | Union bound with $D_p = 36\lceil\log_2(16k)\rceil + \Theta(\log_p k)$ |
 
 ## References
 
 - Kummer's theorem for $p$-adic valuation of binomial coefficients.
 - Chernoff bound for binomial tails (standard combinatorial inequality).
 - Builds on `proofs/erdos728_v2.md` (Lemma 3, probabilistic version).
-
----
-
-## Review Notes
-
-**Reviewed by:** erdos728b-d0o (2026-02-10)
-
-**Overall Assessment:** The proof structure is mathematically sound with well-organized parts (A: cascades, B: high digits, C: combining, D: tiling, E: union bound, F: formalization strategy). Parts A, B (structure), and C are correct. However, there are gaps that need addressing before verification.
-
-**Issues Requiring Revision:**
-
-1. **Part E - Relationship between $k$ and $m_0$ not explicit (MAJOR)**:
-   - The theorem statement says "$m_0$ sufficiently large (in terms of $k$)" but the proof in Part E relies on $k = O(\log m_0)$ (implicit assumption)
-   - The verification that $D_p \ge 16\log_p(k+1) + 16$ uses asymptotic arguments without explicit bounds
-   - **Fix needed**: Either (a) add explicit condition like "$m_0 \ge 2^{2^{32k}}$" or similar constructive bound, OR (b) split into two parts: existence theorem ("for all $k$, there exists $M_0(k)$ such that...") and then give a separate constructive bound for $M_0(k)$
-
-2. **Lemma B4' - Chernoff bound incomplete (MAJOR)**:
-   - The bound $\#\{m : H(m) < D/6\} \le p^D/2^{D/36}$ is stated but relies on "Chernoff bound with $\mu = D/3$ and $t = D/6$"
-   - The proof correctly identifies this as non-trivial and provides formalization strategies in Part F
-   - **Status**: This is acceptable for Draft → Under Review transition since Part F explicitly flags it as needing separate formalization
-   - **Recommendation**: Create a separate lemma "Chernoff bound for binomial tails" with this as a dependency
-   - Alternative: Use the cruder explicit bound mentioned in Part F (partition into blocks of 6, use $(2/3)^6$ bound)
-
-3. **Corollary A4 - Minor inconsistency**:
-   - First statement says "$\le N/p^T$" but the sharper bound $(\star)$ gives "$\le N/p^{T+1}$"
-   - The $(\star)$ version is what's actually used later, so the loose bound is harmless but confusing
-   - **Fix**: Remove the weaker statement or clarify which bound is being used where
-
-4. **Part D exposition - Minor**:
-   - Lemma D1 is introduced, then noted to not apply, then D2 is attempted, then D3 is the real proof
-   - This "working out loud" style is fine for draft but could be cleaned up for final version
-   - **Suggestion**: Move the dead-end exploration to a remark or appendix
-
-**Dependencies:**
-- None from other proofs (this is self-contained)
-- Requires: Kummer's theorem (standard), basic binomial coefficient properties
-- Requires (to be formalized): Chernoff/Hoeffding bound for binomial tails OR explicit combinatorial substitute
-
-**Verification Status:** Cannot verify until Issues 1 and 2 are addressed.
-
-**Formalization Impact:** 
-- Parts A and B (cascade structure, high digit forcing) can proceed immediately
-- Part C (combining bounds) can proceed assuming B4' as a lemma
-- Parts D/E (tiling/union) should wait until the $k$ vs $m_0$ relationship is clarified
-
-
-**Related Tasks:**
-- Revision needed: erdos728b-pbc (explicit k vs m_0 bounds)
-- Chernoff bound formalization: erdos728b-vuz (already tracked)
-
-**Recommendation:** Request revision via erdos728b-pbc. Once Issues #1 and #2 are addressed, this proof can be re-reviewed for verification.
-
