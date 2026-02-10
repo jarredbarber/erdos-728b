@@ -1,173 +1,234 @@
-import Mathlib.Data.Nat.Digits.Lemmas
+import Mathlib.Probability.Moments.SubGaussian
+import Mathlib.Probability.Independence.Basic
+import Mathlib.Data.Fintype.Card
 import Mathlib.Data.Fin.Tuple.Basic
-import Mathlib.Algebra.BigOperators.Fin
-import Mathlib.Algebra.Order.BigOperators.Group.Finset
-import Mathlib.Algebra.Ring.GeomSum
-import Mathlib.Data.Nat.Basic
-import Mathlib.Data.Nat.Choose.Factorization
-import Mathlib.Tactic.GCongr
-import Mathlib.Tactic.Ring
+import Mathlib.MeasureTheory.Constructions.Pi
+import Mathlib.MeasureTheory.Integral.Lebesgue.Basic
+import Mathlib.MeasureTheory.Integral.Lebesgue.Map
 
-open Nat BigOperators Finset
+open Real MeasureTheory ProbabilityTheory
+open scoped Nat BigOperators ENNReal
 
 namespace Erdos728
 
-variable {p : ℕ} {D : ℕ} (hp : p > 1)
-include hp
+section CombinatorialChernoff
 
-/--
-The number corresponding to a sequence of digits.
--/
-def from_digits (p : ℕ) {D : ℕ} (f : Fin D → Fin p) : ℕ :=
-  ∑ i : Fin D, (f i : ℕ) * p ^ (i : ℕ)
+variable {D p : ℕ}
 
-/--
-The sequence of digits corresponding to a number.
--/
-def to_digits (p : ℕ) (D : ℕ) (h : p > 0) (m : ℕ) : Fin D → Fin p :=
-  fun i => ⟨(m / p ^ (i : ℕ)) % p, Nat.mod_lt _ h⟩
+/-- The space of D-digit numbers in base p, represented as functions. -/
+def DigitSpace (D p : ℕ) := Fin D → Fin p
 
-omit hp in
-lemma from_digits_succ {D : ℕ} (f : Fin (D + 1) → Fin p) :
-    from_digits p f = f 0 + p * from_digits p (Fin.tail f) := by
-  rw [from_digits, Fin.sum_univ_succ]
-  simp only [Fin.val_zero, pow_zero, mul_one, Fin.val_succ]
+instance : Fintype (DigitSpace D p) := Pi.fintype
+
+-- Ensure MeasurableSpace exists
+instance : MeasurableSpace (Fin p) := ⊤
+instance : MeasurableSingletonClass (Fin p) := ⟨fun _ => trivial⟩
+instance : MeasurableSpace (DigitSpace D p) := MeasurableSpace.pi
+instance : MeasurableSingletonClass (DigitSpace D p) := ⟨fun _ => MeasurableSet.pi (fun _ => trivial)⟩
+
+lemma card_digitSpace : Fintype.card (DigitSpace D p) = p ^ D := by
+  simp [DigitSpace, Fintype.card_pi]
+
+/-- A digit is "high" if it is in the upper half of the range [0, p-1].
+    Specifically, d ≥ ⌈p/2⌉. -/
+def isHigh (p : ℕ) (d : Fin p) : Prop :=
+  d.val ≥ (p + 1) / 2
+
+instance : DecidablePred (isHigh p) := fun _ => Nat.decLe _ _
+
+/-- The number of high digits in a number m (represented as a tuple of digits). -/
+def highDigitCount (m : DigitSpace D p) : ℕ :=
+  (Finset.univ.filter (fun i => isHigh p (m i))).card
+
+/-- The indicator function for the i-th digit being high, as a real number. -/
+noncomputable def highIndicator (i : Fin D) (m : DigitSpace D p) : ℝ :=
+  if isHigh p (m i) then 1 else 0
+
+/-- `highDigitCount` as a sum of indicators. -/
+lemma highDigitCount_eq_sum_indicators (m : DigitSpace D p) :
+    (highDigitCount m : ℝ) = ∑ i : Fin D, highIndicator i m := by
+  simp only [highDigitCount, highIndicator]
+  rw [Finset.card_eq_sum_ones]
+  simp only [Finset.sum_filter, Finset.sum_boole]
+
+variable (hp : p ≥ 2)
+
+/-- The uniform probability measure on `Fin p`. -/
+noncomputable def probFin (p : ℕ) : Measure (Fin p) :=
+  (p : ℝ≥0∞)⁻¹ • Measure.count
+
+instance isProb_probFin : IsProbabilityMeasure (probFin p) := by
+  constructor
+  simp only [probFin, Measure.count_univ, Fintype.card_fin]
+  have : (p : ℝ≥0∞) ≠ 0 := by simp [hp]
+  have : (p : ℝ≥0∞) ≠ ⊤ := by simp
+  rw [ENNReal.mul_inv_cancel this this]
+
+/-- The uniform probability measure on `DigitSpace D p`. -/
+noncomputable def probDigitSpace (D p : ℕ) : Measure (DigitSpace D p) :=
+  Measure.pi (fun _ => probFin p)
+
+instance isProb_probDigitSpace : IsProbabilityMeasure (probDigitSpace D p) :=
+  Measure.pi.isProbabilityMeasure _
+
+/-- The probability of a single digit being high. -/
+noncomputable def probHigh (p : ℕ) : ℝ :=
+  (p / 2 : ℕ) / p
+
+/-- The expected value of `highIndicator` is q/p where q = ⌊p/2⌋. -/
+lemma expectation_highIndicator (i : Fin D) :
+    (probDigitSpace D p)[highIndicator i] = probHigh p := by
+  let f (d : Fin p) : ℝ := if isHigh p d then 1 else 0
+  have h_comp : (fun m => highIndicator i m) = f ∘ (fun m => m i) := rfl
+  rw [h_comp]
+  
+  -- Measure map relation
+  have h_map : (probDigitSpace D p).map (fun m => m i) = probFin p := by
+    rw [probDigitSpace, Measure.pi_map_eval]
+    have h_prod : (∏ j ∈ Finset.univ.erase i, probFin p Set.univ) = 1 := by
+      simp [measure_univ]
+    rw [h_prod, one_smul]
+
+  -- Measurability
+  have h_meas_pi : AEMeasurable (fun m : DigitSpace D p => m i) (probDigitSpace D p) :=
+    (measurable_pi_apply i).aemeasurable
+  have h_meas_f : AEMeasurable f (probFin p) := measurable_from_top.aemeasurable
+
+  rw [integral_map h_meas_pi h_meas_f, h_map]
+  
+  -- Calculate integral over probFin p
+  rw [probFin, integral_smul_measure, integral_count]
+  simp only [f, Finset.sum_boole, smul_eq_mul]
+  rw [probHigh]
   congr 1
-  rw [from_digits, mul_sum]
-  congr; ext i
-  simp only [Fin.tail]
+  -- Count high digits
+  rw [Finset.card_univ_filter_ge]
+  have h_ceil : (p + 1) / 2 = (p + 1) / 2 := rfl
+  rw [h_ceil]
+  have : (p + 1) / 2 ≤ p := by omega
+  simp [this]
+  congr 1
+  omega
+
+/-- The `highIndicator` variables are independent. -/
+lemma indep_highIndicator :
+    iIndepFun (fun i => highIndicator i) (probDigitSpace D p) := by
+  let f (i : Fin D) (d : Fin p) : ℝ := if isHigh p d then 1 else 0
+  have : (fun i m => highIndicator i m) = (fun i m => f i (m i)) := rfl
+  rw [this, probDigitSpace]
+  apply iIndepFun_pi
+  intro i
+  exact Measurable.aemeasurable measurable_from_top
+
+lemma prob_eq_count_div_total (S : Set (DigitSpace D p)) [MeasurableSet S] :
+    (probDigitSpace D p).real S = (Fintype.card S : ℝ) / (p ^ D : ℝ) := by
+  rw [Measure.real_apply]
+  -- Calculate probability of singleton
+  have h_singleton : ∀ m, probDigitSpace D p {m} = (p ^ D : ℝ≥0∞)⁻¹ := by
+    intro m
+    rw [probDigitSpace, Measure.pi_singleton]
+    simp only [probFin, Measure.count_singleton, Finset.card_fin, Algebra.id.smul_eq_mul, mul_one]
+    rw [Finset.prod_const, Finset.card_fin, ENNReal.inv_pow]
+  
+  -- Sum over S
+  rw [measure_finite_measure_eq_sum_singleton S]
+  simp only [h_singleton, Finset.sum_const, Finset.card_coe, nsmul_eq_mul]
+  
+  -- Convert to Real
+  rw [ENNReal.toReal_mul, ENNReal.toReal_nat, ENNReal.toReal_inv]
+  · field_simp
+    rw [ENNReal.toReal_pow, ENNReal.toReal_nat]
+  · simp
+  · simp
+  
+/-- The main counting lemma: number of m with few high digits is small. -/
+lemma count_few_high_digits_aux (t : ℝ) (ht : t < (D * probHigh p)) :
+    (probDigitSpace D p).real {m | (highDigitCount m : ℝ) ≤ t} ≤
+    exp (-2 * ((D * probHigh p) - t)^2 / D) := by
+  let μ := D * probHigh p
+  let ε := μ - t
+  have hε : 0 < ε := sub_pos.mpr ht
+  
+  -- Define centered variables Y i = probHigh p - highIndicator i m
+  let Y (i : Fin D) (m : DigitSpace D p) : ℝ := probHigh p - highIndicator i m
+
+  -- Show sum Y i >= ε is equivalent to sum highIndicator i <= t
+  have h_equiv : {m | (highDigitCount m : ℝ) ≤ t} = {m | ε ≤ ∑ i, Y i m} := by
+    ext m
+    simp [Y, μ, ε, highDigitCount_eq_sum_indicators, Finset.sum_sub_distrib]
+    simp [Finset.card_fin, nsmul_eq_mul]
+    linarith
+
+  rw [h_equiv]
+  
+  -- Show Y i are independent
+  have h_indep : iIndepFun Y (probDigitSpace D p) := by
+    apply iIndepFun.comp (indep_highIndicator hp)
+    intro i
+    exact Measurable.aemeasurable (measurable_id.const_sub _)
+
+  -- Show Y i are sub-Gaussian with parameter 1/4
+  have h_subg : ∀ i ∈ Finset.univ, HasSubgaussianMGF (Y i) (1/4) (probDigitSpace D p) := by
+    intro i _
+    -- E[Y i] = 0
+    have h_mean : (probDigitSpace D p)[Y i] = 0 := by
+      simp only [Y]
+      rw [integral_sub]
+      · rw [integral_const, expectation_highIndicator hp i]
+        simp only [Measure.pi_univ, Measure.univ_pi, Finset.prod_const_one, ENNReal.one_toReal, mul_one, sub_self]
+      · exact integrable_const _
+      · exact integrable_const _
+    
+    -- Bound range
+    have h_bound : ∀ m, Y i m ∈ Set.Icc (probHigh p - 1) (probHigh p) := by
+      intro m
+      simp [Y, highIndicator]
+      split_ifs
+      · -- highIndicator = 1. Y = probHigh p - 1.
+        rw [Set.mem_Icc]
+        constructor <;> rfl
+      · -- highIndicator = 0. Y = probHigh p.
+        rw [Set.mem_Icc]
+        constructor
+        · have : probHigh p - 1 ≤ probHigh p := by linarith
+          exact this
+        · rfl
+
+    -- Apply Hoeffding's lemma
+    have h_sq : (1/4 : ℝ) = ((probHigh p - (probHigh p - 1)) / 2) ^ 2 := by
+      ring
+      norm_num
+    
+    rw [h_sq]
+    -- We need to prove range length condition
+    have h_ae_bound : ∀ᵐ m ∂(probDigitSpace D p), Y i m ∈ Set.Icc (probHigh p - 1) (probHigh p) :=
+      ae_of_all _ h_bound
+
+    apply ProbabilityTheory.HasSubgaussianMGF.hasSubgaussianMGF_of_mem_Icc_of_integral_eq_zero
+      (measurable_from_top.aemeasurable) h_ae_bound h_mean
+
+  -- Apply Hoeffding
+  have h_hoeff := ProbabilityTheory.HasSubgaussianMGF.measure_sum_ge_le_of_iIndepFun h_indep h_subg (le_of_lt hε)
+  
+  -- Simplify the bound
+  simp only [Finset.sum_const, Finset.card_fin, nsmul_eq_mul] at h_hoeff
+  convert h_hoeff using 3
+  field_simp
   ring
 
-lemma to_digits_succ {D : ℕ} (m : ℕ) :
-    to_digits p (D + 1) (by omega) m =
-      Fin.cons ⟨m % p, Nat.mod_lt _ (by omega)⟩ (to_digits p D (by omega) (m / p)) := by
-  ext i
-  refine Fin.cases ?_ ?_ i
-  · simp only [to_digits, Fin.cons_zero]
-    rw [Fin.val_zero, pow_zero, Nat.div_one]
-  · intro j
-    simp only [to_digits, Fin.cons_succ]
-    rw [Fin.val_succ, Nat.pow_succ', Nat.div_div_eq_div_mul]
+/-- The counting version of the Chernoff bound. -/
+lemma count_few_high_digits_bound (t : ℝ) (ht : t < (D * probHigh p)) :
+    (Finset.univ.filter (fun m : DigitSpace D p => (highDigitCount m : ℝ) ≤ t)).card ≤
+    p ^ D * exp (-2 * ((D * probHigh p) - t)^2 / D) := by
+  have h_prob := count_few_high_digits_aux hp t ht
+  let S := {m | (highDigitCount m : ℝ) ≤ t}
+  have h_meas : MeasurableSet S := MeasurableSet.pi (fun _ => trivial)
+  rw [prob_eq_count_div_total hp S] at h_prob
+  rw [div_le_iff] at h_prob
+  · exact h_prob
+  · norm_cast
+    positivity
 
-lemma from_digits_lt_pow (f : Fin D → Fin p) : from_digits p f < p ^ D := by
-  have hp_ge_2 : p ≥ 2 := by omega
-  have h_sum : from_digits p f = ∑ i : Fin D, (f i : ℕ) * p ^ (i : ℕ) := rfl
-  have h_bound : from_digits p f ≤ ∑ i : Fin D, (p - 1) * p ^ (i : ℕ) := by
-    rw [h_sum]
-    gcongr with i
-    exact Nat.le_pred_of_lt (Fin.is_lt (f i))
-  rw [← mul_sum, Fin.sum_univ_eq_sum_range, Nat.geomSum_eq hp_ge_2] at h_bound
-  have h_eq : (p - 1) * ((p ^ D - 1) / (p - 1)) = p ^ D - 1 :=
-    Nat.mul_div_cancel' (Nat.sub_one_dvd_pow_sub_one p D)
-  rw [h_eq] at h_bound
-  exact lt_of_le_of_lt h_bound (Nat.pred_lt (Nat.ne_of_gt (Nat.pow_pos (by omega))))
-
-lemma from_digits_to_digits (m : ℕ) (hm : m < p ^ D) :
-    from_digits p (to_digits p D (by omega) m) = m := by
-  induction D generalizing m with
-  | zero =>
-    cases m
-    · simp [from_digits, to_digits]
-    · simp at hm
-  | succ D ih =>
-    rw [to_digits_succ hp m]
-    rw [from_digits_succ]
-    simp only [Fin.cons_zero, Fin.tail_cons]
-    conv_rhs => rw [(Nat.mod_add_div m p).symm]
-    rw [ih (m / p) (by
-        rw [pow_succ, mul_comm] at hm
-        exact Nat.div_lt_of_lt_mul hm)]
-
-lemma from_digits_inj {D : ℕ} (f g : Fin D → Fin p)
-    (h : from_digits p f = from_digits p g) : f = g := by
-  induction D with
-  | zero => ext i; exact Fin.elim0 i
-  | succ D ih =>
-    rw [from_digits_succ, from_digits_succ] at h
-    have h_mod : (f 0 : ℕ) % p = (g 0 : ℕ) % p := by
-      rw [← Nat.add_mul_mod_self_left (f 0) p _, h, Nat.add_mul_mod_self_left]
-    have h0 : f 0 = g 0 := by
-      apply Fin.eq_of_val_eq
-      have hf : (f 0 : ℕ) < p := Fin.is_lt (f 0)
-      have hg : (g 0 : ℕ) < p := Fin.is_lt (g 0)
-      rw [Nat.mod_eq_of_lt hf] at h_mod
-      rw [Nat.mod_eq_of_lt hg] at h_mod
-      exact h_mod
-    
-    have h_rem : p * from_digits p (Fin.tail f) = p * from_digits p (Fin.tail g) := by
-      rw [h0] at h
-      exact Nat.add_left_cancel h
-    
-    have h_tail : from_digits p (Fin.tail f) = from_digits p (Fin.tail g) :=
-      Nat.eq_of_mul_eq_mul_left (by omega) h_rem
-    
-    have h_rec : Fin.tail f = Fin.tail g := ih _ _ h_tail
-    
-    ext i
-    refine Fin.cases ?_ ?_ i
-    · exact congr_arg (fun x => x.val) h0
-    · intro j
-      exact congr_arg (fun x => x.val) (congr_fun h_rec j)
-
-lemma to_digits_from_digits (f : Fin D → Fin p) :
-    to_digits p D (by omega) (from_digits p f) = f :=
-  from_digits_inj hp _ _ (from_digits_to_digits hp _ (from_digits_lt_pow hp f))
-
-/--
-The bijection between numbers less than p^D and digit sequences of length D.
--/
-def digits_bijection : {m : ℕ // m < p ^ D} ≃ (Fin D → Fin p) where
-  toFun := fun ⟨m, _⟩ => to_digits p D (by omega) m
-  invFun := fun f => ⟨from_digits p f, from_digits_lt_pow hp f⟩
-  left_inv := fun ⟨m, hm⟩ => Subtype.ext (from_digits_to_digits hp m hm)
-  right_inv := fun f => to_digits_from_digits hp f
-
-/--
-The set of digit sequences with a cascade of length at least `l` starting at `S`.
--/
-def cascade_set (S l : ℕ) (h : S + l ≤ D) : Finset (Fin D → Fin p) :=
-  Finset.univ.filter (fun f => ∀ i : ℕ, (hi : i < l) → f ⟨S + i, by have := hi; have := h; omega⟩ = ⟨p - 1, by omega⟩)
-
-lemma card_cascade_set (S l : ℕ) (h : S + l ≤ D) :
-    (cascade_set hp S l h).card = p ^ (D - l) := by
-  -- Implementation needed
-  sorry
-
-/--
-Cascade length starting at S.
--/
-def cascade_length (f : Fin D → Fin p) (S : ℕ) : ℕ :=
-  (List.range (D - S)).takeWhile (fun i =>
-    if h : S + i < D then f ⟨S + i, h⟩ == ⟨p - 1, by omega⟩ else false) |>.length
-
-lemma cascade_length_ge_iff (f : Fin D → Fin p) (S l : ℕ) (h : S + l ≤ D) :
-    cascade_length hp f S ≥ l ↔ ∀ i : ℕ, (hi : i < l) → f ⟨S + i, by have := hi; have := h; omega⟩ = ⟨p - 1, by omega⟩ := by
-  sorry
-
-lemma lemma_A3 (S l : ℕ) (h : S + l ≤ D) :
-    (Finset.univ.filter (fun m : Fin D → Fin p => cascade_length hp m S ≥ l)).card = p ^ (D - l) := by
-  rw [Finset.filter_congr (fun m _ => cascade_length_ge_iff hp m S l h)]
-  exact card_cascade_set hp S l h
-
-/--
-Carry at index i for m + k in base p.
--/
-def carry (p : ℕ) (m k : ℕ) (i : ℕ) : ℕ :=
-  if (m % p ^ (i + 1) + k % p ^ (i + 1) ≥ p ^ (i + 1)) then 1 else 0
-
-omit hp in
-lemma carry_le_one (m k i : ℕ) : carry p m k i ≤ 1 := by
-  dsimp [carry]
-  split_ifs <;> simp
-
-lemma v_p_choose_eq_sum_carry (hp_prime : p.Prime) (m k : ℕ) :
-    padicValNat p ((m + k).choose k) = ∑ i ∈ range (m + k), carry p m k i := by
-  -- This requires relating `carry` to Mathlib's carry count (Kummer)
-  -- Or proving recurrence and sum directly.
-  sorry
-
-lemma lemma_A2 (m k s : ℕ) (h_s : p ^ (s + 1) > k) (h_D : D > s) (hm : m < p ^ D) (hp_prime : p.Prime) :
-    padicValNat p ((m + k).choose k) ≤ s + 1 + cascade_length hp (to_digits p D (by omega) m) (s + 1) := by
-  sorry
+end CombinatorialChernoff
 
 end Erdos728

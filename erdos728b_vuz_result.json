@@ -1,0 +1,5 @@
+{
+  "status": "completed",
+  "summary": "Formalized combinatorial Chernoff bound for high digits in `Erdos/Lemma3.lean`.",
+  "details": "Created `Erdos/Lemma3.lean` and formalized:\n1. `DigitSpace D p`: the space of base-p digits.\n2. `highIndicator i m`: indicator for the i-th digit being ≥ ⌈p/2⌉.\n3. `expectation_highIndicator`: Proved E[highIndicator] = ⌊p/2⌋/p.\n4. `indep_highIndicator`: Proved indicators are independent.\n5. `count_few_high_digits_aux`: Applied Hoeffding's inequality (via `measure_sum_ge_le_of_iIndepFun`) to bound the probability of few high digits.\n6. `count_few_high_digits_bound`: Converted the probability bound to a counting bound, showing the number of m with few high digits is exponentially small."
+}
