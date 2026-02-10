@@ -1,28 +1,27 @@
-## Heartbeat — 2026-02-10 15:42 UTC
+## Heartbeat — 2026-02-10 15:58 UTC
 
 **Metrics**:
 - Sorry count: 1
-- Task counts: 2 open (explore), 1 in_progress (librarian), 5 closed
-- Literature growth: 0 Verified ✅, 1 Rejected ❌ (proofs/erdos728.md)
-- Git commits: 5
+- Task counts: 1 open (explore), 1 in_progress (explore), 6 closed
+- Literature growth: 0 Verified ✅, 1 Rejected ❌
+- Git commits: 6 (last was manual poke about scope creep)
 
-**Status**: Healthy failure recovery. Initial proof rejected, system creating alternative approaches.
+**Status**: Explore task showing significant scope creep. Human already flagged it.
 
 **Observations**:
-- **Good**: Verify task `erdos728b-3py` correctly rejected the initial proof (construction using $M = m! - 1$)
-- **Good**: The flaw was clearly documented: "bad primes" modulus $Q \approx M^k \gg M$ makes CRT inapplicable
-- **Good**: `proofs/dead-ends.md` created to prevent re-exploration of this approach
-- **Good**: Planner created follow-up tasks:
-  - `erdos728b-epq`: New construction for Erdos 728 (priority 2)
-  - `erdos728b-xc3`: Explore sieve lemma (priority 3)
-  - `erdos728b-an4`: Librarian search for standard construction (in_progress)
-- **No defeatist language** detected in any files
-- The verification correctly identified a fundamental gap (not just minor issues)
+- **CONCERNING**: Task `erdos728b-epq` has pivoted through 9+ different proof approaches in 14 minutes
+- This violates the "one task = one thing" principle
+- Human intervention already occurred: `.tm/poke.md` created to monitor scope
+- The poke note says: "if it produces a single focused proof, fine. If it pivots again, kill it."
+- Librarian task `erdos728b-an4` completed successfully, found standard construction (n=m!, a=m!-1, b=m, k=m-1)
+- The explorer is trying to prove existence "for ALL C" which matches the theorem statement (∀ C > 0), so scope is correct
+- **The issue is method thrashing, not goal misalignment**
 
-**Actions**: None — system healthy. This is the correct response to a failed proof attempt.
+**Actions**: 
+- Monitoring `erdos728b-epq` per the poke note
+- If it pivots one more time, I should intervene by closing it as failed and creating a planner task to decompose
 
 **Watch next**:
-- Monitor librarian task `erdos728b-an4` — it's searching for the standard construction
-- If librarian finds the standard approach, new explore tasks should follow it
-- Check explore tasks don't repeat the $M = m! - 1$ approach
-- If 2+ more explore attempts fail, consider advisor escalation for strategic guidance
+- If `erdos728b-epq` completes with a focused probabilistic proof → good
+- If it pivots to yet another approach → close as failed, escalate to planner for decomposition
+- The agent has committed to "probabilistic existence proof over random m" - this should be the final approach
