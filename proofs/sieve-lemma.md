@@ -1,6 +1,7 @@
 # Sieve Lemma: Avoiding Forbidden Residues in a Long Interval
 
-**Status:** Draft ✏️
+**Status:** Verified ✅
+**Reviewed by:** erdos728b-hp6
 **Statement:** Let $X, Y$ be positive integers with $Y - X \ge 1$. Let $P$ be a finite set of distinct primes, and for each $p \in P$ let $F_p \subseteq \mathbb{Z}/p\mathbb{Z}$ be a set of "forbidden" residues with $|F_p| < p$. Define:
 $$\alpha_p := \frac{|F_p|}{p}, \qquad Q := \prod_{p \in P} p.$$
 If
