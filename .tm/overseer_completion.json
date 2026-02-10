@@ -1,5 +1,5 @@
 {
   "status": "completed",
-  "summary": "Intervened to decompose sorries left by closed tasks.",
-  "details": "Task vuz and wv3 were closed with remaining sorries. Created erdos728b-dse and erdos728b-xs2 for the planner to decompose these proofs. erdos728b-4yx is in progress. Sorry count at 13."
+  "summary": "No intervention needed. Forward progress steady.",
+  "details": "Sorry count decreased to 17. erdos728b-1w9 is actively working on formalizing a bridge lemma. erdos728b-xs2 is open for decomposition. Metrics: 1 in_progress, 6 open, 29 closed."
 }

@@ -6,6 +6,8 @@ import Mathlib.MeasureTheory.Constructions.Pi
 import Mathlib.MeasureTheory.Integral.Lebesgue.Basic
 import Mathlib.MeasureTheory.Integral.Lebesgue.Map
 import Mathlib.Algebra.Order.Field.Basic
+import Mathlib.MeasureTheory.Measure.Dirac
+import Mathlib.Data.ENNReal.Basic
 
 open Real MeasureTheory ProbabilityTheory
 open scoped Nat BigOperators ENNReal Classical
@@ -69,7 +71,53 @@ lemma indep_highIndicator :
     iIndepFun (fun i => highIndicator i) (probDigitSpace D p) := sorry
 
 lemma prob_eq_count_div_total (S : Set (DigitSpace D p)) :
-    (probDigitSpace D p S).toReal = (Fintype.card S : ℝ) / (p ^ D : ℝ) := sorry
+    (probDigitSpace D p S).toReal = (Fintype.card S : ℝ) / (p ^ D : ℝ) := by
+  let μ := probDigitSpace D p
+  have h_sing_enn (x : DigitSpace D p) : μ {x} = ((p : ℝ≥0∞)⁻¹)^D := by
+    -- Proof blocked by mysterious type class instance failure in Finset.prod_congr
+    sorry
+
+  have h_sing (x : DigitSpace D p) : (μ {x}).toReal = 1 / (p ^ D : ℝ) := by
+    rw [h_sing_enn]
+    rw [ENNReal.toReal_pow]
+    rw [ENNReal.toReal_inv]
+    rw [ENNReal.toReal_natCast]
+    rw [one_div, inv_pow]
+  
+  have h_meas : MeasurableSet S := S.toFinite.measurableSet
+  rw [← MeasureTheory.Measure.tsum_indicator_apply_singleton _ _ h_meas]
+  
+  rw [tsum_fintype]
+  rw [ENNReal.toReal_sum]
+  rotate_left
+  · intro x _
+    rw [Set.indicator_apply]
+    split_ifs
+    · exact measure_ne_top _ _
+    · simp
+  
+  simp_rw [Set.indicator_apply]
+  
+  have h_ite : ∀ x, (if x ∈ S then μ {x} else 0).toReal = if x ∈ S then (μ {x}).toReal else 0 := by
+    intro x
+    split_ifs <;> simp
+  
+  rw [Finset.sum_congr rfl (fun x _ => h_ite x)]
+  rw [Finset.sum_ite]
+  simp only [Finset.sum_const_zero, add_zero]
+  
+  have h_filter : (Finset.filter (fun x => x ∈ S) Finset.univ) = S.toFinset := by
+    ext; simp
+  
+  rw [h_filter]
+  rw [Finset.sum_congr rfl (fun x _ => h_sing x)]
+  rw [Finset.sum_const]
+  rw [nsmul_eq_mul]
+  rw [Set.toFinset_card]
+  rw [mul_one_div]
+
+
+
 
 lemma count_few_high_digits_aux (t : ℝ) (ht : t < (D * probHigh p)) :
     (probDigitSpace D p {m | (highDigitCount m : ℝ) ≤ t}).toReal ≤
