@@ -1,7 +1,7 @@
 import Mathlib
 import Erdos.Lemmas
 
-open Real Nat
+open Real Nat Filter Asymptotics
 open scoped Nat Topology
 
 namespace Erdos728
@@ -54,7 +54,44 @@ lemma log_gap_bounds (C C' : ℝ) (hC : 0 < C) (hCC' : C < C') :
       ∀ m : ℕ, m₀ ≤ m → m ≤ 2 * m₀ →
         C * Real.log (2 * ↑m) < ↑k ∧
         (↑k : ℝ) < C' * Real.log (2 * ↑m) := by
-  sorry
+  let M := (C + C') / 2
+  have hCM : C < M := by dsimp [M]; linarith
+  have hMC' : M < C' := by dsimp [M]; linarith
+  have hM_pos : 0 < M := by dsimp [M]; linarith
+
+  have h_unbounded : Tendsto (fun m₀ : ℕ => 2 * (m₀ : ℝ)) atTop atTop := by
+    apply Filter.Tendsto.const_mul_atTop (by norm_num : (0 : ℝ) < 2)
+    exact tendsto_natCast_atTop_atTop
+
+  have h1 : ∀ᶠ m₀ : ℕ in atTop, 1 ≤ ⌊M * Real.log (2 * ↑m₀)⌋₊ := by
+    have h_tendsto : Tendsto (fun m₀ : ℕ => M * Real.log (2 * ↑m₀)) atTop atTop := by
+      apply Filter.Tendsto.const_mul_atTop hM_pos
+      apply Filter.Tendsto.comp (g := Real.log) Real.tendsto_log_atTop
+      exact h_unbounded
+    filter_upwards [h_tendsto (eventually_ge_atTop 1)] with m₀ hm₀
+    rw [Nat.le_floor_iff]
+    · exact_mod_cast hm₀
+    · exact le_trans (by norm_num) hm₀
+
+  have h2 : ∀ᶠ m₀ : ℕ in atTop, ⌊M * Real.log (2 * ↑m₀)⌋₊ ≤ m₀ := by
+    sorry
+
+  have h3 : ∀ᶠ m₀ : ℕ in atTop, ∀ m : ℕ, m₀ ≤ m → m ≤ 2 * m₀ →
+      C * Real.log (2 * ↑m) < ↑⌊M * Real.log (2 * ↑m₀)⌋₊ := by
+    sorry
+
+  have h4 : ∀ᶠ m₀ : ℕ in atTop, ∀ m : ℕ, m₀ ≤ m → m ≤ 2 * m₀ →
+      (↑⌊M * Real.log (2 * ↑m₀)⌋₊ : ℝ) < C' * Real.log (2 * ↑m) := by
+    sorry
+
+  obtain ⟨S, hS_and⟩ := (h1.and (h2.and (h3.and h4))).exists_mem
+  obtain ⟨hS_mem, hS_forall⟩ := hS_and
+  obtain ⟨M₀, hM₀⟩ := mem_atTop_sets.mp hS_mem
+  exists M₀
+  intro m₀ hm₀_ge
+  specialize hS_forall m₀ (hM₀ m₀ hm₀_ge)
+  rcases hS_forall with ⟨h_k_ge, h_k_le, h_cond3, h_cond4⟩
+  refine ⟨h_k_ge, h_k_le, fun m hm hm' => ⟨h_cond3 m hm hm', h_cond4 m hm hm'⟩⟩
 
 /-- **Combined existence**: For 0 < C < C' and m₀ sufficiently large,
 there exist m ∈ [m₀, 2m₀] and k ≥ 1 with C(m+k,k) | C(2m,m) and
