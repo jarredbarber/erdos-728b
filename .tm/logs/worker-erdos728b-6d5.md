@@ -354,3 +354,30 @@ Three variants provided:
 - carry_dominance_padicValNat: in terms of padicValNat
 - carry_dominance_dvd: the p-power divisibility consequence"
 ```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-6d5 --status "Complete. All lemmas compile, lake build succeeds."
+```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm close erdos728b-6d5
+```
+```json
+{
+  "status": "completed",
+  "summary": "Closed all sorrys in carry dominance lemma. lake build succeeds.",
+  "details": "Formalized Lemma 2 from proofs/erdos728_v2.md in Erdos/Lemmas.lean. Three sorry-free lemmas added:\n\n1. **`carry_dominance`** (factorization form): For prime p with 2k < p and any m, `((m + k).choose k).factorization p ≤ ((2 * m).choose m).factorization p`.\n\n2. **`carry_dominance_padicValNat`**: Same result in terms of `padicValNat`.\n\n3. **`carry_dominance_dvd`**: The p-power divisibility consequence.\n\n**Proof approach**: Uses Kummer's theorem (`Nat.factorization_choose'`) to express both p-adic valuations as cardinalities of carry sets `{i ∈ Ico 1 b | p^i ≤ a % p^i + b % p^i}`. A pointwise helper lemma (`carry_dominance_pointwise`) shows the carry set for m+k is a subset of the carry set for m+m: since 2k < p ≤ p^i, k % p^i = k, so if k + (m % p^i) ≥ p^i then m % p^i > p^i/2, hence 2·(m % p^i) > p^i. The cardinality inequality then follows from `Finset.card_le_card`.\n\nNo new sorry holes introduced. `lake build` succeeds with only the expected sorry in the main theorem statement."
+}
+```
+
+## Final Result
+
+```json
+{
+  "status": "completed",
+  "summary": "Closed all sorrys in carry dominance lemma. lake build succeeds.",
+  "details": "Formalized Lemma 2 from proofs/erdos728_v2.md in Erdos/Lemmas.lean. Three sorry-free lemmas added:\n\n1. **`carry_dominance`** (factorization form): For prime p with 2k < p and any m, `((m + k).choose k).factorization p ≤ ((2 * m).choose m).factorization p`.\n\n2. **`carry_dominance_padicValNat`**: Same result in terms of `padicValNat`.\n\n3. **`carry_dominance_dvd`**: The p-power divisibility consequence.\n\n**Proof approach**: Uses Kummer's theorem (`Nat.factorization_choose'`) to express both p-adic valuations as cardinalities of carry sets `{i ∈ Ico 1 b | p^i ≤ a % p^i + b % p^i}`. A pointwise helper lemma (`carry_dominance_pointwise`) shows the carry set for m+k is a subset of the carry set for m+m: since 2k < p ≤ p^i, k % p^i = k, so if k + (m % p^i) ≥ p^i then m % p^i > p^i/2, hence 2·(m % p^i) > p^i. The cardinality inequality then follows from `Finset.card_le_card`.\n\nNo new sorry holes introduced. `lake build` succeeds with only the expected sorry in the main theorem statement."
+}
+```
+
+End Time: 2026-02-10T16:31:38.227Z

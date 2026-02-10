@@ -1659,3 +1659,26 @@ Three variants provided:
 - carry_dominance: in terms of factorization
 - carry_dominance_padicValNat: in terms of padicValNat
 - carry_dominance_dvd: the p-power divisibility consequence"
+[2026-02-10T16:31:26.107Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-6d5 --status "Complete. All lemmas compile, lake build succeeds."
+[2026-02-10T16:31:28.010Z] 
+$ cd /home/jarred/code/erdos-728b && tm close erdos728b-6d5
+[2026-02-10T16:31:38.227Z] 
+
+📝 Agent response complete.
+
+[2026-02-10T16:31:38.227Z] 📄 Log saved to .tm/logs/worker-erdos728b-6d5.md
+[2026-02-10T16:31:38.227Z] 
+📊 Task erdos728b-6d5 completed:
+[2026-02-10T16:31:38.227Z]    Summary: Closed all sorrys in carry dominance lemma. lake build succeeds.
+[2026-02-10T16:31:38.227Z]    Details: Formalized Lemma 2 from proofs/erdos728_v2.md in Erdos/Lemmas.lean. Three sorry-free lemmas added:
+
+1. **`carry_dominance`** (factorization form): For prime p with 2k < p and any m, `((m + k).choose k).factorization p ≤ ((2 * m).choose m).factorization p`.
+
+2. **`carry_dominance_padicValNat`**: Same result in terms of `padicValNat`.
+
+3. **`carry_dominance_dvd`**: The p-power divisibility consequence.
+
+**Proof approach**: Uses Kummer's theorem (`Nat.factorization_choose'`) to express both p-adic valuations as cardinalities of carry sets `{i ∈ Ico 1 b | p^i ≤ a % p^i + b % p^i}`. A pointwise helper lemma (`carry_dominance_pointwise`) shows the carry set for m+k is a subset of the carry set for m+m: since 2k < p ≤ p^i, k % p^i = k, so if k + (m % p^i) ≥ p^i then m % p^i > p^i/2, hence 2·(m % p^i) > p^i. The cardinality inequality then follows from `Finset.card_le_card`.
+
+No new sorry holes introduced. `lake build` succeeds with only the expected sorry in the main theorem statement.
