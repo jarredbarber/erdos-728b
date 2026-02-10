@@ -1,24 +1,22 @@
-## Heartbeat — 2026-02-10 18:27 UTC
+## Heartbeat — 2026-02-10 18:38 UTC
 
 **Metrics**:
-- Sorry count: 2 (Basic.lean: 2; Lemma3.lean: 0 - **DOWN FROM 4**)
-- Task counts: 1 in_progress (formalize), 7 open (6 formalize, 1 verify), 24 closed
-- Literature growth: 2 Verified ✅, 1 Draft ✏️ (lemma3-counting.md awaiting re-verification), 1 Rejected ❌
-- Git commits: 32 (1 new: revision of lemma3-counting.md)
+- Sorry count: 6 (Basic.lean: 2; Lemma3.lean: 4)
+- Task counts: 1 in_progress (formalize), 5 open, 26 closed
+- Literature growth: 3 Verified ✅, 1 Rejected ❌
+- Git commits: 34
 
-**Status**: Strong forward progress. Sorry count decreased 4→2.
+**Status**: Forward progress steady. Lemma 3 formalization pipeline unblocked.
 
 **Observations**:
-- **MAJOR SUCCESS**: `erdos728b-6mr` closed **both** sorries in Lemma3.lean (to_digits_succ, from_digits_lt_pow)! This is excellent progress.
-- **REVISION COMPLETED**: `erdos728b-pbc` successfully revised `proofs/lemma3-counting.md` addressing all 3 review issues.
-- **GAP DETECTED**: The revised proof needs re-verification before formalize tasks can proceed. Created `erdos728b-djp` (verify) to complete the cycle.
-- **ACTIVE FORMALIZATION**: `erdos728b-ljs` is working on cascade length bound (4 minutes in, not stale).
-- No axioms, no stale tasks.
+- **SUCCESS**: `erdos728b-djp` verified `proofs/lemma3-counting.md`. The core NL proof is now solid.
+- **SUCCESS**: `erdos728b-ljs` formalized the definitions and lemma statements for cascades in `Erdos/Lemma3.lean`.
+- **SORRY STATUS**: Count increased 2→6 as the Lemma 3 skeleton grows. This is healthy decomposition.
+- **ACTIVE FORMALIZATION**: `erdos728b-xd1` is working on the lower bound on carries via high digits.
+- No stale tasks or axioms.
 
-**Actions**: 
-- Created verify task `erdos728b-djp` to re-review revised lemma3-counting.md.
+**Actions**: None.
 
 **Watch next**:
-- Once lemma3-counting.md is Verified ✅, formalize tasks can accelerate (they all reference this proof).
-- Monitor `erdos728b-ljs` completion.
-- The 2 remaining sorries (exists_m_choose_dvd_uniform, log_gap_bounds) are the final targets.
+- Monitor `erdos728b-xd1` and `erdos728b-vuz` progress on Lemma 3 sub-parts.
+- Once Lemma 3 components are in, `erdos728b-wv3` will combine them.
