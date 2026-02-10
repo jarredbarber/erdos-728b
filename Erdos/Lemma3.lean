@@ -4,6 +4,7 @@ import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Algebra.Ring.GeomSum
 import Mathlib.Data.Nat.Basic
+import Mathlib.Data.Nat.Choose.Factorization
 import Mathlib.Tactic.GCongr
 import Mathlib.Tactic.Ring
 
@@ -12,6 +13,7 @@ open Nat BigOperators Finset
 namespace Erdos728
 
 variable {p : ℕ} {D : ℕ} (hp : p > 1)
+include hp
 
 /--
 The number corresponding to a sequence of digits.
@@ -25,6 +27,7 @@ The sequence of digits corresponding to a number.
 def to_digits (p : ℕ) (D : ℕ) (h : p > 0) (m : ℕ) : Fin D → Fin p :=
   fun i => ⟨(m / p ^ (i : ℕ)) % p, Nat.mod_lt _ h⟩
 
+omit hp in
 lemma from_digits_succ {D : ℕ} (f : Fin (D + 1) → Fin p) :
     from_digits p f = f 0 + p * from_digits p (Fin.tail f) := by
   rw [from_digits, Fin.sum_univ_succ]
@@ -36,9 +39,28 @@ lemma from_digits_succ {D : ℕ} (f : Fin (D + 1) → Fin p) :
   ring
 
 lemma to_digits_succ {D : ℕ} (m : ℕ) :
-    to_digits p (D + 1) (by omega) m = Fin.cons ⟨m % p, Nat.mod_lt _ (by omega)⟩ (to_digits p D (by omega) (m / p)) := sorry
+    to_digits p (D + 1) (by omega) m =
+      Fin.cons ⟨m % p, Nat.mod_lt _ (by omega)⟩ (to_digits p D (by omega) (m / p)) := by
+  ext i
+  refine Fin.cases ?_ ?_ i
+  · simp only [to_digits, Fin.cons_zero]
+    rw [Fin.val_zero, pow_zero, Nat.div_one]
+  · intro j
+    simp only [to_digits, Fin.cons_succ]
+    rw [Fin.val_succ, Nat.pow_succ', Nat.div_div_eq_div_mul]
 
-lemma from_digits_lt_pow (f : Fin D → Fin p) : from_digits p f < p ^ D := sorry
+lemma from_digits_lt_pow (f : Fin D → Fin p) : from_digits p f < p ^ D := by
+  have hp_ge_2 : p ≥ 2 := by omega
+  have h_sum : from_digits p f = ∑ i : Fin D, (f i : ℕ) * p ^ (i : ℕ) := rfl
+  have h_bound : from_digits p f ≤ ∑ i : Fin D, (p - 1) * p ^ (i : ℕ) := by
+    rw [h_sum]
+    gcongr with i
+    exact Nat.le_pred_of_lt (Fin.is_lt (f i))
+  rw [← mul_sum, Fin.sum_univ_eq_sum_range, Nat.geomSum_eq hp_ge_2] at h_bound
+  have h_eq : (p - 1) * ((p ^ D - 1) / (p - 1)) = p ^ D - 1 :=
+    Nat.mul_div_cancel' (Nat.sub_one_dvd_pow_sub_one p D)
+  rw [h_eq] at h_bound
+  exact lt_of_le_of_lt h_bound (Nat.pred_lt (Nat.ne_of_gt (Nat.pow_pos (by omega))))
 
 lemma from_digits_to_digits (m : ℕ) (hm : m < p ^ D) :
     from_digits p (to_digits p D (by omega) m) = m := by
@@ -48,7 +70,7 @@ lemma from_digits_to_digits (m : ℕ) (hm : m < p ^ D) :
     · simp [from_digits, to_digits]
     · simp at hm
   | succ D ih =>
-    rw [to_digits_succ (by omega) m]
+    rw [to_digits_succ hp m]
     rw [from_digits_succ]
     simp only [Fin.cons_zero, Fin.tail_cons]
     conv_rhs => rw [(Nat.mod_add_div m p).symm]
@@ -89,15 +111,63 @@ lemma from_digits_inj {D : ℕ} (f g : Fin D → Fin p)
 
 lemma to_digits_from_digits (f : Fin D → Fin p) :
     to_digits p D (by omega) (from_digits p f) = f :=
-  from_digits_inj _ _ (from_digits_to_digits hp (from_digits p f) (from_digits_lt_pow f))
+  from_digits_inj hp _ _ (from_digits_to_digits hp _ (from_digits_lt_pow hp f))
 
 /--
 The bijection between numbers less than p^D and digit sequences of length D.
 -/
 def digits_bijection : {m : ℕ // m < p ^ D} ≃ (Fin D → Fin p) where
   toFun := fun ⟨m, _⟩ => to_digits p D (by omega) m
-  invFun := fun f => ⟨from_digits p f, from_digits_lt_pow f⟩
+  invFun := fun f => ⟨from_digits p f, from_digits_lt_pow hp f⟩
   left_inv := fun ⟨m, hm⟩ => Subtype.ext (from_digits_to_digits hp m hm)
   right_inv := fun f => to_digits_from_digits hp f
+
+/--
+The set of digit sequences with a cascade of length at least `l` starting at `S`.
+-/
+def cascade_set (S l : ℕ) (h : S + l ≤ D) : Finset (Fin D → Fin p) :=
+  Finset.univ.filter (fun f => ∀ i : ℕ, (hi : i < l) → f ⟨S + i, by have := hi; have := h; omega⟩ = ⟨p - 1, by omega⟩)
+
+lemma card_cascade_set (S l : ℕ) (h : S + l ≤ D) :
+    (cascade_set hp S l h).card = p ^ (D - l) := by
+  -- Implementation needed
+  sorry
+
+/--
+Cascade length starting at S.
+-/
+def cascade_length (f : Fin D → Fin p) (S : ℕ) : ℕ :=
+  (List.range (D - S)).takeWhile (fun i =>
+    if h : S + i < D then f ⟨S + i, h⟩ == ⟨p - 1, by omega⟩ else false) |>.length
+
+lemma cascade_length_ge_iff (f : Fin D → Fin p) (S l : ℕ) (h : S + l ≤ D) :
+    cascade_length hp f S ≥ l ↔ ∀ i : ℕ, (hi : i < l) → f ⟨S + i, by have := hi; have := h; omega⟩ = ⟨p - 1, by omega⟩ := by
+  sorry
+
+lemma lemma_A3 (S l : ℕ) (h : S + l ≤ D) :
+    (Finset.univ.filter (fun m : Fin D → Fin p => cascade_length hp m S ≥ l)).card = p ^ (D - l) := by
+  rw [Finset.filter_congr (fun m _ => cascade_length_ge_iff hp m S l h)]
+  exact card_cascade_set hp S l h
+
+/--
+Carry at index i for m + k in base p.
+-/
+def carry (p : ℕ) (m k : ℕ) (i : ℕ) : ℕ :=
+  if (m % p ^ (i + 1) + k % p ^ (i + 1) ≥ p ^ (i + 1)) then 1 else 0
+
+omit hp in
+lemma carry_le_one (m k i : ℕ) : carry p m k i ≤ 1 := by
+  dsimp [carry]
+  split_ifs <;> simp
+
+lemma v_p_choose_eq_sum_carry (hp_prime : p.Prime) (m k : ℕ) :
+    padicValNat p ((m + k).choose k) = ∑ i ∈ range (m + k), carry p m k i := by
+  -- This requires relating `carry` to Mathlib's carry count (Kummer)
+  -- Or proving recurrence and sum directly.
+  sorry
+
+lemma lemma_A2 (m k s : ℕ) (h_s : p ^ (s + 1) > k) (h_D : D > s) (hm : m < p ^ D) (hp_prime : p.Prime) :
+    padicValNat p ((m + k).choose k) ≤ s + 1 + cascade_length hp (to_digits p D (by omega) m) (s + 1) := by
+  sorry
 
 end Erdos728

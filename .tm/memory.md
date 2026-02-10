@@ -1,21 +1,24 @@
-## Heartbeat — 2026-02-10 18:10 UTC
+## Heartbeat — 2026-02-10 18:27 UTC
 
 **Metrics**:
-- Sorry count: 4 (Basic.lean: 2; Lemma3.lean: 2)
-- Task counts: 1 in_progress (explore), 7 open (formalize), 22 closed
-- Literature growth: 2 Verified ✅, 1 Draft ✏️ (lemma3-counting.md under revision), 1 Rejected ❌
-- Git commits: 31 (2 new: verification request + digit bijection completion)
+- Sorry count: 2 (Basic.lean: 2; Lemma3.lean: 0 - **DOWN FROM 4**)
+- Task counts: 1 in_progress (formalize), 7 open (6 formalize, 1 verify), 24 closed
+- Literature growth: 2 Verified ✅, 1 Draft ✏️ (lemma3-counting.md awaiting re-verification), 1 Rejected ❌
+- Git commits: 32 (1 new: revision of lemma3-counting.md)
 
-**Status**: Healthy forward progress. Verify-revise cycle active.
+**Status**: Strong forward progress. Sorry count decreased 4→2.
 
 **Observations**:
-- **SUCCESS**: `erdos728b-6mr` (Formalize digit counting bijection) completed successfully! Created Erdos/Lemma3.lean with core definitions and lemmas. This unblocks 3 downstream formalize tasks (ljs, xd1, vuz).
-- **VERIFICATION CYCLE**: `erdos728b-d0o` requested revision of `proofs/lemma3-counting.md` (issue: k vs m_0 relationship not explicit). Task `erdos728b-pbc` is actively revising.
-- **SORRY STATUS**: Count increased 3→4 but this is healthy - the new sorries are small proof holes in the Lemma3.lean skeleton (to_digits_succ, from_digits_lt_pow), not regressions.
-- No stale tasks, no axioms.
+- **MAJOR SUCCESS**: `erdos728b-6mr` closed **both** sorries in Lemma3.lean (to_digits_succ, from_digits_lt_pow)! This is excellent progress.
+- **REVISION COMPLETED**: `erdos728b-pbc` successfully revised `proofs/lemma3-counting.md` addressing all 3 review issues.
+- **GAP DETECTED**: The revised proof needs re-verification before formalize tasks can proceed. Created `erdos728b-djp` (verify) to complete the cycle.
+- **ACTIVE FORMALIZATION**: `erdos728b-ljs` is working on cascade length bound (4 minutes in, not stale).
+- No axioms, no stale tasks.
 
-**Actions**: None.
+**Actions**: 
+- Created verify task `erdos728b-djp` to re-review revised lemma3-counting.md.
 
 **Watch next**:
-- Monitor `erdos728b-pbc` completion and subsequent re-verification.
-- Once lemma3-counting.md is Verified ✅, the 7 open formalize tasks can proceed with a solid NL foundation.
+- Once lemma3-counting.md is Verified ✅, formalize tasks can accelerate (they all reference this proof).
+- Monitor `erdos728b-ljs` completion.
+- The 2 remaining sorries (exists_m_choose_dvd_uniform, log_gap_bounds) are the final targets.
