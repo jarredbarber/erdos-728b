@@ -198,12 +198,115 @@ lemma prob_eq_count_div_total (S : Set (DigitSpace D p)) :
   rw [Set.toFinset_card]
   rw [mul_one_div]
 
+lemma probHigh_nonneg (p : ℕ) [NeZero p] : 0 ≤ probHigh p := by
+  unfold probHigh
+  apply div_nonneg
+  · norm_cast; apply Nat.zero_le
+  · norm_cast; apply Nat.zero_le
 
+lemma probHigh_le_one (p : ℕ) [NeZero p] : probHigh p ≤ 1 := by
+  unfold probHigh
+  rw [div_le_one]
+  · norm_cast; apply Nat.div_le_self
+  · norm_cast; apply Nat.pos_of_ne_zero (NeZero.ne p)
 
+lemma integrable_highIndicator (i : Fin D) : Integrable (highIndicator i) (probDigitSpace D p) := by
+  apply Integrable.of_finite
+
+lemma highDigitCount_eq_sum (m : DigitSpace D p) :
+    (highDigitCount m : ℝ) = ∑ i, highIndicator i m := by
+  unfold highDigitCount highIndicator
+  have h_term (i : Fin D) : (if isHigh p (m i) then 1 else 0 : ℝ) = ((if isHigh p (m i) then 1 else 0 : ℕ) : ℝ) := by
+    split_ifs <;> simp
+  rw [Finset.sum_congr rfl (fun i _ => h_term i)]
+  rw [← Nat.cast_sum]
+  congr
+  rw [Finset.sum_boole]
+  simp
 
 lemma count_few_high_digits_aux (t : ℝ) (ht : t < (D * probHigh p)) :
     (probDigitSpace D p {m | (highDigitCount m : ℝ) ≤ t}).toReal ≤
-    exp (-2 * ((D * probHigh p) - t)^2 / D) := sorry
+    exp (-2 * ((D * probHigh p) - t)^2 / D) := by
+  by_cases hD : D = 0
+  · subst hD
+    simp only [Nat.cast_zero, zero_mul] at ht
+    have : {m : DigitSpace 0 p | (highDigitCount m : ℝ) ≤ t} = ∅ := by
+      ext m
+      simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+      have : highDigitCount m = 0 := by
+        unfold highDigitCount
+        simp
+      rewrite [this]
+      norm_cast
+      linarith
+    rw [this, measure_empty, ENNReal.toReal_zero]
+    apply exp_nonneg
+  
+  have hD_ne_zero : (D : ℝ) ≠ 0 := by exact_mod_cast hD
+
+  let Y (i : Fin D) (m : DigitSpace D p) := -(highIndicator i m - probHigh p)
+  let c : Fin D → NNReal := fun _ => ⟨1/4, by norm_num⟩
+
+  have h_indep : iIndepFun Y (probDigitSpace D p) := by
+    apply iIndepFun.comp indep_highIndicator (fun _ x => -(x - probHigh p))
+    intro i
+    exact measurable_id.sub (measurable_const) |>.neg
+
+  have h_bound_Y (i) : ∀ᵐ m ∂(probDigitSpace D p), Y i m ∈ Set.Icc (probHigh p - 1) (probHigh p) := by
+    apply ae_of_all
+    intro m
+    simp only [Y, highIndicator]
+    split_ifs
+    · rw [Set.mem_Icc]; constructor <;> linarith
+    · rw [Set.mem_Icc]; constructor <;> linarith
+
+  have h_int_Y (i) : ∫ m, Y i m ∂(probDigitSpace D p) = 0 := by
+    simp only [Y]
+    rw [integral_neg, integral_sub (integrable_highIndicator i) (integrable_const _)]
+    rw [expectation_highIndicator, integral_const]
+    simp only [Measure.real, measure_univ, ENNReal.toReal_one, one_smul, sub_self, neg_zero]
+
+  have h_subg (i : Fin D) : HasSubgaussianMGF (Y i) (c i) (probDigitSpace D p) := by
+    convert ProbabilityTheory.hasSubgaussianMGF_of_mem_Icc_of_integral_eq_zero
+      (hm := AEMeasurable.neg ((integrable_highIndicator i).aemeasurable.sub_const (probHigh p)))
+      (hb := h_bound_Y i) (hc := h_int_Y i)
+      (a := probHigh p - 1) (b := probHigh p)
+    · simp only [c]
+      rw [show probHigh p - (probHigh p - 1) = 1 by ring]
+      ext; push_cast; norm_num
+
+  let ε := (D : ℝ) * probHigh p - t
+  have hε : 0 ≤ ε := sub_nonneg.mpr (le_of_lt ht)
+
+  have h_event : {m | (highDigitCount m : ℝ) ≤ t} = {m | ε ≤ ∑ i, Y i m} := by
+    ext m
+    simp only [Set.mem_setOf_eq, Y]
+    rw [Finset.sum_neg_distrib, Finset.sum_sub_distrib]
+    rw [Finset.sum_const, Finset.card_fin]
+    rw [nsmul_eq_mul]
+    rw [← highDigitCount_eq_sum m]
+    dsimp [ε]
+    rw [neg_sub, sub_le_sub_iff_left]
+
+  rw [h_event]
+  have h_sum_c : ∑ i : Fin D, c i = D * (1/4 : NNReal) := by
+    simp only [c]
+    rw [Finset.sum_const, Finset.card_fin, nsmul_eq_mul]
+    ext; push_cast; ring
+
+  have h_hoeff := ProbabilityTheory.HasSubgaussianMGF.measure_sum_ge_le_of_iIndepFun h_indep (s := Finset.univ) (fun i _ => h_subg i) hε
+  
+  -- Calculate the bound
+  convert h_hoeff using 1
+  rw [h_sum_c]
+  congr 1
+  
+  -- Simplify the exponent
+  dsimp [ε]
+  push_cast
+  field_simp [hD_ne_zero]
+  ring
+
 
 lemma count_few_high_digits_bound (t : ℝ) (ht : t < (D * probHigh p)) :
     (Finset.univ.filter (fun m : DigitSpace D p => (highDigitCount m : ℝ) ≤ t)).card ≤
