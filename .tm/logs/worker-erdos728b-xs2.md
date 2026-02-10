@@ -1,286 +1,549 @@
-# timtam Task: Decompose Lemma 3 integration (remaining sorries in Lemma3Counting.lean) (erdos728b-xs2)
+# timtam Task: Decompose Lemma 3 integration (erdos728b-xs2)
 
 Role: planner
-Agent: planner (google-antigravity/gemini-3-pro-high:high)
-Start Time: 2026-02-10T19:44:33.123Z
+Agent: planner (google-antigravity/claude-opus-4-6-thinking)
+Start Time: 2026-02-10T21:23:25.881Z
 
 ## Agent Interaction
 
 
-```bash
-$ ls -F Erdos/
-```
-
-🛠️ **Executing tool: read**
-
 
 > **Thinking:**
-> **Identifying Key Elements**
-> 
-> I've successfully parsed the file and isolated "sorries" and sections. I'm now drilling down into the specific items outlined in the task. Currently, my focus is on `valuation_le_cascade`, specifically its relationship to the lemma of the same name. I am noting the implication for the induction on indices.
-> 
-> 
-> **Analyzing Remaining Sorries**
-> 
-> I've expanded my scope to examine all the "sorries" within the file, not just those initially identified. This reveals a significantly larger number of unresolved issues than anticipated. I am now prioritizing the decomposition of "Lemma 3 integration" as per the user's task instruction, listing the items as they come up to facilitate focused debugging.
-> 
-> 
-> **Prioritizing Lemma3 Integration**
-> 
-> I am now focusing on the prioritized list from the Lean file: `valuation_le_cascade`, `count_few_high_digits`, `count_bad_single_prime`, and the Chernoff bound. I'm noting the potential scope overlap for `count_congruent_le`, `residue_count_interval`, `bad_residue_sets`, and `count_bad_interval` which seem part of `ResidueCounting`, and confirming if I can consider them implicitly or should treat them as separate tasks. I will re-examine `valuation_le_cascade` with the implication of the other listed sorries in mind.
-> 
-> 
-> **Refining Chernoff and Count**
-> 
-> I am now focusing on the "Explicit Chernoff bound calculation bridge" which is the `count_few_high_digits_bound`. I will split the "count_bad_single_prime" to match its components. I need to handle `?_` in `count_large_cascade`. I will work to integrate these calculations, particularly around the Chernoff bound. I want to ensure my approach is consistent with the lemma's objective.
-> 
-> 
-> 
+> Let me start by understanding the current state of the project. I need to do gap analysis - check the sorry holes in the Lean files, check the proofs directory, and check artifacts. Let me gather all this information first.
 
+I'll start by gathering the current state of the project — sorry holes, proofs, artifacts, and existing tasks.
+```bash
+$ cd /home/jarred/code/erdos-728b && grep -rn 'sorry\|^axiom' Erdos/*.lean 2>/dev/null
+```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && ls proofs/ 2>/dev/null
+```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && ls artifacts/ 2>/dev/null
+```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm ls 2>/dev/null
+```
 
 🛠️ **Executing tool: read**
 
 🛠️ **Executing tool: read**
 
-
-> **Thinking:**
-> **Clarifying Code Definition**
-> 
-> I realized `Erdos/Digits.lean` doesn't define `count_high_digits` directly, but it provides a noncomputable definition. It seems to be calculating the cardinality of a set of high digits. Specifically, there is `high_digits_finset`.
-> 
-> 
-> **Decomposing the Proof**
-> 
-> I was mistaken; `h_digits` is inside `valuation_le_cascade`. I will extract it as `carry_implies_digits_max`. The decomposition now includes proving the carry-implies-max-digits property and then completing `valuation_le_cascade` via a counting argument. I've also identified a separate task for a decreasing induction step.
-> 
-> **Identifying the Lemmas**
-> 
-> I've identified two primary tasks. Task 1 focuses on `valuation_le_cascade`, specifically extracting and proving the `carry_implies_digits_max` lemma, plus the rest of the proof. Task 2 targets `count_few_high_digits`, which addresses bounding the number of `m`
-> 
-> 
-> **Defining the Bounds**
-> 
-> I'm now focusing on proving `count_bad_single_prime`. I realize this combines bounds from prior steps. Specifically, I'm integrating the large cascade bound with the few high digits bound using the union bound, finally addressing the "sorry" at the proof's conclusion. It seems manageable as a single task unless the algebraic manipulations become overly complex.
-> 
-> 
-> **Analyzing Interval Counting**
-> 
-> My current focus is on lemmas for counting residues within an interval, specifically `residue_count_interval`, `bad_residue_sets`, and `count_bad_interval`. I see this as a sequence, starting with basic arithmetic, relating valuation to digit properties (which leverages earlier results), then combining everything for interval counting. I've adjusted my plan. First, I'll extract logic from `valuation_le_cascade` to a helper lemma, proving it by induction. Next, I'll finish `valuation_le_cascade` by using the helper lemma and completing the counting argument. Then I'll focus on closing `count_few_high_digits_bound`.
-> 
-> 
-> **Implementing Hoeffding Bound**
-> 
-> I'm now implementing the Hoeffding bound for `probHigh`. It's a bridge between `Lemma3Common.lean` and the current proof and uses standard Hoeffding arguments for bounded variables. This approach will be instrumental to finishing `count_few_high_digits`.
-> 
-> 
-> 
-
+🛠️ **Executing tool: read**
+Now let me read the proofs and artifacts:
+🛠️ **Executing tool: read**
 
 🛠️ **Executing tool: read**
 
-
-> **Thinking:**
-> **Discovering Lemma Definitions**
-> 
-> I've located the definition of `count_few_high_digits_bound` within `Lemma3.lean`. Furthermore, I've found a related lemma in `Lemma3Counting.lean`, which appears to contain a bound related to high digit counts, that I should explore.
-> 
-> 
-> **Reconciling Lemma Structures**
-> 
-> I'm now investigating the potential redundancy between `Lemma3.lean` and `Lemma3Counting.lean`, specifically regarding `count_few_high_digits_bound`. It appears that `Lemma3.lean` offers a probabilistic, higher-level perspective while `Lemma3Counting.lean` focuses on lower-level counting. I'm leaning toward the idea that `Lemma3Counting.lean` might import `Lemma3.lean` to leverage the probabilistic tools, but I need to ensure this structural change aligns with the overall design.
-> 
-> 
-> **Connecting Counting & Probability**
-> 
-> I'm now focusing on bridging the gap between `Lemma3.lean` and `Lemma3Counting.lean`, as the user requested I "Decompose Lemma 3 integration." The "bridge" seems to be integrating the probabilistic approach of `Lemma3.lean` into the counting framework of `Lemma3Counting.lean`, likely by leveraging the former's explicit calculations to complete the latter's integration. I'm investigating how `count_few_high_digits_bound` fits into this.
-> 
-> 
-> **Defining New Tasks**
-> 
-> I've determined that `Lemma3Counting.lean` currently defines `count_few_high_digits_bound` with a placeholder. I will create a task to prove this bound within the file. I have given the task the description "Explicit Chernoff bound calculation bridge," which I believe fits the task description well. I'll leave the implementation of the proof, which might involve importing `Lemma3.lean`, to the worker, and have created a second task as requested, `digits_eq_pred_of_carry_propagate`, with an associated goal and context.
-> 
-> 
-> **Prioritizing Proof Strategies**
-> 
-> I'm now prioritizing the next steps. I'll focus on proving `valuation_le_cascade`, since it builds from Task 1. Then I'll focus on proving `count_few_high_digits`, which builds from the `count_few_high_digits_bound` task. Next, I can complete the proof of `count_bad_single_prime`. I will then move on to the `Residue Counting Lemmas` as a final step.
-> 
-> 
-> **Analyzing Residue Properties**
-> 
-> I'm now diving into the `ResidueCounting` section within `Erdos/Lemma3Counting.lean`, focusing on `count_bad_interval` as the core component, with some preliminary review of `count_congruent_le` and `residue_count_interval`. I've created a new task to address this. Additionally, I've noticed the `bad_residue_sets` lemma contains a `sorry` and necessitates bridging valuation bounds with digit properties using `valuation_le_cascade` (inverted from Task 2) and `valuation_ge_high_digits`. It seems like `bad_residue_sets` depends on both Task 2, and another task covering `valuation_ge_high_digits`.
-> 
-> 
-> **Mapping Task Dependencies**
-> 
-> I've clarified the dependency structure. Task 6 hinges on Task 2, which requires `valuation_le_cascade`. Task 5 relies on both Tasks 2 and 4. I've also verified that the proof of `valuation_ge_high_digits` is complete. Finally, I've incorporated the `count_large_cascade` lemma into Task 2, as the related code is located in the same section.
-> 
-> 
-> **Refining Task Structure**
-> 
-> I've refined the task list. I've separated the "Finish Cascade Section" into Task 2, which covers `valuation_le_cascade` and `count_large_cascade`. Also, I've added a new Task 4 to address the `HighDigits` section. This now includes cleanup of `highDigitCount_eq` and `count_few_high_digits`. It seems like `highDigitCount_eq` is important for the connection between Fin and Nat for digits.
-> 
-> 
-> **Clarifying Lemma Dependencies**
-> 
-> I'm now establishing how `count_bad_interval` interacts with prior tasks. It seems to directly use results from both the Cascade and HighDigits sections. Specifically, `bad_residue_sets` employs `valuation_le_cascade` and `count_few_high_digits` to define "bad" numbers, which `count_bad_interval` then applies over intervals, completing the integration. The structure seems sound now.
-> 
-> 
-> **Defining Task Scope**
-> 
-> I'm now clarifying the relationship between Task 5 and Task 6, as both rely on the same bounds but on different intervals. I've re-examined the tasks and confirmed that `count_bad_single_prime` (Task 5) is indeed for `range (p^D)`, while `count_bad_interval` (Task 6) targets `Ico m0 (2*m0)`. I'll stick with the existing six tasks, but I also need to note that `valuation_le_cascade` has two outstanding parts: the induction and the rest.
-> 
-> 
-> **Prioritizing Induction Goal**
-> 
-> I'm now zeroing in on the decreasing induction step within `valuation_le_cascade`. I've extracted it as `digits_eq_pred_of_carry_propagate`. I'll prioritize this as it blocks progress on the "Cascade Section" task (Task 2). The goal is to prove this helper, and then use it as a component of Task 2.
-> 
-> 
-> 
-
+🛠️ **Executing tool: read**
 
 ```bash
-$ tm create -t "Lemma 3 Helper - Cascade Induction" -d "Prove the decreasing induction step in valuation_le_cascade. Extract it as a helper lemma (e.g., digits_eq_pred_of_carry_propagate). This corresponds to the first sorry in valuation_le_cascade." -r formalize -p 1
+$ cd /home/jarred/code/erdos-728b && cat Erdos/Basic.lean
 ```
 
 ```bash
-$ tm create -t "Lemma 3 - Cascade Section" -d "Finish valuation_le_cascade (using the helper lemma from erdos728b-qfb) and count_large_cascade. This covers the remaining sorries in the Cascade section." -r formalize -p 1 --deps erdos728b-qfb
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-xs2 --status "Analyzing sorry holes and matching with verified proofs"
+```
+Now let me check what tasks already exist to avoid duplicates:
+```bash
+$ cd /home/jarred/code/erdos-728b && tm ls --all 2>/dev/null || true
 ```
 
 ```bash
-$ tm create -t "Lemma 3 - Chernoff Bound Bridge" -d "Prove count_few_high_digits_bound (or verify it as a standard result / use Lemma3.lean). This is the 'Explicit Chernoff bound calculation bridge' from the task description." -r formalize -p 1
+$ cd /home/jarred/code/erdos-728b && tm ls -a 2>/dev/null; tm list 2>/dev/null; tm list --all 2>/dev/null
+```
+Good. I can see there are two open formalize tasks (`erdos728b-cvq` and `erdos728b-q4t`) targeting `Lemma3.lean`. Now let me also read the remaining supporting files:
+🛠️ **Executing tool: read**
+
+🛠️ **Executing tool: read**
+
+```bash
+$ cd /home/jarred/code/erdos-728b && ls Erdos/
 ```
 
 ```bash
-$ tm create -t "Lemma 3 - High Digits Section" -d "Finish highDigitCount_eq (linking Fin world to Nat digits) and count_few_high_digits. This covers the remaining sorries in the HighDigits section and depends on the bound from erdos728b-vrw." -r formalize -p 1 --deps erdos728b-vrw
+$ cd /home/jarred/code/erdos-728b && lake build 2>&1 | tail -30
+```
+Good — it compiles. Now let me also check the other Lean files for compilation:
+```bash
+$ cd /home/jarred/code/erdos-728b && lake build 2>&1 | grep -E '(error|sorry)' | grep -v '.lake/'
 ```
 
 ```bash
-$ tm create -t "Lemma 3 - Single Prime Count" -d "Prove count_bad_single_prime using count_large_cascade (erdos728b-b24) and count_few_high_digits (erdos728b-7i8). This applies the union bound to combine the results." -r formalize -p 1 --deps erdos728b-b24 erdos728b-7i8
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-xs2 --status "Mapping sorry holes to NL proof parts; checking which Lean files compile vs have sorrys"
 ```
+Now I have a clear picture. Let me do a thorough analysis.
 
+## Current State Summary
 
-> **Thinking:**
-> **Analyzing Residue Integration**
-> 
-> I'm now focused on integrating residue properties. The approach hinges on results from Tasks 2 and 4, specifically how the properties of 'm' influence properties related to `m % p^D`. This integration relies on the `bad_residue_sets` property. I'm exploring the dependency relationships between `erdos728b-b24`, `erdos728b-7i8`, and potentially `erdos728b-azh` in this process; I believe the latter directly relies on the lemmas.
-> 
-> 
-> 
+### Sorry holes (only those that matter — `lake build` succeeds)
 
+| File | Line | Lemma | Matches NL Proof |
+|------|------|-------|-----------------|
+| `Lemma3.lean:68` | `expectation_highIndicator` | Part B (probability setup) |
+| `Lemma3.lean:83` | `prob_eq_count_div_total` (inner sorry: `h_sing_enn`) | Part B/F bridge |
+| `Lemma3.lean:129` | `count_few_high_digits_aux` | Part B, Lemma B4' (Chernoff) |
+| `Basic.lean:39` | `exists_m_choose_dvd_uniform` | Parts C+D+E (the whole counting argument) |
+
+### Files that compile but are NOT imported (dead code?)
+
+`Lemma3Counting.lean` and `Lemma3Residue.lean` have many sorrys but let me check if they're imported:
+```bash
+$ cd /home/jarred/code/erdos-728b && grep -r 'import Erdos.Lemma3Counting\|import Erdos.Lemma3Residue' Erdos/ lakefile.lean 2>/dev/null
+```
 
 ```bash
-$ tm create -t "Lemma 3 - Residue Integration" -d "Prove the lemmas in ResidueCounting section (count_congruent_le, residue_count_interval, bad_residue_sets, count_bad_interval). This links the single-period results to intervals." -r formalize -p 1 --deps erdos728b-b24 erdos728b-7i8
+$ cd /home/jarred/code/erdos-728b && grep -rn 'import Erdos' Erdos/ lakefile.lean 2>/dev/null; cat lakefile.lean
 ```
-
-
-> **Thinking:**
-> **Decomposing the Tasks**
-> 
-> I've outlined six tasks to address the prompt's components: 'valuation_le_cascade' (subdivided), 'count_few_high_digits', 'count_bad_single_prime', and the Chernoff bound calculation. I've also allocated one task to handle any leftover elements, ensuring complete coverage of the initial prompt.
-> 
-> 
-> **Verifying Task Dependencies**
-> 
-> I'm now focusing on task dependencies. I've confirmed that Task 6 includes handling "sorry" elements, and the original task is complete. However, I've identified a possible dependency issue with Task 5. The output of my task creation command only lists one dependency, but I believe it requires two: Task 2 and Task 4. I'll need to investigate this discrepancy further and make a correction if necessary.
-> 
-> 
-> 
-
 
 ```bash
-$ tm update erdos728b-azh --deps erdos728b-b24,erdos728b-7i8
+$ cd /home/jarred/code/erdos-728b && cat lakefile.toml 2>/dev/null || cat lakefile.lean 2>/dev/null
 ```
 
+```bash
+$ cd /home/jarred/code/erdos-728b && cat Erdos.lean 2>/dev/null
+```
+Key finding: **`Lemma3Counting.lean` and `Lemma3Residue.lean` are NOT imported** anywhere. They're dead code — previous formalization attempts that were never wired in. The actual sorry chain to the main theorem is:
 
-> **Thinking:**
-> **Considering Update Alternatives**
-> 
-> I'm now thinking `tm update` might be missing `--deps` support. I'm exploring if I should modify my approach. Perhaps I'll stick with the original or try a UI solution, if one existed. However, I now recall `tm edit` or `tm update` can be used via description too, for that task.
-> 
-> 
-> **Verifying Task Decomposition**
-> 
-> I've decomposed the overall task, confirming I can cover the "sorries" in `Lemma3Counting.lean`. The key tasks are now clearly defined, and I'm confident in the dependencies. I have six tasks: Cascade Induction, Cascade Section, Chernoff Bridge, High Digits Section, Single Prime Count, and Residue Integration. These should cover all the necessary proof steps. I'm verifying one last time to be extra sure.
-> 
-> 
-> 
+```
+erdos_728 → exists_m_choose_dvd_uniform (sorry, Basic.lean:39)
+  → needs Lemma 3 counting argument
+    → which requires the probabilistic path in Lemma3.lean:
+       - expectation_highIndicator (sorry, line 68)
+       - prob_eq_count_div_total inner sorry (line 83)
+       - count_few_high_digits_aux (sorry, line 129)
+```
 
-The decomposition of the remaining work in `Erdos/Lemma3Counting.lean` is complete. The sorries have been mapped to 6 distinct formalize tasks, respecting dependencies and logical grouping.
+But wait — the NL proof (`proofs/lemma3-counting.md`) takes a **deterministic counting** approach (Parts A-E), NOT the probabilistic approach in `Lemma3.lean`. The code in `Lemma3Counting.lean` (dead code) is actually closer to the NL proof's Part A/B/C approach. Let me check if `Lemma3.lean`'s result `count_few_high_digits_bound` is used by anything:
+```bash
+$ cd /home/jarred/code/erdos-728b && grep -rn 'count_few_high_digits_bound\|count_few_high_digits_aux\|expectation_highIndicator\|prob_eq_count_div_total' Erdos/ --include='*.lean' | grep -v '.lake/'
+```
+So `count_few_high_digits_bound` (in `Lemma3.lean`) is only used within `Lemma3.lean` itself — and nothing in `Lemma3.lean` is used by `Basic.lean`. Let me verify:
+```bash
+$ cd /home/jarred/code/erdos-728b && grep -n 'import Erdos.Lemma3' Erdos/Basic.lean
+```
+`Basic.lean` does NOT import `Lemma3.lean`. So the sorry in `Basic.lean:39` (`exists_m_choose_dvd_uniform`) stands alone — it needs to be proved from scratch, and could use either path:
 
-### Created Tasks
+1. **Probabilistic path** (Lemma3.lean) — partially done but has 3 sorrys
+2. **Deterministic counting path** (Lemma3Counting.lean) — dead code, many sorrys but closer to the NL proof
 
-1.  **Lemma 3 Helper - Cascade Induction**
-    -   **ID:** `erdos728b-qfb`
-    -   **Goal:** Prove the decreasing induction step in `valuation_le_cascade`.
-    -   **Context:** Extracts the first `sorry` in `valuation_le_cascade` as a standalone helper lemma.
+The critical question is: **which path to pursue?**
 
-2.  **Lemma 3 - Cascade Section**
-    -   **ID:** `erdos728b-b24`
-    -   **Goal:** Finish `valuation_le_cascade` and prove `count_large_cascade`.
-    -   **Context:** Covers the remaining `sorry` and `?_` hole in the Cascade section.
-    -   **Dependency:** `erdos728b-qfb`
+Let me look more carefully at what `exists_m_choose_dvd_uniform` needs:
+🛠️ **Executing tool: read**
+Now I have the complete picture. Let me read the existing open tasks to understand their current descriptions:
+```bash
+$ cd /home/jarred/code/erdos-728b && tm show erdos728b-cvq 2>/dev/null && echo "---" && tm show erdos728b-q4t 2>/dev/null
+```
+Now I have the full picture. Let me analyze the architecture carefully.
+```bash
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-xs2 --status "Designing task decomposition for connecting Lemma3 to exists_m_choose_dvd_uniform"
+```
+Now let me read the timtam skill for proper task creation syntax:
+🛠️ **Executing tool: read**
 
-3.  **Lemma 3 - Chernoff Bound Bridge**
-    -   **ID:** `erdos728b-vrw`
-    -   **Goal:** Prove or bridge `count_few_high_digits_bound`.
-    -   **Context:** Implements the "Explicit Chernoff bound calculation bridge". Can reference `Lemma3.lean` or implement directly.
+```bash
+$ cd /home/jarred/code/erdos-728b && tm workflow agents 2>/dev/null
+```
+Now I have everything I need. Let me do the comprehensive analysis and create the right tasks.
 
-4.  **Lemma 3 - High Digits Section**
-    -   **ID:** `erdos728b-7i8`
-    -   **Goal:** Prove `highDigitCount_eq` and `count_few_high_digits`.
-    -   **Context:** Covers the HighDigits section sorries.
-    -   **Dependency:** `erdos728b-vrw`
+## Architecture Analysis
 
-5.  **Lemma 3 - Single Prime Count**
-    -   **ID:** `erdos728b-azh`
-    -   **Goal:** Prove `count_bad_single_prime` using union bound.
-    -   **Context:** Combines results from Cascade and High Digits sections.
-    -   **Dependency:** `erdos728b-b24`, `erdos728b-7i8`
+Here's what I see:
 
-6.  **Lemma 3 - Residue Integration**
-    -   **ID:** `erdos728b-sb6`
-    -   **Goal:** Prove `count_congruent_le`, `residue_count_interval`, `bad_residue_sets`, and `count_bad_interval`.
-    -   **Context:** Handles the lifting of bounds from `range(p^D)` to intervals `[m0, 2m0]`.
-    -   **Dependency:** `erdos728b-b24`, `erdos728b-7i8`
+**The critical path** to closing all sorrys is:
+
+1. `erdos_728` (main theorem) → uses `exists_m_choose_dvd_uniform` (sorry at `Basic.lean:39`)
+2. `exists_m_choose_dvd_uniform` needs a full Lemma 3 proof (Parts A through E of the NL proof)
+
+**Two parallel code paths exist** for Lemma 3:
+- **Path A (probabilistic, `Lemma3.lean`)**: Uses measure-theoretic Chernoff bounds. Has 3 sorrys but is imported by the project. However, it only proves `count_few_high_digits_bound` — just Part B4' from the NL proof. **It does NOT prove `exists_m_choose_dvd_uniform`.**
+- **Path B (deterministic, `Lemma3Counting.lean`)**: Closer to the full NL proof (Parts A-E). Has many sorrys. **Not imported.**
+
+**Critical observation**: Neither path currently connects to `exists_m_choose_dvd_uniform`. The entire Lemma 3 integration is missing. The NL proof (Parts A–E) provides a complete counting argument that culminates in Theorem E2, which directly proves `exists_m_choose_dvd_uniform`.
+
+**Strategy decision**: The `Lemma3Counting.lean` code was a previous formalization attempt that has significant structure already built. But it has many sorrys and isn't wired in. Meanwhile, `Lemma3.lean`'s probabilistic approach only handles one piece (the Chernoff/high-digit counting). We need BOTH:
+- The cascade counting from `Lemma3Counting.lean` (Part A)  
+- The high-digit counting from `Lemma3.lean` or `Lemma3Counting.lean` (Part B)
+- The threshold combination (Part C)
+- The residue counting (Part D) 
+- The union bound (Part E)
+- And finally the connection to `exists_m_choose_dvd_uniform`
+
+Let me now create a well-structured task decomposition. First, let me check which sorrys in `Lemma3Counting.lean` have real partial progress:
+🛠️ **Executing tool: read**
+
+🛠️ **Executing tool: read**
+Now I have the complete picture. Let me also check for the `Lemma3Residue.lean` sorry:
+🛠️ **Executing tool: read**
+Now I have a thorough understanding. Let me create the task decomposition.
+```bash
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-xs2 --status "Creating decomposed tasks for Lemma 3 integration pipeline"
+```
+Now I'll create the tasks. The decomposition follows the NL proof structure. There are two parallel tracks (cascade counting and high-digit counting) that merge into the single-prime bound, then residue counting, then union bound, then the final integration.
+
+**Key strategic decision**: `Lemma3Counting.lean` already has significant partial work for Parts A, B, C. `Lemma3Residue.lean` has partial work for Part D. These should be completed and wired in, rather than starting from scratch. The open tasks `erdos728b-cvq` and `erdos728b-q4t` (on `Lemma3.lean`) serve Part B4' (Chernoff bound), which is needed by the deterministic path as `count_few_high_digits_bound`.
+```bash
+$ cd /home/jarred/code/erdos-728b && tm create \
+  -t "Close sorry in carry_propagate cascade induction" \
+  -r formalize -p 1 \
+  -d "Close the two sorrys at Erdos/Lemma3Counting.lean:150-151 inside valuation_le_cascade.
+
+These are in the h_large branch. The proof needs:
+1. Line 150: Decreasing induction on j from i-1 down to s+1, using carry_propagate to show digit p m j = p-1 for each j in [s+1, i-1]. carry_propagate is already proved in the same file (line ~104) and gives exactly this: if carry_cond holds at position i and i > log p k + 1, then digit p m (i-1) = p-1 AND carry_cond holds at i-1.
+2. Line 151: After h_digits is proved, show S_large.card ≤ cascade_length. The cascade_length is defined as the length of the takeWhile of consecutive (p-1) digits starting at position s+1. Since every i in S_large has i > s+1 and carry_cond, h_digits shows all digits from s+1 to i-1 are p-1, so the cascade length is at least i-(s+1). This means S_large ⊆ {s+2, ..., s+1+cascade_length}, giving the bound.
+
+NL proof reference: proofs/lemma3-counting.md, Part A (Lemmas A1-A2).
+Available lemmas: carry_propagate (same file, proved), carry_cond (defined).
+Target: ≤30 lines of new Lean code."
+
+```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm create \
+  -t "Close sorry in count_large_cascade" \
+  -r formalize -p 1 \
+  -d "Close the sorry at Erdos/Lemma3Counting.lean:183 in count_large_cascade.
+
+The lemma has most of its proof already written. The remaining sorry is at line 183 inside the lambda (fun m hm => ?_). The proof needs to show: if cascade_length k D m ≥ T, then for each Fin T index k, digit p m (s + 1 + k) = p - 1.
+
+The proof outline is already sketched:
+- cascade_length is defined via List.takeWhile on digits starting at position s+1
+- hm gives cascade_length ≥ T
+- List.takeWhile_length_ge_iff.mp hm k.val k.isLt gives that the k-th element satisfies the predicate
+- The predicate is (digit p m (s + 1 + k) = p - 1)
+
+The existing code already has h_pred := List.takeWhile_length_ge_iff.mp hm k.val k.isLt, just need to connect it to the goal. Check if List.takeWhile_length_ge_iff exists in current Mathlib or if a manual proof is needed.
+
+NL proof reference: proofs/lemma3-counting.md, Part A (Lemma A3).
+Target: ≤15 lines of new Lean code." \
+  --deps erdos728b-9xx
+
+```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm create \
+  -t "Close sorry in highDigitCount_eq" \
+  -r formalize -p 1 \
+  -d "Close the sorry at Erdos/Lemma3Counting.lean:200 in highDigitCount_eq.
+
+This lemma equates the DigitSpace-based highDigitCount with the Nat-based count_high_digits. The statement is:
+  highDigitCount (toDigitSpace D m) = count_high_digits p m D
+
+After simp, the goal should reduce to showing two filtered Finset.card expressions are equal. The key is:
+- highDigitCount filters Fin D indices i where isHigh p ((toDigitSpace D m) i)
+- count_high_digits filters range D indices i where is_high_digit p m i
+- toDigitSpace D m i = ⟨digit p m i, ...⟩ by definition
+- isHigh p ⟨digit p m i, ...⟩ ↔ is_high_digit p m i (both check digit p m i ≥ (p+1)/2)
+
+The proof should be a Finset.card bijection or congr argument showing the two filter predicates are equivalent under the obvious correspondence between Fin D and range D.
+
+NL proof reference: proofs/lemma3-counting.md, Part B (definition of H(m)).
+Target: ≤20 lines of new Lean code."
+
+```
+Now the Chernoff-related tasks. The existing `erdos728b-cvq` and `erdos728b-q4t` handle the probabilistic Chernoff path in `Lemma3.lean`. But `Lemma3Counting.lean` at line 187 has a `sorry -- Citation axiom` for `count_few_high_digits_bound`. This is a duplicate of `Lemma3.lean:131`. We need to decide: use the probabilistic `Lemma3.lean` result or prove it directly in `Lemma3Counting.lean`?
+
+The simplest path: make `Lemma3Counting.lean` import `Erdos.Lemma3` and USE the result from there. Or just mark the citation axiom as acceptable and move on to prove `count_few_high_digits` (line 214) using it.
+```bash
+$ cd /home/jarred/code/erdos-728b && tm create \
+  -t "Close sorry in count_few_high_digits" \
+  -r formalize -p 1 \
+  -d "Close the sorry at Erdos/Lemma3Counting.lean:214 in count_few_high_digits.
+
+The proof outline is already written. The sorry is after:
+  rw [h_card]
+where h_card converts the Finset.filter count to Fintype.card S'.
+
+The remaining step needs to:
+1. Bound Fintype.card S' using count_few_high_digits_bound (line 187, currently a sorry/citation axiom — treat it as available).
+2. count_few_high_digits_bound gives: for DigitSpace tuples with highDigitCount ≤ t, the count is ≤ p^D * exp(-2*((D*probHigh p) - t)^2 / D).
+3. For t = D/6 and p ≥ 3, probHigh p = ⌊p/2⌋/p ≥ 1/3, so D*probHigh p ≥ D/3.
+4. The deviation (D/3 - D/6) = D/6, giving exp(-2*(D/6)^2/D) = exp(-D/18) ≤ 2^(-D/36).
+5. Therefore the count ≤ p^D * 2^(-D/36) = p^D / 2^(D/36).
+
+Note: count_few_high_digits_bound is marked as a citation axiom at line 187. The task should use it as-is (even with sorry) and focus only on the arithmetic deduction from it to the final bound. If count_few_high_digits_bound compiles (even with sorry), the downstream proof should still compile.
+
+NL proof reference: proofs/lemma3-counting.md, Part B (Lemma B4').
+Dependencies: erdos728b-zws (needs highDigitCount_eq).
+Target: ≤30 lines of new Lean code." \
+  --deps erdos728b-zws
+
+```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm create \
+  -t "Close sorry in count_bad_single_prime" \
+  -r formalize -p 1 \
+  -d "Close the sorry at Erdos/Lemma3Counting.lean:224 in count_bad_single_prime.
+
+This is the threshold argument (Part C of the NL proof). The proof combines the cascade and high-digit bounds:
+
+1. Define Bad1 = {m : v_p(C(m+k,k)) > D/6} and Bad2 = {m : v_p(C(2m,m)) < D/6}
+2. Show: if v_p(C(m+k,k)) > v_p(C(2m,m)), then m ∈ Bad1 ∪ Bad2
+3. Bound |Bad1| using valuation_le_cascade + count_large_cascade:
+   - v_p(C(m+k,k)) > D/6 = s+1+T0 implies L(m) > T0, so L ≥ T0+1
+   - count_large_cascade gives |{L ≥ T0+1}| ≤ p^(D-T0-1)
+   - So |Bad1| ≤ p^D / p^(T0+1) = p^D / p^(D/6 - log p k)
+4. Bound |Bad2| using valuation_ge_high_digits + count_few_high_digits:
+   - v_p(C(2m,m)) < D/6 implies H(m) < D/6
+   - count_few_high_digits gives |{H < D/6}| ≤ p^D / 2^(D/36)
+5. Union bound: Finset.card_union_le gives |Bad| ≤ |Bad1| + |Bad2|
+
+Available lemmas (all in same file):
+- valuation_le_cascade, count_large_cascade (cascade bounds)
+- valuation_ge_high_digits, count_few_high_digits (high-digit bounds)
+- Finset.card_union_le from Mathlib
+
+NL proof reference: proofs/lemma3-counting.md, Part C (Theorem C1).
+Target: ≤40 lines of new Lean code." \
+  --deps erdos728b-s9h,erdos728b-2wo
+
+```
+Now the residue counting tasks. `Lemma3Residue.lean` has one sorry; `Lemma3Counting.lean` has the higher-level sorrys:
+```bash
+$ cd /home/jarred/code/erdos-728b && tm create \
+  -t "Close sorry in residue_count_interval" \
+  -r formalize -p 1 \
+  -d "Close the sorry at Erdos/Lemma3Residue.lean:54 inside count_le.
+
+This lemma bounds the number of elements in [a,b) with a fixed residue mod p^D. The statement:
+  ((Ico a b).filter (fun m => m % p^D = r)).card ≤ q + 1
+where q = (b-a) / p^D.
+
+The proof outline is already written with comments. The key insight is:
+- Map each m to m / p^D. Since m % p^D = r is fixed, this map is injective on the relevant set (already proved as 'inj').
+- The image under this map is contained in an interval of length q+1: m ∈ [a,b) implies m/p^D ∈ [a/p^D, (b-1)/p^D], which has at most q+1 = (b-a)/p^D + 1 elements.
+- Use Finset.card_le_card_of_injOn or card_image_le combined with card of the target interval.
+
+Alternative approach: partition [a,b) into at most q+1 blocks of length p^D. Each block contains at most one m with m%p^D = r. This gives the bound directly.
+
+The outer structure (calc chain summing over R) is already complete in the file — only the inner sorry at line 54 needs closing.
+
+NL proof reference: proofs/lemma3-counting.md, Part D (Lemma D1).
+Target: ≤20 lines of new Lean code."
+
+```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm create \
+  -t "Close sorrys in Lemma3Counting residue section" \
+  -r formalize -p 1 \
+  -d "Close the sorrys at Erdos/Lemma3Counting.lean:228, 235, 241 in the ResidueCounting section.
+
+Three lemmas need proofs:
+
+1. count_congruent_le (line 228): For any K > 0, |{m ∈ [a,b) : m%K = r}| ≤ (b-a)/K + 1.
+   Same as the result in Lemma3Residue.lean but stated differently. Can import from Lemma3Residue or prove independently. The argument is the same: injectively map m → m/K, image has ≤ (b-a)/K + 1 elements.
+
+2. residue_count_interval (line 235): |{m ∈ [a,b) : m%p^D ∈ R}| ≤ |R| * ((b-a)/p^D + 1).
+   Decompose the filter by residue class (Finset.card_biUnion or sum argument), apply count_congruent_le to each residue, sum over R.
+
+3. bad_residue_sets (line 241): Both bad events depend only on m mod p^D.
+   Part 1: v_p(C(m+k,k)) > D/6 depends only on digits 0..D-1 of m, hence on m%p^D. Use valuation_le_cascade to show the cascade length (which depends only on digits s+1..D-1) determines the bound.
+   Part 2: v_p(C(2m,m)) < D/6 implies H(m) < D/6 (by valuation_ge_high_digits), and H(m) depends only on digits 0..D-1, hence on m%p^D.
+
+NL proof reference: proofs/lemma3-counting.md, Parts D1-D2.
+Available lemmas: valuation_le_cascade, valuation_ge_high_digits, cascade_length, count_high_digits.
+Target: ≤40 lines of new Lean code total." \
+  --deps erdos728b-rw2,erdos728b-9fz
+
+```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm create \
+  -t "Close sorry in count_bad_interval" \
+  -r formalize -p 1 \
+  -d "Close the sorry at Erdos/Lemma3Counting.lean:246 in count_bad_interval.
+
+This is the corollary combining the single-prime bound with residue counting to bound bad m in [m0, 2m0). The statement:
+  |{m ∈ [m0, 2m0) : v_p(C(m+k,k)) > v_p(C(2m,m))}| ≤ (2*m0)/2^(D/36) + (2*p^D)/2^(D/36)
+
+Proof outline (Part D, Corollary D3 in NL proof):
+1. Use bad_residue_sets to get the set R of bad residues mod p^D.
+2. |R| ≤ count_bad_single_prime bound = p^D/p^(D/6-log p k) + p^D/2^(D/36) ≤ 2*p^D/2^(D/36) (using the simplification from Corollary C2 in NL proof, which needs D/6-log p k ≥ D/36 under the hypothesis).
+3. Apply residue_count_interval with [a,b) = [m0, 2m0), so b-a = m0.
+4. |bad| ≤ |R| * (m0/p^D + 1) ≤ (2p^D/2^(D/36)) * ((m0+p^D)/p^D) = 2(m0+p^D)/2^(D/36).
+5. Since p^D ≤ m0: this ≤ 4m0/2^(D/36). The tighter form is (2m0 + 2p^D)/2^(D/36).
+
+Available lemmas: bad_residue_sets, residue_count_interval, count_bad_single_prime.
+NL proof reference: proofs/lemma3-counting.md, Part D (Corollary D3).
+Target: ≤30 lines of new Lean code." \
+  --deps erdos728b-e6t
+
+```
+Now the grand finale — wiring `Lemma3Counting.lean` into `Basic.lean` to close `exists_m_choose_dvd_uniform`:
+```bash
+$ cd /home/jarred/code/erdos-728b && tm create \
+  -t "Wire Lemma3Counting into exists_m_choose_dvd_uniform" \
+  -r formalize -p 0 \
+  -d "Close the sorry at Erdos/Basic.lean:39 in exists_m_choose_dvd_uniform.
+
+This is the CRITICAL integration task — it connects the Lemma 3 counting argument to the main theorem.
+
+The statement:
+  ∃ M₀ : ℕ, ∀ m₀ : ℕ, M₀ ≤ m₀ → ∀ k : ℕ, 1 ≤ k → k ≤ m₀ →
+    ∃ m : ℕ, m₀ ≤ m ∧ m ≤ 2 * m₀ ∧ (m + k).choose k ∣ (2 * m).choose m
+
+Steps:
+1. Add 'import Erdos.Lemma3Counting' to Basic.lean (and add the file to Erdos.lean root).
+2. Implement Part E (union bound over primes) from NL proof:
+   a. For each prime p ≤ 2k, choose D_p = 36*⌈log₂(16k)⌉ + 36*⌊log_p(k+1)⌋ + 36
+   b. Verify D_p satisfies hypotheses of count_bad_interval
+   c. Verify p^D_p ≤ m₀ for M₀ = (2k)^(72*⌈log₂(16k)⌉+72)
+   d. Each prime contributes ≤ m₀/(8k) bad m (since 2^(D_p/36) ≥ 32k)
+   e. Union bound: total bad ≤ π(2k) * m₀/(8k) ≤ m₀/4 < m₀
+3. Since |bad| < m₀ = |[m₀, 2m₀)|, there exists a good m
+4. For this good m: v_p(C(m+k,k)) ≤ v_p(C(2m,m)) for ALL primes p ≤ 2k
+5. For primes p > 2k: carry_dominance (already proved in Lemmas.lean) gives v_p(C(m+k,k)) ≤ v_p(C(2m,m))
+6. Combine: C(m+k,k) | C(2m,m) by comparing all prime valuations
+
+This task may need to create helper lemmas for the union bound arithmetic (Part E of the NL proof). If needed, put them in a new file Erdos/UnionBound.lean or directly in Lemma3Counting.lean.
+
+Available lemmas:
+- count_bad_interval (Lemma3Counting.lean) — per-prime bound over intervals
+- carry_dominance (Lemmas.lean) — large prime handling
+- Nat.Primes, Finset.filter for enumerating primes ≤ 2k
+- Nat.factorization for combining prime-by-prime divisibility
+
+NL proof reference: proofs/lemma3-counting.md, Part E (Theorem E2).
+IMPORTANT: Do NOT modify the theorem statement. Only fill in the proof." \
+  --deps erdos728b-4tm
+
+```
+Now let me also create an explore task for the union bound arithmetic, since that's a non-trivial mathematical argument (Part E) that hasn't been independently verified for the specific parameter choices:
+```bash
+$ cd /home/jarred/code/erdos-728b && tm create \
+  -t "Prove union bound arithmetic for Part E" \
+  -r explore -p 1 \
+  -d "Write a detailed NL proof of the union bound arithmetic (Part E of lemma3-counting.md) with enough detail for direct Lean formalization.
+
+The NL proof in proofs/lemma3-counting.md Part E already has this, but the formalization task (erdos728b-hwa) may need more granular steps. Specifically, prove in detail:
+
+1. For D_p = 36*ceil(log2(16k)) + 36*floor(logp(k+1)) + 36:
+   - D_p ≥ 16*logp(k+1) + 16 (needed for count_bad_interval hypothesis)
+   - p^D_p ≤ (2k)^(72*ceil(log2(16k))+72) for all primes p ≤ 2k
+
+2. The key decay estimate: D_p/36 ≥ ceil(log2(16k)) + 1 ≥ log2(32k), so 2^(D_p/36) ≥ 32k.
+
+3. Per-prime contribution: 4*m0/2^(D_p/36) ≤ 4*m0/(32k) = m0/(8k)
+
+4. Union bound: sum over ≤ 2k primes gives total ≤ 2k * m0/(8k) = m0/4
+
+5. Existence: m0/4 < m0 so at least 3/4 of m in [m0, 2m0) are good.
+
+Focus on making the arithmetic steps explicit enough that omega/norm_num/linarith can close each step in Lean. Pay special attention to the interplay between nat division (floor) and real logarithms."
+
+```
+Now let me create a verify task for that explore:
+```bash
+$ cd /home/jarred/code/erdos-728b && tm create \
+  -t "Review Part E union bound proof" \
+  -r verify -p 2 \
+  --deps erdos728b-t4f
+
+```
+Now let me also handle the `prob_eq_count_div_total` sorry in `Lemma3.lean:83` — this is needed if we continue the probabilistic path, but it's NOT on the critical path since `Lemma3.lean` isn't imported by `Basic.lean`. Let me check the open tasks for it:
+
+The existing open tasks `erdos728b-cvq` (expectation_highIndicator) and `erdos728b-q4t` (count_few_high_digits_aux) are for the probabilistic path in `Lemma3.lean`. These are NOT on the critical path to closing the main theorem, but they ARE needed to eventually close the Chernoff citation axiom in `Lemma3Counting.lean:187`. Let me make sure the dependency is clear:
+```bash
+$ cd /home/jarred/code/erdos-728b && tm create \
+  -t "Close Chernoff citation axiom in Lemma3Counting" \
+  -r formalize -p 2 \
+  -d "Close the sorry at Erdos/Lemma3Counting.lean:187 (count_few_high_digits_bound, marked 'Citation axiom').
+
+This is the same result as Erdos/Lemma3.lean:131 (count_few_high_digits_bound). Two approaches:
+
+Option A: Import Erdos.Lemma3 from Lemma3Counting.lean and use the result directly. This requires first closing the sorrys in Lemma3.lean (erdos728b-cvq, erdos728b-q4t, and the prob_eq_count_div_total sorry at line 83).
+
+Option B: Prove it directly using Mathlib's sub-Gaussian machinery without going through the probabilistic path. See artifacts/mathlib-coverage.md for available Mathlib lemmas:
+- ProbabilityTheory.HasSubgaussianMGF.measure_sum_ge_le_of_iIndepFun
+- ProbabilityTheory.hasSubgaussianMGF_of_mem_Icc
+
+The Chernoff bound is the LAST remaining sorry after all other Lemma3 tasks are complete. It can remain as a sorry while the rest of the pipeline is built out.
+
+This task is Priority 2 because the main theorem pipeline can proceed with this sorry in place — it's the deepest leaf sorry and doesn't block the structural integration.
+
+NL proof reference: proofs/lemma3-counting.md, Lemma B4' (Chernoff bound)." \
+  --deps erdos728b-cvq,erdos728b-q4t
+
+```
+Finally, we need a task for the `prob_eq_count_div_total` sorry in `Lemma3.lean` since `erdos728b-q4t` depends on `erdos728b-cvq` which may need it:
+```bash
+$ cd /home/jarred/code/erdos-728b && tm create \
+  -t "Close sorry in prob_eq_count_div_total (Lemma3.lean:83)" \
+  -r formalize -p 2 \
+  -d "Close the sorry at Erdos/Lemma3.lean:83 inside prob_eq_count_div_total, specifically in h_sing_enn.
+
+The sorry is inside a have statement proving:
+  h_sing_enn (x : DigitSpace D p) : μ {x} = ((p : ℝ≥0∞)⁻¹)^D
+
+where μ = probDigitSpace D p = Measure.pi (fun _ => probFin p).
+
+The proof needs:
+1. For a product measure, μ {x} = ∏ i, μ_i {x i} (Measure.pi_singleton or similar)
+2. probFin p {d} = (p : ℝ≥0∞)⁻¹ for any d : Fin p (from the definition of probFin as (p)⁻¹ • count)
+3. The product of D copies of p⁻¹ is (p⁻¹)^D
+
+The comment says 'Proof blocked by mysterious type class instance failure in Finset.prod_congr'. The issue may be:
+- MeasurableSpace on Fin p is ⊤ (discrete), defined locally in the file
+- Measure.pi_singleton or Measure.pi_apply_singleton may need MeasurableSingletonClass instances
+- Try using Measure.pi_pi_singleton (if available) or compute via Measure.pi definition directly
+
+This is NOT on the critical path (Lemma3.lean is not imported by Basic.lean) but needed for the Chernoff bound chain."
+
+```
+Now let me also add `Lemma3Counting` and `Lemma3Residue` to the import list — but wait, that's implementation work. The formalize tasks should handle that. Let me verify the tree looks right:
+```bash
+$ cd /home/jarred/code/erdos-728b && tm tree 2>/dev/null
+```
+The task tree looks clean and well-structured. Let me verify the unblocked leaf tasks:
+```bash
+$ cd /home/jarred/code/erdos-728b && tm list --open 2>/dev/null
+```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm ls 2>/dev/null
+```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm ls
+```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm list
+```
+Good. The unblocked leaf tasks (no unsatisfied dependencies) are:
+- `erdos728b-9xx` — cascade induction (P1, formalize)
+- `erdos728b-zws` — highDigitCount_eq (P1, formalize)
+- `erdos728b-9fz` — residue_count_interval (P1, formalize)
+- `erdos728b-cvq` — expectation_highIndicator (P1, formalize)
+- `erdos728b-t4f` — Part E union bound (P1, explore)
+- `erdos728b-9s7` — prob_eq_count_div_total (P2, formalize)
+
+These can all run in parallel. Let me now close out my task:
+```bash
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-xs2 --state closed --status "Complete"
+```
+```json
+{
+  "status": "completed",
+  "summary": "Created 10 new tasks (8 formalize, 1 explore, 1 verify) decomposing the Lemma 3 integration into a well-structured dependency DAG.",
+  "details": "## Gap Analysis\n\n### Current sorry count: 4 (in compiled code)\n- `Basic.lean:39` — `exists_m_choose_dvd_uniform` (main theorem dependency)\n- `Lemma3.lean:68` — `expectation_highIndicator` (probabilistic path)\n- `Lemma3.lean:83` — `prob_eq_count_div_total` inner sorry (probabilistic path)\n- `Lemma3.lean:129` — `count_few_high_digits_aux` (Chernoff bound)\n\n### Dead code with sorrys: 12 (Lemma3Counting.lean + Lemma3Residue.lean)\nThese files are NOT imported but contain the correct structural approach matching the verified NL proof.\n\n### Key architectural finding\nThe verified NL proof (proofs/lemma3-counting.md, Parts A-E) takes a **deterministic counting** approach. The existing `Lemma3Counting.lean` code partially implements this approach but is dead code (not imported). The critical integration is to:\n1. Complete the sorrys in `Lemma3Counting.lean`\n2. Wire it into `Basic.lean` via imports\n3. Use it to prove `exists_m_choose_dvd_uniform`\n\n### Task DAG (critical path in bold)\n\n**Parallel leaf tasks (unblocked now):**\n- `erdos728b-9xx` — Cascade induction (Lemma3Counting.lean:150-151)\n- `erdos728b-zws` — highDigitCount_eq (Lemma3Counting.lean:200)\n- `erdos728b-9fz` — residue_count_interval (Lemma3Residue.lean:54)\n- `erdos728b-cvq` — expectation_highIndicator (Lemma3.lean:68, pre-existing)\n- `erdos728b-t4f` — Part E union bound arithmetic (explore)\n- `erdos728b-9s7` — prob_eq_count_div_total (Lemma3.lean:83)\n\n**Cascade chain:**\n`9xx` → `s9h` (count_large_cascade) → `rw2` (count_bad_single_prime)\n\n**High-digit chain:**\n`zws` → `2wo` (count_few_high_digits) → `rw2`\n\n**Integration chain:**\n`rw2` + `9fz` → `e6t` (residue section) → `4tm` (count_bad_interval) → **`hwa`** (wire into exists_m_choose_dvd_uniform, P0)\n\n**Chernoff chain (P2, non-blocking):**\n`cvq` → `q4t` → `6a3` (close citation axiom)\n\nThe Chernoff citation axiom (Lemma3Counting.lean:187) is the LAST sorry to close. The entire structural pipeline works with it remaining as sorry."
+}
+```
 
 ## Final Result
 
-The decomposition of the remaining work in `Erdos/Lemma3Counting.lean` is complete. The sorries have been mapped to 6 distinct formalize tasks, respecting dependencies and logical grouping.
+```json
+{
+  "status": "completed",
+  "summary": "Created 10 new tasks (8 formalize, 1 explore, 1 verify) decomposing the Lemma 3 integration into a well-structured dependency DAG.",
+  "details": "## Gap Analysis\n\n### Current sorry count: 4 (in compiled code)\n- `Basic.lean:39` — `exists_m_choose_dvd_uniform` (main theorem dependency)\n- `Lemma3.lean:68` — `expectation_highIndicator` (probabilistic path)\n- `Lemma3.lean:83` — `prob_eq_count_div_total` inner sorry (probabilistic path)\n- `Lemma3.lean:129` — `count_few_high_digits_aux` (Chernoff bound)\n\n### Dead code with sorrys: 12 (Lemma3Counting.lean + Lemma3Residue.lean)\nThese files are NOT imported but contain the correct structural approach matching the verified NL proof.\n\n### Key architectural finding\nThe verified NL proof (proofs/lemma3-counting.md, Parts A-E) takes a **deterministic counting** approach. The existing `Lemma3Counting.lean` code partially implements this approach but is dead code (not imported). The critical integration is to:\n1. Complete the sorrys in `Lemma3Counting.lean`\n2. Wire it into `Basic.lean` via imports\n3. Use it to prove `exists_m_choose_dvd_uniform`\n\n### Task DAG (critical path in bold)\n\n**Parallel leaf tasks (unblocked now):**\n- `erdos728b-9xx` — Cascade induction (Lemma3Counting.lean:150-151)\n- `erdos728b-zws` — highDigitCount_eq (Lemma3Counting.lean:200)\n- `erdos728b-9fz` — residue_count_interval (Lemma3Residue.lean:54)\n- `erdos728b-cvq` — expectation_highIndicator (Lemma3.lean:68, pre-existing)\n- `erdos728b-t4f` — Part E union bound arithmetic (explore)\n- `erdos728b-9s7` — prob_eq_count_div_total (Lemma3.lean:83)\n\n**Cascade chain:**\n`9xx` → `s9h` (count_large_cascade) → `rw2` (count_bad_single_prime)\n\n**High-digit chain:**\n`zws` → `2wo` (count_few_high_digits) → `rw2`\n\n**Integration chain:**\n`rw2` + `9fz` → `e6t` (residue section) → `4tm` (count_bad_interval) → **`hwa`** (wire into exists_m_choose_dvd_uniform, P0)\n\n**Chernoff chain (P2, non-blocking):**\n`cvq` → `q4t` → `6a3` (close citation axiom)\n\nThe Chernoff citation axiom (Lemma3Counting.lean:187) is the LAST sorry to close. The entire structural pipeline works with it remaining as sorry."
+}
+```
 
-### Created Tasks
-
-1.  **Lemma 3 Helper - Cascade Induction**
-    -   **ID:** `erdos728b-qfb`
-    -   **Goal:** Prove the decreasing induction step in `valuation_le_cascade`.
-    -   **Context:** Extracts the first `sorry` in `valuation_le_cascade` as a standalone helper lemma.
-
-2.  **Lemma 3 - Cascade Section**
-    -   **ID:** `erdos728b-b24`
-    -   **Goal:** Finish `valuation_le_cascade` and prove `count_large_cascade`.
-    -   **Context:** Covers the remaining `sorry` and `?_` hole in the Cascade section.
-    -   **Dependency:** `erdos728b-qfb`
-
-3.  **Lemma 3 - Chernoff Bound Bridge**
-    -   **ID:** `erdos728b-vrw`
-    -   **Goal:** Prove or bridge `count_few_high_digits_bound`.
-    -   **Context:** Implements the "Explicit Chernoff bound calculation bridge". Can reference `Lemma3.lean` or implement directly.
-
-4.  **Lemma 3 - High Digits Section**
-    -   **ID:** `erdos728b-7i8`
-    -   **Goal:** Prove `highDigitCount_eq` and `count_few_high_digits`.
-    -   **Context:** Covers the HighDigits section sorries.
-    -   **Dependency:** `erdos728b-vrw`
-
-5.  **Lemma 3 - Single Prime Count**
-    -   **ID:** `erdos728b-azh`
-    -   **Goal:** Prove `count_bad_single_prime` using union bound.
-    -   **Context:** Combines results from Cascade and High Digits sections.
-    -   **Dependency:** `erdos728b-b24`, `erdos728b-7i8`
-
-6.  **Lemma 3 - Residue Integration**
-    -   **ID:** `erdos728b-sb6`
-    -   **Goal:** Prove `count_congruent_le`, `residue_count_interval`, `bad_residue_sets`, and `count_bad_interval`.
-    -   **Context:** Handles the lifting of bounds from `range(p^D)` to intervals `[m0, 2m0]`.
-    -   **Dependency:** `erdos728b-b24`, `erdos728b-7i8`
-
-End Time: 2026-02-10T19:46:33.396Z
+End Time: 2026-02-10T21:28:58.496Z
