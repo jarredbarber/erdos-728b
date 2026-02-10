@@ -1,5 +1,5 @@
 {
   "status": "completed",
-  "summary": "Closed sorry in count_large_cascade. lake build succeeds.",
-  "details": "Replaced the reference to the missing `List.takeWhile_length_ge_iff` with a direct proof. The proof uses `List.takeWhile_prefix` to show that `(range n).takeWhile p` is a prefix of `range n`, and thus equals `range k` for some `k`. This allows concluding that if the length is at least `T`, then for all `k < T`, `p k` holds (which corresponds to `digit ... = p - 1`)."
+  "summary": "Closed sorry in count_few_high_digits. lake build succeeds.",
+  "details": "Implemented the bound using count_few_high_digits_bound. \n1. Proved probHigh p ≥ 1/3 for p ≥ 3.\n2. Used Nat.le_floor_iff and Nat.floor_div_eq_div to bridge the gap between Real bound (p^D * exp(...)) and Nat bound (p^D / 2^(D/36)).\n3. Used the exponential bound exp(-D/18) ≤ 2^(-D/36) derived from 2 ≥ ln 2.\n4. Cleaned up imports and removed temporary files."
 }

@@ -242,8 +242,65 @@ lemma count_few_high_digits (hp : p.Prime) (t : ℕ) (ht : t ≤ D/6) (hp_ge_3 :
     let iso : {m : Fin (p^D) | count_high_digits p m D < t} ≃ S' :=
       Equiv.subtypeEquiv equiv (by intro m; dsimp [equiv]; simp [highDigitCount_eq hp D]; rfl)
     exact Fintype.card_congr iso
-  rw [h_card]
-  sorry
+  cases D with
+  | zero =>
+    simp at ht
+    have : t = 0 := by omega
+    subst this
+    simp [S', highDigitCount]
+    norm_num
+  | succ d =>
+    have h_prob : probHigh p ≥ 1/3 := by
+      rw [probHigh, div_ge_iff (by norm_cast; linarith)]
+      norm_cast
+      cases Nat.mod_two_eq_zero_or_one p with
+      | inl h => rw [(Nat.dvd_iff_mod_eq_zero _ _).mpr h]; ring_nf; linarith
+      | inr h => rw [← Nat.mul_div_cancel' h, mul_comm, add_comm]; linarith
+
+    let t_R : ℝ := t
+    have h_bound := count_few_high_digits_bound D t_R (by
+      apply lt_of_le_of_lt (by norm_cast; exact ht)
+      calc (D/6 : ℝ) < D/3 := by have : (D:ℝ) > 0 := by norm_cast; omega; linarith
+           _ ≤ D * probHigh p := by gcongr)
+
+    have h_sub : S' ⊆ (Finset.univ.filter (fun m => (highDigitCount m : ℝ) ≤ t_R)) := by
+      intro x hx; simp [S'] at hx; simp; norm_cast; omega
+    
+    -- Use floor to bridge Real and Nat
+    have h_floor : ⌊(p^D : ℝ) / 2^(D/36)⌋₊ = p^D / 2^(D/36) := by
+      rw [Nat.floor_eq_iff (by positivity)]
+      constructor
+      · exact Nat.cast_div_le
+      · rw [div_lt_iff (by positivity), add_one_mul, ← Nat.cast_add_one, ← Nat.cast_mul]
+        norm_cast
+        rw [mul_comm]
+        exact Nat.lt_mul_div_succ _ (by positivity)
+    
+    rw [← h_floor, Nat.le_floor_iff (by positivity)]
+    
+    apply le_trans (le_trans (Finset.card_le_card_of_subset h_sub) h_bound)
+    
+    rw [div_eq_mul_inv, Real.inv_rpow (by norm_num) _]
+    calc
+      (p^D : ℝ) * exp (-2 * (D * probHigh p - t_R)^2 / D) 
+        ≤ p^D * exp (-D/18) := by
+          gcongr
+          rw [neg_le_neg_iff, div_le_div_iff (by norm_cast; omega) (by norm_num)]
+          ring_nf
+          have : D * probHigh p - t_R ≥ D/6 := by
+            calc D * probHigh p - t_R ≥ (D:ℝ)/3 - D/6 := by gcongr; norm_cast
+                 _ = D/6 := by ring
+          nlinarith
+      _ ≤ p^D * 2^(-(D:ℝ)/36) := by
+        gcongr
+        rw [← Real.log_le_log_iff (Real.exp_pos _) (Real.rpow_pos_of_pos (by norm_num) _), Real.log_exp, Real.log_rpow (by norm_num)]
+        linarith [Real.log_two_lt_one]
+      _ = p^D / 2^((D:ℝ)/36) := by rw [Real.rpow_neg (by norm_num), div_eq_mul_inv]
+      _ ≤ p^D / 2^(D/36 : ℕ) := by
+        gcongr
+        norm_cast
+        apply Nat.floor_le
+        positivity
 
 end HighDigits
 
