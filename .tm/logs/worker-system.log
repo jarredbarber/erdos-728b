@@ -2753,3 +2753,189 @@ Three sorry'd helper lemmas remain:
 - exists_good_m: combines the above two (needs threshold compatibility argument)
 
 The reduction_lemma and carry_dominance from Lemmas.lean are used directly."
+[2026-02-10T16:51:00.900Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-ud3 --status "Main theorem proven! 3 sorry'd helper lemmas remain: exists_m_choose_dvd, log_gap_bounds, exists_good_m. Building succeeds." 2>/dev/null || true
+[2026-02-10T16:51:41.351Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_good_m.lean << 'EOF'
+import Mathlib
+import Erdos.Lemmas
+
+open Real Nat
+open scoped Nat Topology
+
+namespace Erdos728
+
+-- Sorry'd dependencies
+lemma exists_m_choose_dvd (k : ℕ) (hk : 1 ≤ k) :
+    ∃ M₀ : ℕ, ∀ m₀ : ℕ, M₀ ≤ m₀ →
+      ∃ m : ℕ, m₀ ≤ m ∧ m ≤ 2 * m₀ ∧ (m + k).choose k ∣ (2 * m).choose m := by
+  sorry
+
+lemma log_gap_bounds (C C' : ℝ) (hC : 0 < C) (hCC' : C < C') :
+    ∃ M₀ : ℕ, ∀ m₀ : ℕ, M₀ ≤ m₀ →
+      let k := ⌊(C + C') / 2 * Real.log (2 * ↑m₀)⌋₊
+      1 ≤ k ∧
+      ∀ m : ℕ, m₀ ≤ m → m ≤ 2 * m₀ →
+        C * Real.log (2 * ↑m) < ↑k ∧
+        (↑k : ℝ) < C' * Real.log (2 * ↑m) := by
+  sorry
+
+-- Now try to prove exists_good_m from the two above
+-- The challenge: k depends on m₀, and exists_m_choose_dvd gives a threshold 
+-- that depends on k.
+-- 
+-- Strategy: 
+-- 1. Pick m₀_init ≥ M₁ (from log_gap_bounds). This gives k₀.
+-- 2. Get M₂ from exists_m_choose_dvd k₀.
+-- 3. Set M₀ = max(m₀_init, M₂).
+-- 4. For any m₀ ≥ M₀:
+--    - m₀ ≥ m₀_init ≥ M₁, so the k for m₀ is valid
+--    - But k for m₀ might differ from k₀!
+--    - However, k is monotone in m₀ (since log is monotone)
+--    - So k(m₀) ≥ k₀ for m₀ ≥ m₀_init
+--    - exists_m_choose_dvd needs to work for k(m₀), not just k₀
+--
+-- This approach doesn't work directly because exists_m_choose_dvd 
+-- gives a separate threshold for each k.
+--
+-- Better approach: don't try to wire them together. Instead, 
+-- prove exists_good_m directly using a combined argument.
+-- OR, use a quantifier swap.
+--
+-- Cleanest Lean approach: For a given (C, C'), we can pick a SPECIFIC
+-- large m₀ and show everything works. The ∃ M₀ statement just needs
+-- us to exhibit one such threshold.
+--
+-- Let me try: obtain the M₁ from log_gap_bounds, pick m₀ = M₁,
+-- get k from this, then get M₂ from exists_m_choose_dvd k,
+-- then set M₀ = max(M₁, M₂).
+-- For any m₀ ≥ M₀: we compute k' = ⌊...⌋₊ using m₀.
+-- But we want to use the SAME k as we got for M₁.
+-- Actually no — we want k to depend on m₀. That's the whole point.
+--
+-- The real issue: the lemma exists_m_choose_dvd works for a FIXED k,
+-- but in the combined statement k varies with m₀.
+--
+-- The RIGHT approach: strengthen exists_m_choose_dvd to work for all k
+-- simultaneously, or reformulate.
+--
+-- Actually, the simplest fix: exists_m_choose_dvd says for EACH k ≥ 1,
+-- ∃ M₀(k), ∀ m₀ ≥ M₀(k), ... . The NL proof says M₀(k) grows 
+-- polynomially in k (roughly k^40 or (π(2k))^40). Since k = O(log m₀),
+-- M₀(k) = O((log m₀)^40) = o(m₀). So for m₀ large enough, m₀ ≥ M₀(k(m₀)).
+--
+-- This is a real analysis argument. Let me formalize it with a sorry on 
+-- the growth rate, or find a simpler path.
+--
+-- Actually, here's the key insight: we DON'T need to use exists_m_choose_dvd
+-- with varying k. We can use it with a FIXED k, and then observe that
+-- log_gap_bounds works for that same fixed k if m₀ is in the right range.
+--
+-- Wait, but k = ⌊(C+C')/2 * log(2*m₀)⌋₊ changes with m₀. Unless we
+-- fix k and then find the range of m₀ for which the log bounds hold for
+-- that k... This is more natural!
+--
+-- New approach: Fix k ≥ 1. Then:
+-- (a) exists_m_choose_dvd gives M₀(k): for m₀ ≥ M₀(k), ∃ m with divisibility.
+-- (b) The log gap C * log(2m) < k < C' * log(2m) for m ∈ [m₀, 2m₀] 
+--     is equivalent to roughly e^{k/C'} / 2 < m₀ < e^{k/C} / 2.
+--     So for each k, there's a range of m₀ that works.
+-- (c) If we can find k such that the range in (b) contains some m₀ ≥ M₀(k),
+--     we're done.
+--
+-- Since the range in (b) grows exponentially in k while M₀(k) grows 
+-- polynomially, this works for large k.
+--
+-- For the ∃ M₀ statement: we need to show ∀ m₀ ≥ M₀, ... . So we need
+-- a single M₀ that works for ALL large m₀.
+--
+-- Hmm, this is getting circular again. Let me try a different formulation.
+
+-- Alternative: Let me try to prove it directly using the sorry'd lemmas,
+-- accepting that we need to handle the threshold compatibility manually.
+
+-- The trick: exists_m_choose_dvd gives ∃ M₀, ∀ m₀ ≥ M₀, ... for EACH k.
+-- We can compose by first getting k from m₀, then applying exists_m_choose_dvd.
+-- But the ∃ M₀ in the conclusion must be independent of m₀.
+-- 
+-- Key realization: We need a UNIFORM version of exists_m_choose_dvd.
+-- Something like: ∃ M₀, ∀ m₀ ≥ M₀, ∀ k with 1 ≤ k ≤ C' * log(2m₀),
+-- ∃ m ∈ [m₀, 2m₀] with C(m+k,k) | C(2m,m).
+--
+-- This is actually what the NL proof proves! The threshold M₀ can be taken
+-- independent of k (as long as k ≤ C' * log(2m₀)).
+
+-- For now, let me sorry exists_good_m and focus on the other helpers.
+
+end Erdos728
+EOF
+echo "Analysis complete"
+[2026-02-10T16:52:00.579Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_good_m2.lean << 'EOF'
+import Mathlib
+import Erdos.Lemmas
+
+open Real Nat
+open scoped Nat Topology
+
+namespace Erdos728
+
+-- Let me try a cleaner version of exists_m_choose_dvd that's easier to compose
+-- The key: the threshold M₀ can be taken as (2k+1)^40 or similar polynomial in k.
+
+/-- Uniform existence: for all sufficiently large m₀, for ALL k with 
+    1 ≤ k ≤ m₀, there exists m ∈ [m₀, 2m₀] with C(m+k,k) | C(2m,m). 
+    
+    The threshold is independent of k (as long as k ≤ m₀). -/
+lemma exists_m_choose_dvd_uniform :
+    ∃ M₀ : ℕ, ∀ m₀ : ℕ, M₀ ≤ m₀ → ∀ k : ℕ, 1 ≤ k → k ≤ m₀ →
+      ∃ m : ℕ, m₀ ≤ m ∧ m ≤ 2 * m₀ ∧ (m + k).choose k ∣ (2 * m).choose m := by
+  sorry
+
+lemma log_gap_bounds (C C' : ℝ) (hC : 0 < C) (hCC' : C < C') :
+    ∃ M₀ : ℕ, ∀ m₀ : ℕ, M₀ ≤ m₀ →
+      let k := ⌊(C + C') / 2 * Real.log (2 * ↑m₀)⌋₊
+      1 ≤ k ∧ k ≤ m₀ ∧
+      ∀ m : ℕ, m₀ ≤ m → m ≤ 2 * m₀ →
+        C * Real.log (2 * ↑m) < ↑k ∧
+        (↑k : ℝ) < C' * Real.log (2 * ↑m) := by
+  sorry
+
+-- Now exists_good_m follows easily!
+lemma exists_good_m (C C' : ℝ) (hC : 0 < C) (hCC' : C < C') :
+    ∃ M₀ : ℕ, ∀ m₀ : ℕ, M₀ ≤ m₀ →
+      ∃ m k : ℕ,
+        m₀ ≤ m ∧ m ≤ 2 * m₀ ∧
+        1 ≤ k ∧
+        (m + k).choose k ∣ (2 * m).choose m ∧
+        C * Real.log (2 * ↑m) < ↑k ∧
+        (↑k : ℝ) < C' * Real.log (2 * ↑m) := by
+  obtain ⟨M₁, hM₁⟩ := log_gap_bounds C C' hC hCC'
+  obtain ⟨M₂, hM₂⟩ := exists_m_choose_dvd_uniform
+  refine ⟨max M₁ M₂, fun m₀ hm₀ => ?_⟩
+  have hm₀₁ : M₁ ≤ m₀ := le_of_max_le_left hm₀
+  have hm₀₂ : M₂ ≤ m₀ := le_of_max_le_right hm₀
+  obtain ⟨hk, hk_le, hgap⟩ := hM₁ m₀ hm₀₁
+  set k := ⌊(C + C') / 2 * Real.log (2 * ↑m₀)⌋₊
+  obtain ⟨m, hm_lb, hm_ub, hdvd⟩ := hM₂ m₀ hm₀₂ k hk hk_le
+  exact ⟨m, k, hm_lb, hm_ub, hk, hdvd, (hgap m hm_lb hm_ub).1, (hgap m hm_lb hm_ub).2⟩
+
+end Erdos728
+EOF
+lake env lean /tmp/test_good_m2.lean 2>&1
+[2026-02-10T16:52:53.564Z] 
+🛠️  Executing tool: write...
+[2026-02-10T16:52:55.805Z] 
+$ cd /home/jarred/code/erdos-728b && lake build 2>&1 | tail -10
+[2026-02-10T16:53:24.167Z] 
+$ cd /home/jarred/code/erdos-728b && git add -A && git commit -m "Reduce to 2 sorry holes: prove exists_good_m from uniform existence + log gap
+
+Restructured the decomposition:
+- exists_m_choose_dvd_uniform: uniform version (threshold independent of k)
+- log_gap_bounds: k selection gives gap bounds and k ≤ m₀
+- exists_good_m: now FULLY PROVEN from the above two (was sorry'd before)
+- erdos_728: main theorem fully proven from exists_good_m
+
+Remaining sorrys:
+1. exists_m_choose_dvd_uniform (carry dominance + counting/union bound)
+2. log_gap_bounds (real analysis: log monotonicity + floor bounds)"

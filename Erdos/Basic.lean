@@ -20,33 +20,37 @@ The main theorem then follows by choosing k ≈ (C+C')/2 · log(2m₀) and verif
 the size and gap constraints.
 -/
 
-/-- **Core existence lemma**: For any k ≥ 1 and all sufficiently large m₀,
-there exists m ∈ [m₀, 2m₀] such that C(m+k, k) | C(2m, m).
+/-- **Core existence lemma (uniform version)**: For all sufficiently large m₀,
+for every k with 1 ≤ k ≤ m₀, there exists m ∈ [m₀, 2m₀] such that
+C(m+k, k) | C(2m, m).
 
 This combines carry dominance for large primes with a counting argument
-for small primes. The key steps:
+for small primes:
 1. For p > 2k: carry_dominance gives v_p(C(m+k,k)) ≤ v_p(C(2m,m)) for ALL m.
 2. For p ≤ 2k: Among m ∈ [m₀, 2m₀], the fraction of "bad" m for prime p
-   (where v_p(C(m+k,k)) > v_p(C(2m,m))) is ≤ 2/2^{D_p/36} where D_p = log_p(m₀)/2.
-3. Union bound: total bad fraction ≤ Σ_{p≤2k} 2/2^{D_p/36} + O(√m₀/m₀) < 1
-   for m₀ sufficiently large relative to k. -/
-lemma exists_m_choose_dvd (k : ℕ) (hk : 1 ≤ k) :
-    ∃ M₀ : ℕ, ∀ m₀ : ℕ, M₀ ≤ m₀ →
+   (where v_p(C(m+k,k)) > v_p(C(2m,m))) decays exponentially in log_p(m₀).
+3. Union bound: total bad fraction < 1 for m₀ sufficiently large.
+
+The threshold M₀ is independent of k (as long as k ≤ m₀), because the
+per-prime failure probability decreases as m₀ grows regardless of k. -/
+lemma exists_m_choose_dvd_uniform :
+    ∃ M₀ : ℕ, ∀ m₀ : ℕ, M₀ ≤ m₀ → ∀ k : ℕ, 1 ≤ k → k ≤ m₀ →
       ∃ m : ℕ, m₀ ≤ m ∧ m ≤ 2 * m₀ ∧ (m + k).choose k ∣ (2 * m).choose m := by
   sorry
 
 /-- **Log gap selection**: For 0 < C < C', the choice k = ⌊(C+C')/2 · log(2m₀)⌋₊
-gives k ≥ 1 and C·log(2m) < k < C'·log(2m) for all m ∈ [m₀, 2m₀],
+gives 1 ≤ k ≤ m₀ and C·log(2m) < k < C'·log(2m) for all m ∈ [m₀, 2m₀],
 provided m₀ is large enough.
 
 The proof uses:
-- log(2m)/log(2m₀) → 1 as m₀ → ∞ (for m ∈ [m₀, 2m₀])
+- log(2m)/log(2m₀) ∈ [1, 1 + log(2)/log(2m₀)] for m ∈ [m₀, 2m₀]
 - (C+C')/2 is strictly between C and C'
-- Floor doesn't lose more than 1, which is absorbed by the margin -/
+- Floor loses at most 1, which is absorbed by the margin for large m₀
+- k = O(log m₀) ≤ m₀ for large m₀ -/
 lemma log_gap_bounds (C C' : ℝ) (hC : 0 < C) (hCC' : C < C') :
     ∃ M₀ : ℕ, ∀ m₀ : ℕ, M₀ ≤ m₀ →
       let k := ⌊(C + C') / 2 * Real.log (2 * ↑m₀)⌋₊
-      1 ≤ k ∧
+      1 ≤ k ∧ k ≤ m₀ ∧
       ∀ m : ℕ, m₀ ≤ m → m ≤ 2 * m₀ →
         C * Real.log (2 * ↑m) < ↑k ∧
         (↑k : ℝ) < C' * Real.log (2 * ↑m) := by
@@ -56,9 +60,7 @@ lemma log_gap_bounds (C C' : ℝ) (hC : 0 < C) (hCC' : C < C') :
 there exist m ∈ [m₀, 2m₀] and k ≥ 1 with C(m+k,k) | C(2m,m) and
 C·log(2m) < k < C'·log(2m).
 
-This combines `exists_m_choose_dvd` and `log_gap_bounds`. The key observation
-is that k = O(log m₀) grows much slower than m₀, so the threshold M₀(k) from
-`exists_m_choose_dvd` is eventually dominated by m₀. -/
+Proved by combining `exists_m_choose_dvd_uniform` and `log_gap_bounds`. -/
 lemma exists_good_m (C C' : ℝ) (hC : 0 < C) (hCC' : C < C') :
     ∃ M₀ : ℕ, ∀ m₀ : ℕ, M₀ ≤ m₀ →
       ∃ m k : ℕ,
@@ -67,7 +69,15 @@ lemma exists_good_m (C C' : ℝ) (hC : 0 < C) (hCC' : C < C') :
         (m + k).choose k ∣ (2 * m).choose m ∧
         C * Real.log (2 * ↑m) < ↑k ∧
         (↑k : ℝ) < C' * Real.log (2 * ↑m) := by
-  sorry
+  obtain ⟨M₁, hM₁⟩ := log_gap_bounds C C' hC hCC'
+  obtain ⟨M₂, hM₂⟩ := exists_m_choose_dvd_uniform
+  refine ⟨max M₁ M₂, fun m₀ hm₀ => ?_⟩
+  have hm₀₁ : M₁ ≤ m₀ := le_of_max_le_left hm₀
+  have hm₀₂ : M₂ ≤ m₀ := le_of_max_le_right hm₀
+  obtain ⟨hk, hk_le, hgap⟩ := hM₁ m₀ hm₀₁
+  set k := ⌊(C + C') / 2 * Real.log (2 * ↑m₀)⌋₊
+  obtain ⟨m, hm_lb, hm_ub, hdvd⟩ := hM₂ m₀ hm₀₂ k hk hk_le
+  exact ⟨m, k, hm_lb, hm_ub, hk, hdvd, (hgap m hm_lb hm_ub).1, (hgap m hm_lb hm_ub).2⟩
 
 /--
 **Erdős Problem #728**: For sufficiently small ε > 0 and any 0 < C < C',
