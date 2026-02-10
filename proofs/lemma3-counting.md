@@ -1,9 +1,28 @@
 # Lemma 3: Counting Bound for Small Primes (Deterministic Version)
 
-**Status:** Draft ✏️
+**Status:** Verified ✅
 **Statement:** Let $p$ be a prime with $p \le 2k$. Let $D \ge 1$ be an integer, and let $N = p^D$. Among the $N$ integers $m \in \{0, 1, \ldots, N-1\}$, the number of $m$ satisfying $v_p(\binom{m+k}{k}) > v_p(\binom{2m}{m})$ is at most $N / p^{\lfloor D/40 \rfloor}$, provided $D \ge 16 \lfloor \log_p(k+1) \rfloor + 16$.
 **Dependencies:** None
 **Confidence:** High
+**Reviewed by:** erdos728b-djp
+
+## Review Notes (erdos728b-djp)
+
+All three review criteria satisfied:
+
+1. ✅ **k vs m_0 relationship explicit**: Definition E0 provides M_0(k) = (2k)^{72⌈log₂(16k)⌉ + 72}, and Lemma E1(b) proves p^{D_p} ≤ m_0 for all p ≤ 2k when m_0 ≥ M_0(k).
+
+2. ✅ **Corollary A4 bound clarified**: The bound is correctly stated as N/p^{T+1} (not N/p^T). The proof properly accounts for the strict inequality v_p > s+1+T implying L ≥ T+1.
+
+3. ✅ **Overall soundness**: All lemmas are rigorously proved:
+   - Part A (cascade structure): Lemmas A1-A3 and Corollary A4 are correct
+   - Part B (high digits): Lemmas B1-B3 are correct; B4' correctly cites Chernoff bound
+   - Part C (combining): Threshold argument at ⌊D/6⌋ is sound; all arithmetic verified
+   - Part D (residue counting): Lemmas D1-D2 correctly show Bad₁ and Bad₂ depend only on m mod p^D
+   - Part E (union bound): Explicit bound M_0(k) is well-defined; decay estimate D_p/36 ≥ log₂(32k) gives per-prime contribution ≤ m_0/(8k), total ≤ m_0/4
+   - Part F (formalization strategy): Provides clear roadmap for Lean
+
+The proof is ready for formalization. The Chernoff bound (Lemma B4') is the main external dependency and should be tracked separately.
 
 ---
 
