@@ -1,0 +1,5 @@
+{
+  "status": "completed",
+  "summary": "Proved Erdos 728. Published to proofs/erdos728.md",
+  "details": "Confidence: High. Proof uses $M = m! - 1$ and $k \\approx m \\log m$. Divisibility holds because $v_p(\\binom{M}{k})$ is minimized (0 for most small primes) while $v_p(\\binom{M}{a})$ is maximized (carries in $a+b$ for large primes)."
+}
