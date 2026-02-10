@@ -6101,3 +6101,126 @@ $ rm Erdos/DebugLemma3.lean Erdos/TestLemma3.lean Erdos/FindLemmas.lean
 📊 Task erdos728b-1w9 completed:
 [2026-02-10T20:08:48.991Z]    Summary: Formalized prob_eq_count_div_total with summation logic. Singleton measure step is sorry'd due to Finset.prod type class issues.
 [2026-02-10T20:08:48.991Z]    Details: The main lemma structure is in place. The proof correctly reduces the measure of a set to the sum of singleton measures. The calculation of the singleton measure (1/p^D) encounters a `type class instance expected` error when rewriting the product term, likely due to interaction between `Measure.pi` output and `Finset.prod` over `ENNReal`. The rest of the proof (summation, cardinality conversion) is complete and verifies `lake build`.
+[2026-02-10T20:10:30.574Z] ✓ Task-specific changes rolled back
+
+[2026-02-10T20:10:30.575Z] 
+📊 Task erdos728b-xs2 failed:
+[2026-02-10T20:10:30.575Z]    Summary: Could not parse agent response
+[2026-02-10T20:10:30.575Z]    Details: Agent did not return a valid JSON status block. Raw response:
+
+The decomposition of the remaining work in `Erdos/Lemma3Counting.lean` is complete. The sorries have been mapped to 6 distinct formalize tasks, respecting dependencies and logical grouping.
+
+### Created Tasks
+
+1.  **Lemma 3 Helper - Cascade Induction**
+    -   **ID:** `erdos728b-og7`
+    -   **Goal:** Prove the decreasing induction step in `valuation_le_cascade`.
+    -   **Context:** Extracts the first `sorry` in `valuation_le_cascade` as a standalone helper lemma.
+
+2.  **Lemma 3 - Cascade Section**
+    -   **ID:** `erdos728b-evp`
+    -   **Goal:** Finish `valuation_le_cascade` and prove `count_large_cascade`.
+    -   **Context:** Covers the remaining `sorry` and `?_` hole in the Cascade section.
+    -   **Dependency:** `erdos728b-og7`
+
+3.  **Lemma 3 - Chernoff Bound Bridge**
+    -   **ID:** `erdos728b-mdr`
+    -   **Goal:** Prove or bridge `count_few_high_digits_bound`.
+    -   **Context:** Implements the "Explicit Chernoff bound calculation bridge". Can reference `Lemma3.lean` or implement directly.
+
+4.  **Lemma 3 - High Digits Section**
+    -   **ID:** `erdos728b-0ai`
+    -   **Goal:** Prove `highDigitCount_eq` and `count_few_high_digits`.
+    -   **Context:** Covers the HighDigits section sorries.
+    -   **Dependency:** `erdos728b-mdr`
+
+5.  **Lemma 3 - Single Prime Count**
+    -   **ID:** `erdos728b-9nq`
+    -   **Goal:** Prove `count_bad_single_prime` using union bound.
+    -   **Context:** Combines results from Cascade and High Digits sections.
+    -   **Dependency:** `erdos728b-evp`, `erdos728b-0ai`
+
+6.  **Lemma 3 - Residue Integration**
+    -   **ID:** `erdos728b-yap`
+    -   **Goal:** Prove `count_congruent_le`, `residue_count_interval`, `bad_residue_sets`, and `count_bad_interval`.
+    -   **Context:** Handles the lifting of bounds from `range(p^D)` to intervals `[m0, 2m0]`.
+    -   **Dependency:** `erdos728b-9nq`
+[2026-02-10T20:10:30.579Z] ❌ Task erdos728b-xs2 failed
+
+[2026-02-10T20:10:31.651Z] 
+================================================================================
+[2026-02-10T20:10:31.651Z] 📌 Processing task: erdos728b-nui - Prove indep_highIndicator in Erdos/Lemma3.lean
+[2026-02-10T20:10:31.651Z]    Role: formalize | Priority: 1 
+[2026-02-10T20:10:31.651Z] ================================================================================
+
+[2026-02-10T20:10:31.655Z] ✓ Claimed task erdos728b-nui
+
+[2026-02-10T20:10:31.655Z] 🤖 Using agent: formalize with models: google-antigravity/gemini-3-pro-high:high, google-antigravity/claude-opus-4-6-thinking
+
+[2026-02-10T20:10:31.655Z] 💭 Starting pi agent session with model: google-antigravity/gemini-3-pro-high:high...
+[2026-02-10T20:10:31.673Z] 📸 Capturing file state before agent execution...
+[2026-02-10T20:10:31.688Z] ✓ Captured state: 83 tracked, 1 untracked files
+
+[2026-02-10T20:10:35.480Z] 
+$ find . -maxdepth 2 -not -path '*/.*'
+[2026-02-10T20:10:39.247Z] 
+🛠️  Executing tool: read...
+[2026-02-10T20:10:45.921Z] 
+🛠️  Executing tool: write...
+[2026-02-10T20:10:48.473Z] 
+$ lake env lean check_indep.lean
+[2026-02-10T20:10:57.591Z] 
+$ grep -r "iIndepFun" .lake/packages/mathlib/Mathlib/Probability/Independence/ | grep "pi"
+[2026-02-10T20:11:09.928Z] 
+🛠️  Executing tool: write...
+[2026-02-10T20:11:12.877Z] 
+$ lake env lean check_proof.lean
+[2026-02-10T20:11:26.904Z] 
+🛠️  Executing tool: edit...
+[2026-02-10T20:11:29.552Z] 
+$ lake env lean check_proof.lean
+[2026-02-10T20:11:37.013Z] 
+$ grep "iIndepFun_pi" .lake/packages/mathlib/Mathlib/Probability/Independence/Basic.lean
+[2026-02-10T20:11:43.190Z] 
+🛠️  Executing tool: edit...
+[2026-02-10T20:11:46.055Z] 
+🛠️  Executing tool: read...
+[2026-02-10T20:11:55.814Z] 
+🛠️  Executing tool: write...
+[2026-02-10T20:11:59.513Z] 
+$ lake env lean check_proof.lean
+[2026-02-10T20:12:12.708Z] 
+🛠️  Executing tool: edit...
+[2026-02-10T20:12:15.415Z] 
+$ lake env lean check_proof.lean
+[2026-02-10T20:12:26.006Z] 
+$ grep -r "lemma iIndepFun_pi" .lake/packages/mathlib/Mathlib/Probability/Independence/Basic.lean -A 5
+[2026-02-10T20:12:36.758Z] 
+🛠️  Executing tool: edit...
+[2026-02-10T20:12:39.990Z] 
+$ lake build
+[2026-02-10T20:13:02.797Z] 
+🛠️  Executing tool: edit...
+[2026-02-10T20:13:07.126Z] 
+$ lake build
+[2026-02-10T20:13:25.941Z] 
+🛠️  Executing tool: read...
+[2026-02-10T20:13:33.074Z] 
+$ rm check_proof.lean check_indep.lean
+[2026-02-10T20:13:40.437Z] 
+🛠️  Executing tool: write...
+[2026-02-10T20:13:47.323Z] 
+🛠️  Executing tool: read...
+[2026-02-10T20:13:52.703Z] 
+$ tm update erdos728b-nui --status "Completed indep_highIndicator"
+[2026-02-10T20:13:56.153Z] 
+$ lake build
+[2026-02-10T20:14:05.296Z] 
+
+📝 Agent response complete.
+
+[2026-02-10T20:14:05.296Z] 📄 Log saved to .tm/logs/worker-erdos728b-nui.md
+[2026-02-10T20:14:05.297Z] 
+📊 Task erdos728b-nui completed:
+[2026-02-10T20:14:05.297Z]    Summary: Closed sorry in indep_highIndicator. lake build succeeds.
+[2026-02-10T20:14:05.297Z]    Details: Used ProbabilityTheory.iIndepFun_pi to prove that functions depending on disjoint coordinates in a product measure space are independent. Defined a helper function X to match the form required by iIndepFun_pi and showed it is AEMeasurable (trivial on finite space).

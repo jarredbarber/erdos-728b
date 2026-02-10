@@ -68,7 +68,12 @@ lemma expectation_highIndicator (i : Fin D) :
     (probDigitSpace D p)[highIndicator i] = probHigh p := sorry
 
 lemma indep_highIndicator :
-    iIndepFun (fun i => highIndicator i) (probDigitSpace D p) := sorry
+    iIndepFun (fun i => highIndicator i) (probDigitSpace D p) := by
+  let X (i : Fin D) (d : Fin p) : ℝ := if isHigh p d then 1 else 0
+  have h_meas (i : Fin D) : AEMeasurable (X i) (probFin p) := by
+    apply Measurable.aemeasurable
+    measurability
+  convert iIndepFun_pi h_meas using 1
 
 lemma prob_eq_count_div_total (S : Set (DigitSpace D p)) :
     (probDigitSpace D p S).toReal = (Fintype.card S : ℝ) / (p ^ D : ℝ) := by
