@@ -188,11 +188,19 @@ lemma count_large_cascade (T : ℕ) (hT : T ≤ D - (log p k + 1)) :
     intro a b h; simp [indices] at h; exact h
   apply le_trans (Finset.card_le_of_subset (fun m hm => ?_)) (le_of_eq (count_digits_fixed hp D indices values h_inj))
   simp at hm ⊢
-  rw [cascade_length, List.length_takeWhile] at hm
+  rw [cascade_length] at hm
   intro k
-  have h_pred := List.takeWhile_length_ge_iff.mp hm k.val k.isLt
-  simp at h_pred
-  exact h_pred
+  let P := fun i => digit p m (s + 1 + i) = p - 1
+  let l := (List.range (D - (s + 1))).takeWhile P
+  have h_sub : l <+: List.range (D - (s + 1)) := List.takeWhile_prefix P (List.range (D - (s + 1)))
+  have h_len : l.length ≤ D - (s + 1) := by
+    simpa using List.Sublist.length_le (List.IsPrefix.sublist h_sub)
+  have h_eq : l = List.range l.length := by
+    rw [List.prefix_iff_eq_take.mp h_sub, List.take_range, min_eq_left h_len]
+  have h_mem : k.val ∈ l := by
+    rw [h_eq, List.mem_range]
+    exact lt_of_lt_of_le k.isLt hm
+  exact List.mem_takeWhile_imp h_mem
 
 end Cascade
 
