@@ -273,3 +273,60 @@ $ tm update erdos728b-cb3 --status "Completed gap analysis. Created verify task 
 📊 Task erdos728b-cb3 completed:
 [2026-02-10T15:31:11.988Z]    Summary: Completed gap analysis and task creation.
 [2026-02-10T15:31:11.988Z]    Details: Gap analysis identified potential issues with the 'bad primes' set in the proof construction (specifically CRT modulus size vs M). Created a verify task to scrutinize this. Created a librarian task to find standard constructions. Created an explore task for a sieve lemma to handle the bad primes if CRT fails.
+[2026-02-10T15:31:11.990Z] ✅ Closed task erdos728b-cb3
+
+[2026-02-10T15:31:12.059Z] 🔄 Checking git status...
+[2026-02-10T15:31:12.072Z] 📝 Committing changes...
+[2026-02-10T15:31:12.093Z] 🚀 Pushing to remote...
+[2026-02-10T15:31:16.797Z] 
+================================================================================
+[2026-02-10T15:31:16.797Z] 📌 Processing task: erdos728b-3py - Review proofs/erdos728.md
+[2026-02-10T15:31:16.797Z]    Role: verify | Priority: 2 
+[2026-02-10T15:31:16.797Z] ================================================================================
+
+[2026-02-10T15:31:16.799Z] ✓ Claimed task erdos728b-3py
+
+[2026-02-10T15:31:16.799Z] 🤖 Using agent: verify with models: google-antigravity/gemini-3-flash, google-antigravity/claude-sonnet-4-5-thinking
+
+[2026-02-10T15:31:16.799Z] 💭 Starting pi agent session with model: google-antigravity/gemini-3-flash...
+[2026-02-10T15:31:16.814Z] 📸 Capturing file state before agent execution...
+[2026-02-10T15:31:16.825Z] ✓ Captured state: 25 tracked, 1 untracked files
+
+[2026-02-10T15:31:20.182Z] 
+$ tm update erdos728b-3py --status "Reading proofs/erdos728.md"
+[2026-02-10T15:31:20.348Z] 
+🛠️  Executing tool: read...
+[2026-02-10T15:32:59.779Z] 
+$ tm update erdos728b-3py --status "Updating proofs/erdos728.md with rejection notes"
+[2026-02-10T15:33:08.949Z] 
+🛠️  Executing tool: edit...
+[2026-02-10T15:33:11.563Z] 
+🛠️  Executing tool: read...
+[2026-02-10T15:33:25.471Z] 
+🛠️  Executing tool: write...
+[2026-02-10T15:33:27.501Z] 
+$ ls proofs/dead-ends.md
+[2026-02-10T15:33:30.172Z] 
+🛠️  Executing tool: write...
+[2026-02-10T15:33:34.856Z] 
+$ tm ready
+[2026-02-10T15:33:37.653Z] 
+$ tm list
+[2026-02-10T15:33:41.796Z] 
+$ tm create -r explore --title "New construction for Erdos 728" --description "The previous construction using M=m!-1 failed (see proofs/erdos728.md). Find a new construction for infinitely many (a, b, n) with a!b! | n!(a+b-n)! and k = a+b-n in (C log n, C' log n). The new construction should ensure that the set of 'bad' primes (where carries are needed) has a product smaller than the range of a."
+[2026-02-10T15:33:44.370Z] 
+$ tm update erdos728b-3py --status "Completed review. Proof rejected due to large modulus issue. Created follow-up explore task."
+[2026-02-10T15:33:48.184Z] 
+
+📝 Agent response complete.
+
+[2026-02-10T15:33:48.185Z] 📄 Log saved to .tm/logs/worker-erdos728b-3py.md
+[2026-02-10T15:33:48.185Z] 
+📊 Task erdos728b-3py completed:
+[2026-02-10T15:33:48.185Z]    Summary: Rejected — proofs/erdos728.md
+[2026-02-10T15:33:48.185Z]    Details: The construction in proofs/erdos728.md using $M=m!-1$ has a fundamental flaw. Specifically:
+1. The set of 'bad primes' $\mathcal{P} = \{ p > m : p \mid \binom{M}{k} \}$ is too large. Its product $Q = \prod_{p \in \mathcal{P}} p \approx \binom{M}{k} \approx M^k$, which is much larger than $M$. Since CRT only guarantees a solution for $a$ in the range $[0, Q)$, it is highly unlikely that any solution exists in the required range $[0, M]$.
+2. The density of valid $a$ values is approximately $\exp(-m(\log m)^2)$, which is much smaller than $1/M$ for large $m$.
+3. For $p \le m$, the choice $M=m!-1$ implies $M \equiv -1 \pmod{p^L}$, which forces zero carries in the first $L$ positions for any $a+b=M$. This makes it impossible for $v_p(\binom{M}{a})$ to satisfy the divisibility condition for primes near $m$ where $v_p(\binom{M}{k}) > 0$ might occur.
+
+The proof has been updated to 'Rejected ❌' and documented in proofs/dead-ends.md. A follow-up explore task (erdos728b-epq) has been created to find a new construction.

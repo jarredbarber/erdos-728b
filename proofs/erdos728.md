@@ -1,6 +1,6 @@
 # Erdos 728: Factorial Divisibility with Logarithmic Sum
 
-**Status:** Draft ✏️
+**Status:** Rejected ❌
 **Statement:**
 For sufficiently small $\epsilon > 0$ and any $0 < C < C'$, there exist infinitely many tuples $(a, b, n)$ with $a, b > \epsilon n$ such that:
 1. $a! b! \mid n! (a+b-n)!$
@@ -9,9 +9,11 @@ For sufficiently small $\epsilon > 0$ and any $0 < C < C'$, there exist infinite
 **Dependencies:**
 - None (self-contained construction)
 
-**Confidence:** High
+**Confidence:** Low (Identified fundamental flaw)
 
-## Proof Strategy
+**Reviewed by:** erdos728b-3py
+
+## Proof Strategy (Rejected)
 
 Let $k = a+b-n$. The conditions become:
 1. $a, b > \epsilon n$
@@ -54,7 +56,7 @@ The condition $p^L > k$ holds for all $p \ll m / \log m$.
 For primes near $m$, say $p \in [m/\log m, m]$, we might have $p^L < k$.
 In this case $v_p(\binom{M}{k})$ can be non-zero.
 However, $v_p(\binom{M}{k}) \le \log_p k + O(1)$, which is small (since $k \approx m \log m \approx p^{1+\delta}$).
-So $v_p(\binom{M}{k})$ is small for these primes.
+So $v_p(\binom{M}{k}) is small for these primes.
 
 For primes $p > m$:
 $v_p(\binom{M}{k}) > 0$ only if $M \pmod p < k$.
@@ -81,3 +83,32 @@ We can choose such an $a$ for all $p \in \mathcal{P}$.
 
 Thus, there exists an $a$ satisfying the conditions.
 Since $M \to \infty$ as $m \to \infty$, we find infinite solutions.
+
+## Review Notes
+
+### 1. The "Bad Primes" Modulus Issue
+The proof relies on choosing $a$ such that $v_p(\binom{M}{a}) \ge v_p(\binom{M}{k})$ for all $p$. 
+For $p > m$, let $\mathcal{P} = \{ p : v_p(\binom{M}{k}) > 0 \}$. 
+The proof claims we can use CRT to find $a \pmod{\prod_{p \in \mathcal{P}} p}$ such that $a \pmod p > M \pmod p$.
+However, the modulus $Q = \prod_{p \in \mathcal{P}} p$ is too large. 
+Since $p \mid \binom{M}{k}$ for $p \in \mathcal{P}$, we have $Q \approx \binom{M}{k} \approx (M/k)^k$.
+With $k \approx m \log m$ and $M \approx m!$, we have $\log Q \approx k \log M \approx (m \log m)^2$.
+But $\log M \approx m \log m$.
+Thus $Q \approx M^{m \log m} \gg M$.
+CRT only guarantees an $a$ in the range $[0, Q)$. The density of $a < Q$ satisfying the congruences is $\alpha = \prod_{p \in \mathcal{P}} (1 - \frac{M \pmod p + 1}{p})$.
+Since $M \pmod p < k$, $\alpha \approx \exp(-\sum_{p \in \mathcal{P}} k/p) \approx \exp(-m (\log m)^2)$.
+The expected number of valid $a < M$ is $M \alpha \approx \exp(m \log m - m (\log m)^2) \to 0$.
+Thus, for the chosen $M = m!-1$, such an $a$ almost certainly does not exist.
+
+### 2. Issues with $p \le m$
+The proof claims $v_p(\binom{M}{a})$ is large for $p \le m$ because $a, b$ are large.
+However, $M = m!-1$ implies $M \equiv -1 \pmod{p^L}$ for $L = v_p(m!)$.
+This means the first $L$ digits of $M$ in base $p$ are all $p-1$.
+In any addition $a+b=M$, there are **zero carries** in the first $L$ positions.
+Thus $v_p(\binom{M}{a}) = v_p(\binom{\lfloor M/p^L \rfloor}{\lfloor a/p^L \rfloor})$.
+For $p$ near $m$, $L=1$. Since $k \approx m \log m > p$, $v_p(\binom{M}{k})$ can be non-zero (carries at position 1 or higher).
+But for $v_p(\binom{M}{a})$ to be $\ge v_p(\binom{M}{k})$, we need $\lfloor M/p \rfloor$ to have carries in $a/p + b/p$.
+This adds even more constraints on $a$, further reducing the density of solutions.
+
+### 3. Conclusion
+The construction $M = m!-1$ is too structured for the $p \le m$ case and too "random" for the $p > m$ case, leading to a set of constraints that cannot be satisfied within the range $[0, M]$.
