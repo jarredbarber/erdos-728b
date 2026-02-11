@@ -20,4 +20,6 @@
 - [2026-02-11 15:55] erdos728b-tkz CLOSED. Proved small n case (n <= P) for erdos_729.
 - [2026-02-11 16:40] erdos728b-lhm CLOSED (Strategic Failure). Casting death spiral detected.
 - [2026-02-11 16:55] erdos728b-662 CLOSED (Planner). Role violation (writing Lean). Overseer intervened.
-- [2026-02-11 17:05] Backlog: Decomposed log bound task manually into 4 bridging lemmas (4nw, 7pr, ogu, pr5). Unblocked for formalizers. Skeletons restored in Problem729.lean.
+- [2026-02-11 17:15] erdos728b-4nw CLOSED. Proved nat_log_le_real_log.
+- [2026-02-11 17:15] erdos728b-ogu IN_PROGRESS. Formalizing sumDigits_bound_real.
+- [2026-02-11 17:15] Backlog: 3 sub-tasks remain for log bound (7pr, ogu, pr5). Compilation stable.

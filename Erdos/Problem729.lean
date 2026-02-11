@@ -146,7 +146,22 @@ lemma log_n_le_log_n_plus_2 (n : ℕ) : Real.log n ≤ Real.log (n + 2) := by
 
 lemma sumDigits_bound_real {p : ℕ} (hp : 1 < p) (n : ℕ) :
     (sumDigits p n : ℝ) ≤ (p - 1) * (Real.log n / Real.log p + 1) := by
-  sorry
+  by_cases hn : n = 0
+  · simp [sumDigits, hn]
+    linarith
+  · have h_nat := sumDigits_le_log p n hp
+    have h_log := nat_log_le_real_log hp hn
+    calc (sumDigits p n : ℝ)
+      ≤ ((p - 1) * (Nat.log p n + 1) : ℕ) := by exact_mod_cast h_nat
+      _ = ((p - 1 : ℕ) : ℝ) * ((Nat.log p n : ℕ) + 1 : ℝ) := by push_cast; rfl
+      _ = ((p : ℝ) - 1) * (Nat.log p n + 1) := by
+        rw [Nat.cast_sub (le_of_lt hp)]
+        simp
+      _ ≤ ((p : ℝ) - 1) * (Real.log n / Real.log p + 1) := by
+        gcongr
+        · rw [sub_nonneg]
+          norm_cast
+          exact le_of_lt hp
 
 /-- The calculation showing sumDigits p a + sumDigits p b ≤ C * log n when a, b < 2n. -/
 lemma sumDigits_log_bound {p : ℕ} (hp : 1 < p) (n a b : ℕ)

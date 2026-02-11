@@ -1,0 +1,5 @@
+{
+  "status": "completed",
+  "summary": "Formalized sumDigits_bound_real in Erdos/Problem729.lean. Also fixed a missing import in Erdos.lean.",
+  "details": "Used sumDigits_le_log (Nat version) and nat_log_le_real_log to prove the Real version. Handled n=0 case separately. Cleaned up Erdos.lean by removing import of missing file Erdos.LogBound."
+}
