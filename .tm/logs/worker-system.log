@@ -19991,3 +19991,14 @@ so v_p > D/6 implies cascade_length ≥ D/6 - s. Then count_large_cascade
 gives |Bad1| ≤ p^(D - (D/6 - s)) = p^D / p^(D/6 - s).
 
 Closes erdos728b-v1n."
+[2026-02-11T06:22:35.963Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-v1n --status "Complete - Bad1 sorry closed, lake build succeeds"
+[2026-02-11T06:22:41.712Z] 
+
+📝 Agent response complete.
+
+[2026-02-11T06:22:41.713Z] 📄 Log saved to .tm/logs/worker-erdos728b-v1n.md
+[2026-02-11T06:22:41.713Z] 
+📊 Task erdos728b-v1n completed:
+[2026-02-11T06:22:41.713Z]    Summary: Closed sorry in count_bad_single_prime (Bad1 bound). lake build succeeds.
+[2026-02-11T06:22:41.713Z]    Details: The Bad1 sorry bounded #{m ∈ [0, p^D) : v_p(C(m+k,k)) > D/6} ≤ p^D / p^(D/6 - log_p k). Proof strategy: (1) By valuation_le_cascade, v_p ≤ (s+1) + cascade_length, so v_p > D/6 implies cascade_length ≥ D/6 - s. This gives Bad1 ⊆ {m : cascade_length ≥ D/6 - s}. (2) By count_large_cascade with T = D/6 - s, the RHS has cardinality ≤ p^(D - (D/6 - s)). (3) Nat.pow_div gives p^(D - (D/6 - s)) = p^D / p^(D/6 - s). No new sorry holes introduced.

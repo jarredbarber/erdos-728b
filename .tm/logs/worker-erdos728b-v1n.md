@@ -210,3 +210,26 @@ gives |Bad1| ≤ p^(D - (D/6 - s)) = p^D / p^(D/6 - s).
 
 Closes erdos728b-v1n."
 ```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-v1n --status "Complete - Bad1 sorry closed, lake build succeeds"
+```
+```json
+{
+  "status": "completed",
+  "summary": "Closed sorry in count_bad_single_prime (Bad1 bound). lake build succeeds.",
+  "details": "The Bad1 sorry bounded #{m ∈ [0, p^D) : v_p(C(m+k,k)) > D/6} ≤ p^D / p^(D/6 - log_p k). Proof strategy: (1) By valuation_le_cascade, v_p ≤ (s+1) + cascade_length, so v_p > D/6 implies cascade_length ≥ D/6 - s. This gives Bad1 ⊆ {m : cascade_length ≥ D/6 - s}. (2) By count_large_cascade with T = D/6 - s, the RHS has cardinality ≤ p^(D - (D/6 - s)). (3) Nat.pow_div gives p^(D - (D/6 - s)) = p^D / p^(D/6 - s). No new sorry holes introduced."
+}
+```
+
+## Final Result
+
+```json
+{
+  "status": "completed",
+  "summary": "Closed sorry in count_bad_single_prime (Bad1 bound). lake build succeeds.",
+  "details": "The Bad1 sorry bounded #{m ∈ [0, p^D) : v_p(C(m+k,k)) > D/6} ≤ p^D / p^(D/6 - log_p k). Proof strategy: (1) By valuation_le_cascade, v_p ≤ (s+1) + cascade_length, so v_p > D/6 implies cascade_length ≥ D/6 - s. This gives Bad1 ⊆ {m : cascade_length ≥ D/6 - s}. (2) By count_large_cascade with T = D/6 - s, the RHS has cardinality ≤ p^(D - (D/6 - s)). (3) Nat.pow_div gives p^(D - (D/6 - s)) = p^D / p^(D/6 - s). No new sorry holes introduced."
+}
+```
+
+End Time: 2026-02-11T06:22:41.712Z
