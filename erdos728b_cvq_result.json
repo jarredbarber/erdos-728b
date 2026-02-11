@@ -1,5 +1,0 @@
-{
-  "status": "completed",
-  "summary": "Proven expectation_highIndicator in Erdos/Lemma3.lean",
-  "details": "Used MeasurePreserving.integral_map to transfer integral to Fin p. Used integral_count and arithmetic lemmas (Nat.card_Ico, Finset.filter_map) to show the sum equals p/2."
-}

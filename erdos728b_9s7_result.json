@@ -1,5 +1,0 @@
-{
-  "status": "completed",
-  "summary": "Closed sorry in prob_eq_count_div_total. lake build succeeds.",
-  "details": "Closed the sorry in `h_sing_enn` within `prob_eq_count_div_total`. The proof required:\n1. Manually rewriting the singleton set `{x}` as a pi set `Set.pi univ (fun i => {x i})`.\n2. Providing an explicit `SigmaFinite (probFin p)` instance using `IsFiniteMeasure.toSigmaFinite`.\n3. Applying `Measure.pi_pi`.\n4. Rewriting the RHS `((p : ℝ≥0∞)⁻¹)^D` as a product using `Finset.prod_const` and `Fintype.card_fin`.\n5. Simplifying `probFin p {x i}` using `Measure.smul_apply` and `Measure.count_apply_finite`."
-}

@@ -1,5 +1,0 @@
-{
-  "status": "completed",
-  "summary": "Closed sorry in indep_highIndicator. lake build succeeds.",
-  "details": "Used ProbabilityTheory.iIndepFun_pi to prove that functions depending on disjoint coordinates in a product measure space are independent. Defined a helper function X to match the form required by iIndepFun_pi and showed it is AEMeasurable (trivial on finite space)."
-}

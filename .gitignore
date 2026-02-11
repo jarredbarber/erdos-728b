@@ -1,4 +1,9 @@
 .lake/
 .build/
-.lake/
 .env
+.tm/logs/
+.tm/worker.pid
+.tm/cron-state.json
+.tm/overseer_completion.json
+.tm/overseer_last_check
+.tm/memory.md

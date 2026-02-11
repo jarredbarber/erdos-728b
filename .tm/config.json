@@ -1,8 +1,0 @@
-{
-  "workflow": "coding",
-  "defaults": {
-    "priority": 2,
-    "size": "medium",
-    "type": "task"
-  }
-}
