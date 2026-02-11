@@ -172,7 +172,93 @@ lemma sumDigits_bound_real {p : ℕ} (hp : 1 < p) (n : ℕ) :
 lemma sumDigits_log_bound {p : ℕ} (hp : 1 < p) (n a b : ℕ)
     (ha : a < 2 * n) (hb : b < 2 * n) :
     ∃ C, (sumDigits p a : ℝ) + sumDigits p b ≤ C * Real.log (n + 2) := by
-  sorry
+  -- Case n = 0
+  by_cases hn : n = 0
+  · subst hn
+    exfalso; exact Nat.not_lt_zero a ha
+  
+  have hn_pos : 0 < n := Nat.pos_of_ne_zero hn
+  have hn_real_pos : 0 < (n : ℝ) := Nat.cast_pos.mpr hn_pos
+  have h_log_p_pos : 0 < Real.log p := Real.log_pos ((Nat.cast_one (R := ℝ)).symm ▸ Nat.cast_lt.mpr hp)
+  
+  -- Bound for single number x < 2n
+  have bound_for (x : ℕ) (hx : x < 2 * n) : ∃ C_x, (sumDigits p x : ℝ) ≤ C_x * Real.log (n + 2) := by
+    by_cases hx0 : x = 0
+    · use 0; simp [sumDigits, hx0]
+    · have h_bound := sumDigits_bound_real hp x
+      
+      have h_log_x : Real.log x < Real.log ↑(2 * n) :=
+        Real.log_lt_log ((Nat.cast_zero (R := ℝ)).symm ▸ Nat.cast_lt.mpr (Nat.pos_of_ne_zero hx0)) (Nat.cast_lt.mpr hx)
+      
+      rw [Nat.cast_mul, Nat.cast_ofNat] at h_log_x
+      
+      have h_log_split : Real.log (2 * n) = Real.log 2 + Real.log n := 
+        Real.log_mul two_ne_zero hn_real_pos.ne'
+      rw [h_log_split] at h_log_x
+
+      have h_log_n_le : Real.log n ≤ Real.log (n + 2) := 
+        log_n_le_log_n_plus_2 n
+        
+      -- So log x < log 2 + log (n + 2)
+      have h_log_x_le : Real.log x ≤ Real.log 2 + Real.log (n + 2) := 
+        le_trans (le_of_lt h_log_x) (add_le_add_right h_log_n_le (Real.log 2))
+      
+      let K := ((p - 1) : ℝ) / Real.log p
+      have K_pos : 0 < K := by
+        apply _root_.div_pos
+        · have : 1 < (p : ℝ) := (Nat.cast_one (R := ℝ)).symm ▸ Nat.cast_lt.mpr hp
+          linarith
+        · exact h_log_p_pos
+      
+      have h_calc : (sumDigits p x : ℝ) ≤ K * Real.log (n + 2) + (K * Real.log 2 + (p - 1)) :=
+        calc (sumDigits p x : ℝ) 
+          ≤ (p - 1) * (Real.log x / Real.log p + 1) := h_bound
+          _ = K * Real.log x + (p - 1) := by 
+            simp [K]; field_simp [h_log_p_pos.ne']; try ring
+          _ ≤ K * (Real.log 2 + Real.log (n + 2)) + (p - 1) := by
+            gcongr
+          _ = K * Real.log (n + 2) + (K * Real.log 2 + (p - 1)) := by ring
+      
+      have h_log_n2_ge : Real.log (n + 2) ≥ Real.log 3 := by
+        rw [← Nat.cast_ofNat (n := 2), ← Nat.cast_ofNat (n := 3), ← Nat.cast_add]
+        apply (Real.log_le_log_iff (by norm_num) (Nat.cast_pos.mpr (Nat.zero_lt_succ _))).mpr
+        apply Nat.cast_le.mpr
+        linarith [hn_pos]
+      
+      have h_log3_pos : 0 < Real.log 3 := Real.log_pos (by norm_num)
+      
+      let numerator := K * Real.log 2 + (p - 1)
+      let C_const := numerator / Real.log 3
+      
+      have h_num_pos : 0 ≤ numerator := by
+        apply add_nonneg
+        · apply mul_nonneg (le_of_lt K_pos) (Real.log_nonneg (by norm_num))
+        · have : 1 ≤ (p : ℝ) := (Nat.cast_one (R := ℝ)).symm ▸ Nat.cast_le.mpr (le_of_lt hp)
+          linarith
+
+      have h_const_le : numerator ≤ C_const * Real.log (n + 2) :=
+        calc numerator 
+          = numerator * 1 := (mul_one _).symm
+          _ ≤ numerator * (Real.log (n + 2) / Real.log 3) := by
+            apply mul_le_mul_of_nonneg_left
+            · rw [one_le_div h_log3_pos]; exact h_log_n2_ge
+            · exact h_num_pos
+          _ = (numerator / Real.log 3) * Real.log (n + 2) := by field_simp; ring
+          _ = C_const * Real.log (n + 2) := rfl
+        
+      use K + C_const
+      have h_bound_x : (sumDigits p x : ℝ) ≤ K * Real.log (n + 2) + C_const * Real.log (n + 2) :=
+        le_trans h_calc (add_le_add_right h_const_le (K * Real.log (n + 2)))
+      
+      rw [← add_mul] at h_bound_x
+      exact h_bound_x
+
+  obtain ⟨Ca, hCa⟩ := bound_for a ha
+  obtain ⟨Cb, hCb⟩ := bound_for b hb
+  use Ca + Cb
+  calc (sumDigits p a : ℝ) + sumDigits p b
+    ≤ Ca * Real.log (n + 2) + Cb * Real.log (n + 2) := by gcongr
+    _ = (Ca + Cb) * Real.log (n + 2) := by ring
 
 /-- The large n case (n > P). -/
 lemma erdos_729_large_n (P a b n : ℕ) (hP : 0 < P) (hnP : n > P)

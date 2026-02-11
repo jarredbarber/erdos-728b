@@ -22,5 +22,6 @@
 - [2026-02-11 16:55] erdos728b-662 CLOSED (Planner). Role violation (writing Lean). Overseer intervened.
 - [2026-02-11 17:05] erdos728b-4nw CLOSED. Proved nat_log_le_real_log.
 - [2026-02-11 17:10] erdos728b-ogu CLOSED. Proved sumDigits_bound_real.
-- [2026-02-11 17:10] erdos728b-7pr IN_PROGRESS. Formalizing log_n_le_log_n_plus_2.
-- [2026-02-11 17:10] Backlog: 2 sub-tasks remain for log bound assembly (pr5, then large n yzp).
+- [2026-02-11 17:55] Project reset: Reverted Erdos/Problem729.lean to safe skeletons to fix casting-induced compilation failures. Stray file Erdos/Problem729_clean.lean removed.
+- [2026-02-11 17:55] Tasks 4nw, ogu, 7pr, pr5 remain OPEN. Workers must prioritize correctly-typed bridging lemmas one-by-one.
+- [2026-02-11 17:55] Backlog unblocked. Compilation stable. Sorry count: 6.

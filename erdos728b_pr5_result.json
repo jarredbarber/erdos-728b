@@ -1,0 +1,5 @@
+{
+  "status": "completed",
+  "summary": "Formalized sumDigits_log_bound in Erdos/Problem729.lean. Proved that for x < 2n, sumDigits p x is bounded by C * log(n+2).",
+  "details": "Used bridging lemmas sumDigits_bound_real and logarithmic bounds. Handled n=0 case and Nat/Real casting issues carefully. Replaced add_le_add_left/right appropriately based on behavior. The lemma compiles without errors (warnings are for subsequent unrelated theorems)."
+}
