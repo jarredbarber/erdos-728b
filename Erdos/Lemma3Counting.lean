@@ -615,8 +615,36 @@ lemma count_bad_single_prime (hD : D ≥ 12 * (log p k + 1) + 6) (hp : p.Prime) 
           show p ^ (D - (T_val - s)) = p ^ D / p ^ (D / 6 - s)
           rw [Nat.pow_div (by omega) (by omega)]
 
-  -- Bound Bad2
-  · sorry
+  -- Bound Bad2: #{m : v_p(C(2m,m)) < D/6} ≤ p^D / 2^(D/36)
+  -- Strategy: v_p(C(2m,m)) ≥ count_high_digits (valuation_ge_high_digits),
+  -- so Bad2 ⊆ {m : count_high_digits < D/6}. Apply count_few_high_digits.
+  · have h_subset_high : Bad2 ⊆
+        (range (p^D)).filter (fun m => count_high_digits p m D < T_val) := by
+      intro m hm
+      rw [mem_filter] at hm ⊢
+      refine ⟨hm.1, ?_⟩
+      have hm_lt : m < p^D := mem_range.mp hm.1
+      -- Need: log p (2*m) < D + 1
+      have h_log : log p (2 * m) < D + 1 := by
+        by_cases hm0 : m = 0
+        · subst hm0; simp [Nat.log_zero_right]
+        have hm_pos : m ≥ 1 := Nat.pos_of_ne_zero hm0
+        have hp2 : p ≥ 2 := hp.two_le
+        have h2m_lt : 2 * m < p ^ (D + 1) := by
+          calc 2 * m ≤ 2 * (p^D - 1) := by omega
+            _ < 2 * p^D := by omega
+            _ ≤ p * p^D := by nlinarith
+            _ = p ^ (D + 1) := by rw [pow_succ]; ring
+        exact Nat.log_lt_of_lt_pow (by omega) h2m_lt
+      -- Apply valuation_ge_high_digits to get count_high_digits ≤ v_p
+      have h_val_ge := valuation_ge_high_digits D hp m h_log
+      omega
+    calc Bad2.card
+        ≤ ((range (p^D)).filter
+            (fun m => count_high_digits p m D < T_val)).card :=
+          card_le_card h_subset_high
+      _ ≤ p^D / 2^(D/36) :=
+          count_few_high_digits D hp T_val (le_refl _) hp_ge_3
 
 end SinglePrime
 
