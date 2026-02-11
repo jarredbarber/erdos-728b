@@ -33,4 +33,4 @@ artifacts/             — Reference material (librarian writes here)
 
 ## Task Management
 
-This project uses `tm` with the `math-research` workflow. Roles: librarian, explore, verify, formalize, planner, advisor.
+This project uses beehive (`bh`) with the `math-research` workflow. Roles: librarian, explore, verify, formalize, planner, advisor.
