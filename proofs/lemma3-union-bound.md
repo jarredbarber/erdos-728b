@@ -1,9 +1,10 @@
 # Lemma 3: Union Bound Arithmetic (Part E)
 
-**Status:** Draft ✏️
+**Status:** Verified ✅
 **Statement:** Arithmetic proof of the union bound for Lemma 3, Part E.
 **Dependencies:** `proofs/lemma3-counting.md` (for context)
 **Confidence:** Certain
+**Reviewed by:** erdos728b-wk2
 
 This document provides the detailed arithmetic proof for the union bound step in Lemma 3 (Part E). It is structured to facilitate direct formalization in Lean 4.
 
@@ -139,3 +140,16 @@ We sum the bad counts over all primes $p \le 2k$.
 4.  Since $m_0 \ge M_0(k) \ge (2k)^{72 \cdot 4 + 72} > 0$, we have $m_0 > 0$.
 5.  Thus $3m_0/4 > 0$, so there exists at least one good $m$.
     $\square$
+
+## Review Notes (erdos728b-wk2)
+
+The proof is mathematically sound and very well-structured for formalization.
+
+1.  **Definitions**: $D_p$ and $M_0(k)$ are defined consistently to satisfy both the cascade and union bound requirements.
+2.  **Arithmetic Bounds**: The case analysis for $D_p \ge 16 \log_p(k+1) + 16$ correctly handles small $p$ relative to $k$.
+3.  **Tiling/Interval argument**: Implicitly uses the result from Part D/C that the bad set is bounded by $4m_0/2^{D_p/36}$. The derivation $2^{D_p/36} \ge 32k$ is correct.
+4.  **Union Bound**: The use of $\pi(x) \le x$ is a safe, crude upper bound that suffices to show the total bad count is $\le m_0/4$.
+5.  **Existence**: Correctly concludes existence from the non-zero count of good $m$ in the interval.
+
+The proof is ready for formalization. No further revisions are required.
+
