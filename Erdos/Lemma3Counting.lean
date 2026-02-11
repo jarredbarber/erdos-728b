@@ -6,6 +6,7 @@ import Mathlib.Data.Fintype.BigOperators
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Data.Int.CardIntervalMod
 import Mathlib.NumberTheory.Padics.PadicVal.Basic
+import Mathlib.Data.Set.Card
 import Erdos.Digits
 import Erdos.Lemma3Common
 import Erdos.Chernoff
@@ -51,9 +52,78 @@ lemma toDigitSpace_bijective : Function.Bijective (toDigitSpace hp D) := by
   · -- Cardinality: |Fin(p^D)| = |Fin D → Fin p| = p^D
     simp [Fintype.card_fin]
 
+/-- Equiv between digit-space functions constrained at T injective positions
+    and unconstrained functions on the D-T remaining positions. -/
+private noncomputable def digitConstraintEquiv {T : ℕ} (indices : Fin T → Fin D)
+    (values : Fin T → Fin p) (h_inj : Function.Injective indices) :
+    {f : DigitSpace D p // ∀ k, f (indices k) = values k} ≃
+    ({i : Fin D // i ∉ Set.range indices} → Fin p) where
+  toFun f := fun ⟨i, _⟩ => f.val i
+  invFun g :=
+    ⟨fun i =>
+      if h : i ∈ Set.range indices then values h.choose
+      else g ⟨i, h⟩,
+    fun k => by
+      have hmem : indices k ∈ Set.range indices := ⟨k, rfl⟩
+      simp only [dif_pos hmem]
+      congr 1
+      exact h_inj hmem.choose_spec⟩
+  left_inv := by
+    intro ⟨f, hf⟩; apply Subtype.ext; funext i; simp only
+    split
+    · rename_i h; rw [← hf h.choose, h.choose_spec]
+    · rfl
+  right_inv := by
+    intro g; funext ⟨i, hi⟩; simp only [dif_neg hi]
+
+include hp in
 lemma count_digits_fixed {T : ℕ} (indices : Fin T → Fin D) (values : Fin T → Fin p)
     (h_inj : Function.Injective indices) :
-    ((range (p^D)).filter (fun m => ∀ k : Fin T, digit p m (indices k) = values k)).card = p ^ (D - T) := sorry
+    ((range (p^D)).filter (fun m => ∀ k : Fin T,
+      digit p m (indices k) = values k)).card = p ^ (D - T) := by
+  -- Step 1: Transfer from range(p^D) to Finset.univ (Fin(p^D))
+  have h1 :
+      ((range (p ^ D)).filter (fun m =>
+        ∀ k, digit p m (indices k) = (values k : ℕ))).card =
+      ((univ : Finset (Fin (p ^ D))).filter (fun m : Fin (p ^ D) =>
+        ∀ k, digit p m.val (indices k) = (values k : ℕ))).card := by
+    apply card_bij (fun m hm =>
+      ⟨m, mem_range.mp (mem_filter.mp hm).1⟩)
+    · intro m hm
+      exact mem_filter.mpr ⟨mem_univ _, (mem_filter.mp hm).2⟩
+    · intro a _ b _ h; simp at h; exact h
+    · intro ⟨b, hb⟩ hmem
+      exact ⟨b, mem_filter.mpr
+        ⟨mem_range.mpr hb, (mem_filter.mp hmem).2⟩, rfl⟩
+  -- Step 2: Transfer Fin(p^D) → DigitSpace via toDigitSpace
+  have hbij := toDigitSpace_bijective hp D
+  have h2 :
+      ((univ : Finset (Fin (p ^ D))).filter (fun m : Fin (p ^ D) =>
+        ∀ k, digit p m.val (indices k) = (values k : ℕ))).card =
+      ((univ : Finset (DigitSpace D p)).filter (fun f : DigitSpace D p =>
+        ∀ k, f (indices k) = values k)).card := by
+    apply card_bij (fun m _ => toDigitSpace hp D m)
+    · intro m hm; rw [mem_filter] at hm ⊢
+      exact ⟨mem_univ _, fun k =>
+        Fin.ext (by simp [toDigitSpace]; exact hm.2 k)⟩
+    · intro a _ b _ h; exact hbij.1 h
+    · intro f hf; obtain ⟨a, ha⟩ := hbij.2 f
+      exact ⟨a, mem_filter.mpr ⟨mem_univ _, fun k => by
+        have := congrArg Fin.val ((mem_filter.mp hf).2 k)
+        rw [← ha] at this
+        simp [toDigitSpace] at this
+        exact this⟩, ha⟩
+  -- Step 3: Constrained DigitSpace = p^(D-T) via Equiv
+  have h3 :
+      ((univ : Finset (DigitSpace D p)).filter (fun f : DigitSpace D p =>
+        ∀ k, f (indices k) = values k)).card = p ^ (D - T) := by
+    rw [← Fintype.card_subtype]
+    rw [Fintype.card_congr
+      (digitConstraintEquiv D indices values h_inj)]
+    simp only [Fintype.card_fun, Fintype.card_fin,
+      Fintype.card_subtype_compl,
+      Set.card_range_of_injective h_inj]
+  linarith
 
 end Common
 

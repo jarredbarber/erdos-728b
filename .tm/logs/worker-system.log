@@ -17002,3 +17002,1827 @@ $ cd /home/jarred/code/erdos-728b && tm close erdos728b-hga
 5. **count_high_le_valuation**: count_high_digits ≤ v_p(C(2m,m)) for arbitrary m (removed the log bound restriction from valuation_ge_high_digits by using factorization_choose with b = max(D+1, log p (2m)+1))
 
 No new sorry holes introduced. All 8 remaining sorrys in the file are pre-existing.
+[2026-02-11T05:47:25.359Z] ✅ Closed task erdos728b-hga
+
+[2026-02-11T05:47:25.428Z] 🔄 Checking git status...
+[2026-02-11T05:47:25.447Z] 📝 Committing changes...
+[2026-02-11T05:47:25.507Z] 🚀 Pushing to remote...
+[2026-02-11T05:47:27.327Z] 
+================================================================================
+[2026-02-11T05:47:27.327Z] 📌 Processing task: erdos728b-bu3 - Close sorry: count_digits_fixed (L3C:26)
+[2026-02-11T05:47:27.327Z]    Role: formalize | Priority: 1 
+[2026-02-11T05:47:27.327Z] ================================================================================
+
+[2026-02-11T05:47:27.331Z] ✓ Claimed task erdos728b-bu3
+
+[2026-02-11T05:47:27.331Z] 🤖 Using agent: formalize with models: google-antigravity/claude-opus-4-6-thinking, google-antigravity/gemini-3-pro-high:high
+
+[2026-02-11T05:47:27.332Z] 💭 Starting pi agent session with model: google-antigravity/claude-opus-4-6-thinking...
+[2026-02-11T05:47:27.365Z] 📸 Capturing file state before agent execution...
+[2026-02-11T05:47:27.380Z] ✓ Captured state: 162 tracked, 1 untracked files
+
+[2026-02-11T05:47:30.751Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-bu3 --status "Reading source files to understand context"
+[2026-02-11T05:47:32.564Z] 
+🛠️  Executing tool: read...
+[2026-02-11T05:47:34.745Z] 
+🛠️  Executing tool: read...
+[2026-02-11T05:47:37.085Z] 
+🛠️  Executing tool: read...
+[2026-02-11T05:47:38.697Z] [overseer] 📝 Cleared poke messages
+[2026-02-11T05:47:38.698Z] [overseer] 💓 Heartbeat #27 complete: Task erdos728b-hga closed successfully, proving bad_residue_sets and decreasing sorry count to 12. Task erdos728b-bu3 (count_digits_fixed) is now in progress. Tier 0 unblocked tasks: bu3, vtv, g8b, 2zs.
+[2026-02-11T05:47:39.967Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "count_digits_fixed" Erdos/Lemma3Counting.lean
+[2026-02-11T05:47:45.129Z] 
+$ cd /home/jarred/code/erdos-728b && ls proofs/
+[2026-02-11T05:47:47.809Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "count_digits_fixed\|digits.*fixed\|D-T\|p.*D.*T" proofs/lemma3-counting.md | head -20
+[2026-02-11T05:47:52.276Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "count_digits_fixed\|digits fixed\|constraining.*digit\|digits.*fixed\|p.*D-T\|p.*D.*-.*T" proofs/lemma3-counting.md | head -20
+[2026-02-11T05:47:55.693Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-bu3 --status "Planning proof approach: bijection via toDigitSpace, fiber counting"
+[2026-02-11T05:48:03.601Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_api.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fin.Basic
+
+-- Check what's available for counting fibers / preimages
+#check Finset.card_filter_le_card_filter
+#check Fintype.card_pi
+#check Fintype.card_fun
+#check Finset.card_range
+#check Finset.card_image_of_injective
+#check Fintype.card_fin
+EOF
+lake env lean /tmp/test_api.lean 2>&1 | head -30
+[2026-02-11T05:48:10.399Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_api2.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Data.Fin.Basic
+
+-- Bijection/equiv-based counting
+#check Fintype.card_of_bijective
+#check Fintype.card_congr
+#check Fintype.card_subtype_compl
+#check Fintype.ofBijective
+#check Finset.card_bij
+#check Finset.card_bij'
+EOF
+lake env lean /tmp/test_api2.lean 2>&1 | head -30
+[2026-02-11T05:48:17.503Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_api3.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Data.Fin.Basic
+import Mathlib.Logic.Equiv.Fin
+
+-- How to count functions from complement 
+#check Fintype.card_piFinsetUnion
+#check Fintype.card_pi
+#check Equiv.piFinSuccAbove
+#check Fintype.prod_pi_card
+EOF
+lake env lean /tmp/test_api3.lean 2>&1 | head -30
+[2026-02-11T05:48:21.822Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_api3.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Data.Fin.Basic
+
+#check @Fintype.card_pi
+#check Fintype.card_fun
+EOF
+lake env lean /tmp/test_api3.lean 2>&1 | head -30
+[2026-02-11T05:48:37.678Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_approach.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fin.Basic
+
+-- Check if there's an equiv for restricting pi types
+#check Equiv.piEquivPiSubtypeProd
+#check Equiv.subtypeEquivRight
+EOF
+lake env lean /tmp/test_approach.lean 2>&1 | head -20
+[2026-02-11T05:48:45.397Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_approach2.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fin.Basic
+
+-- The key idea: functions Fin D → Fin p with T constraints 
+-- = functions on the complement (D-T positions) → Fin p
+-- Need: Fintype.card {i : Fin D // i ∉ Set.range indices} = D - T
+
+#check Fintype.card_compl_set
+#check Set.toFinset_compl
+#check Fintype.card_fin_compl
+EOF
+lake env lean /tmp/test_approach2.lean 2>&1 | head -20
+[2026-02-11T05:48:52.225Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_approach3.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fin.Basic
+import Mathlib.Data.Set.Card
+
+-- If indices : Fin T ↪ Fin D, then Set.range indices has card T
+-- and the complement has card D - T
+#check Set.Finite.toFinset_range
+#check Fintype.card_range
+#check Set.card_range_of_injective
+EOF
+lake env lean /tmp/test_approach3.lean 2>&1 | head -20
+[2026-02-11T05:49:12.760Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_digitspace.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fin.Basic
+
+-- Key fact: for DigitSpace = Fin D → Fin p,
+-- the subtype {f // ∀ k, f (indices k) = values k}
+-- is equiv to ({i : Fin D // i ∉ Set.range indices} → Fin p)
+
+-- This is essentially Equiv.piEquivPiSubtypeProd but for a specific constraint
+
+-- Actually let me think about this differently
+-- We can use Finset-level counting
+
+variable {p D T : ℕ} (indices : Fin T → Fin D) (values : Fin T → Fin p)
+  (h_inj : Function.Injective indices) [NeZero p]
+
+-- The constrained set
+def constrainedSet : Finset (Fin D → Fin p) :=
+  Finset.univ.filter (fun f => ∀ k : Fin T, f (indices k) = values k)
+
+-- Its cardinality should be p^(D-T)
+-- Proof: decompose f into (restriction to range indices) × (restriction to complement)
+-- The constraint fixes the first part, and the second part is free
+
+-- Check Fintype.card of subtype with Pi structure
+#check @Fintype.card_pi
+
+-- We need the complement to have cardinality D - T
+-- Set.card_range_of_injective gives card(range indices) = T
+-- Fintype.card_compl_set gives card(complement) = D - T
+-- Fintype.card_fun gives card(complement → Fin p) = p^(D-T)
+
+example : Fintype.card (Fin D) = D := Fintype.card_fin D
+EOF
+lake env lean /tmp/test_digitspace.lean 2>&1 | head -20
+[2026-02-11T05:49:18.297Z] 
+$ cd /home/jarred/code/erdos-728b && grep -r "card_pi" .lake/packages/mathlib/Mathlib/ --include="*.lean" -l | head -5
+[2026-02-11T05:49:20.757Z] 
+$ cd /home/jarred/code/erdos-728b && grep -r "Fintype.card_pi\b" .lake/packages/mathlib/Mathlib/ --include="*.lean" | head -5
+[2026-02-11T05:49:22.809Z] 
+$ cd /home/jarred/code/erdos-728b && grep -B2 -A2 "theorem Fintype.card_pi\|lemma Fintype.card_pi" .lake/packages/mathlib/Mathlib/Data/Fintype/BigOperators.lean
+[2026-02-11T05:49:24.664Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "card_pi" .lake/packages/mathlib/Mathlib/Data/Fintype/BigOperators.lean
+[2026-02-11T05:49:31.855Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_approach4.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Data.Fin.Basic
+import Mathlib.Data.Set.Card
+
+-- Check: card of functions from complement to Fin p
+example (D T p : ℕ) [NeZero p] (indices : Fin T → Fin D) (h_inj : Function.Injective indices)
+    (hT : T ≤ D) :
+    Fintype.card ({i : Fin D // i ∉ Set.range indices} → Fin p) = p ^ (D - T) := by
+  rw [Fintype.card_fun]
+  congr 1
+  · exact Fintype.card_fin p
+  · rw [Fintype.card_compl_set, Fintype.card_fin, Set.card_range_of_injective h_inj, Fintype.card_fin]
+EOF
+lake env lean /tmp/test_approach4.lean 2>&1
+[2026-02-11T05:49:41.578Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_approach5.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Data.Fin.Basic
+import Mathlib.Data.Set.Card
+
+-- The subtype {i // i ∉ Set.range indices} is the same as {i // ¬ (Set.range indices) i}
+-- which is the complement subtype
+-- Fintype.card_compl_set wants {x // ¬ s x} where s : Set α 
+
+-- Let's try the right form
+example (D T : ℕ) (indices : Fin T → Fin D) (h_inj : Function.Injective indices) :
+    Fintype.card {i : Fin D // i ∉ Set.range indices} = D - T := by
+  have : Fintype.card {i : Fin D // ¬ (Set.range indices) i} = D - T := by
+    rw [show (fun i => ¬ (Set.range indices) i) = (fun i => i ∈ (Set.range indices)ᶜ) from by ext; simp]
+    sorry
+  convert this using 1
+  congr 1; ext; simp [Set.mem_range]
+EOF
+lake env lean /tmp/test_approach5.lean 2>&1
+[2026-02-11T05:49:49.199Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_card_compl.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Data.Fin.Basic
+import Mathlib.Data.Set.Card
+
+-- Let's just verify what tools we have
+example (D T : ℕ) (indices : Fin T → Fin D) (h_inj : Function.Injective indices) :
+    Fintype.card {i : Fin D // i ∉ Set.range indices} = D - T := by
+  classical
+  rw [Fintype.card_subtype_compl]
+  rw [Set.card_range_of_injective h_inj]
+  simp [Fintype.card_fin]
+EOF
+lake env lean /tmp/test_card_compl.lean 2>&1
+[2026-02-11T05:49:57.307Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_fun_card.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Data.Fin.Basic
+import Mathlib.Data.Set.Card
+
+-- Counting functions from complement → Fin p
+example (D T p : ℕ) (indices : Fin T → Fin D) (h_inj : Function.Injective indices) :
+    Fintype.card ({i : Fin D // i ∉ Set.range indices} → Fin p) = p ^ (D - T) := by
+  classical
+  rw [Fintype.card_fun, Fintype.card_fin]
+  congr 1
+  rw [Fintype.card_subtype_compl, Set.card_range_of_injective h_inj, Fintype.card_fin]
+EOF
+lake env lean /tmp/test_fun_card.lean 2>&1
+[2026-02-11T05:50:04.060Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_fun_card2.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Data.Fin.Basic
+import Mathlib.Data.Set.Card
+
+example (D T p : ℕ) (indices : Fin T → Fin D) (h_inj : Function.Injective indices) :
+    Fintype.card ({i : Fin D // i ∉ Set.range indices} → Fin p) = p ^ (D - T) := by
+  classical
+  rw [Fintype.card_fun, Fintype.card_fin, Fintype.card_subtype_compl,
+      Set.card_range_of_injective h_inj, Fintype.card_fin]
+EOF
+lake env lean /tmp/test_fun_card2.lean 2>&1
+[2026-02-11T05:50:10.502Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_fun_card3.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Data.Fin.Basic
+import Mathlib.Data.Set.Card
+
+example (D T p : ℕ) (indices : Fin T → Fin D) (h_inj : Function.Injective indices) :
+    Fintype.card ({i : Fin D // i ∉ Set.range indices} → Fin p) = p ^ (D - T) := by
+  classical
+  simp only [Fintype.card_fun, Fintype.card_fin, Fintype.card_subtype_compl,
+      Set.card_range_of_injective h_inj]
+EOF
+lake env lean /tmp/test_fun_card3.lean 2>&1
+[2026-02-11T05:50:20.416Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-bu3 --status "Building proof: bijection from filtered DigitSpace to complement functions"
+[2026-02-11T05:50:31.622Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_bijection.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Data.Fin.Basic
+import Mathlib.Data.Set.Card
+
+-- Build the bijection between the constrained subtype and complement functions
+variable {D T p : ℕ} (indices : Fin T → Fin D) (values : Fin T → Fin p)
+  (h_inj : Function.Injective indices)
+
+-- Forward direction: restrict to complement
+def restrictToCompl (f : {f : Fin D → Fin p // ∀ k, f (indices k) = values k}) :
+    ({i : Fin D // i ∉ Set.range indices} → Fin p) :=
+  fun ⟨i, hi⟩ => f.val i
+
+-- Backward direction: extend from complement
+noncomputable def extendFromCompl (g : {i : Fin D // i ∉ Set.range indices} → Fin p) :
+    {f : Fin D → Fin p // ∀ k, f (indices k) = values k} := by
+  refine ⟨fun i => if h : i ∈ Set.range indices then values (h.choose) else g ⟨i, h⟩, ?_⟩
+  intro k
+  simp only [Set.mem_range]
+  have : ∃ j, indices j = indices k := ⟨k, rfl⟩
+  rw [dif_pos ⟨k, rfl⟩]
+  congr 1
+  exact h_inj (Exists.choose_spec ⟨k, rfl⟩)
+
+-- Show they're inverses
+lemma left_inv (g : {i : Fin D // i ∉ Set.range indices} → Fin p) :
+    restrictToCompl indices values (extendFromCompl indices values h_inj g) = g := by
+  ext ⟨i, hi⟩
+  simp [restrictToCompl, extendFromCompl, dif_neg hi]
+
+lemma right_inv (f : {f : Fin D → Fin p // ∀ k, f (indices k) = values k}) :
+    extendFromCompl indices values h_inj (restrictToCompl indices values f) = f := by
+  ext i
+  simp only [extendFromCompl, restrictToCompl]
+  split
+  · rename_i h
+    obtain ⟨k, hk⟩ := h
+    rw [← hk, f.prop k]
+    congr 1
+    exact h_inj (Exists.choose_spec h)
+  · rfl
+EOF
+lake env lean /tmp/test_bijection.lean 2>&1
+[2026-02-11T05:50:38.701Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T05:50:38.704Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T05:50:48.280Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_bijection2.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Data.Fin.Basic
+import Mathlib.Data.Set.Card
+
+variable {D T p : ℕ} (indices : Fin T → Fin D) (values : Fin T → Fin p)
+  (h_inj : Function.Injective indices)
+
+noncomputable def extendFromCompl (g : {i : Fin D // i ∉ Set.range indices} → Fin p) :
+    (Fin D → Fin p) :=
+  fun i => if h : i ∈ Set.range indices then values (h.choose) else g ⟨i, h⟩
+
+lemma extendFromCompl_spec (g : {i : Fin D // i ∉ Set.range indices} → Fin p) :
+    ∀ k, extendFromCompl indices values g (indices k) = values k := by
+  intro k
+  unfold extendFromCompl
+  have hmem : indices k ∈ Set.range indices := Set.mem_range.mpr ⟨k, rfl⟩
+  rw [dif_pos hmem]
+  congr 1
+  exact h_inj hmem.choose_spec
+
+lemma extendFromCompl_compl (g : {i : Fin D // i ∉ Set.range indices} → Fin p)
+    (i : Fin D) (hi : i ∉ Set.range indices) :
+    extendFromCompl indices values g i = g ⟨i, hi⟩ := by
+  unfold extendFromCompl
+  rw [dif_neg hi]
+
+-- The Equiv
+noncomputable def digitConstraintEquiv :
+    {f : Fin D → Fin p // ∀ k, f (indices k) = values k} ≃
+    ({i : Fin D // i ∉ Set.range indices} → Fin p) where
+  toFun f := fun ⟨i, hi⟩ => f.val i
+  invFun g := ⟨extendFromCompl indices values g,
+    extendFromCompl_spec indices values h_inj g⟩
+  left_inv := by
+    intro ⟨f, hf⟩
+    ext i
+    simp only
+    by_cases hi : i ∈ Set.range indices
+    · obtain ⟨k, hk⟩ := hi
+      rw [← hk]
+      rw [extendFromCompl_spec indices values h_inj]
+      exact (hf k).symm
+    · exact extendFromCompl_compl indices values i hi
+  right_inv := by
+    intro g
+    ext ⟨i, hi⟩
+    simp only
+    exact extendFromCompl_compl indices values i hi
+EOF
+lake env lean /tmp/test_bijection2.lean 2>&1
+[2026-02-11T05:51:00.959Z] [overseer] 📝 Cleared poke messages
+[2026-02-11T05:51:00.960Z] [overseer] 💓 Heartbeat #28 complete: No intervention needed. Task erdos728b-bu3 is in progress, and the system is moving through the Tier 0 formalization tasks as planned. Sorry count is down to 12.
+[2026-02-11T05:51:03.965Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_bijection3.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Data.Fin.Basic
+import Mathlib.Data.Set.Card
+
+variable {D T p : ℕ} 
+
+section
+variable (indices : Fin T → Fin D) (values : Fin T → Fin p)
+
+noncomputable def extendFromCompl' (g : {i : Fin D // i ∉ Set.range indices} → Fin p) :
+    (Fin D → Fin p) :=
+  fun i => if h : i ∈ Set.range indices then values (h.choose) else g ⟨i, h⟩
+
+lemma extendFromCompl'_at_index (h_inj : Function.Injective indices)
+    (g : {i : Fin D // i ∉ Set.range indices} → Fin p) (k : Fin T) :
+    extendFromCompl' indices values g (indices k) = values k := by
+  unfold extendFromCompl'
+  have hmem : indices k ∈ Set.range indices := Set.mem_range.mpr ⟨k, rfl⟩
+  rw [dif_pos hmem]
+  congr 1
+  exact h_inj hmem.choose_spec
+
+lemma extendFromCompl'_at_compl 
+    (g : {i : Fin D // i ∉ Set.range indices} → Fin p)
+    (i : Fin D) (hi : i ∉ Set.range indices) :
+    extendFromCompl' indices values g i = g ⟨i, hi⟩ := by
+  unfold extendFromCompl'
+  rw [dif_neg hi]
+
+noncomputable def digitConstraintEquiv' (h_inj : Function.Injective indices) :
+    {f : Fin D → Fin p // ∀ k, f (indices k) = values k} ≃
+    ({i : Fin D // i ∉ Set.range indices} → Fin p) where
+  toFun f := fun ⟨i, hi⟩ => f.val i
+  invFun g := ⟨extendFromCompl' indices values g,
+    fun k => extendFromCompl'_at_index indices values h_inj g k⟩
+  left_inv := by
+    intro ⟨f, hf⟩
+    ext i
+    simp only
+    by_cases hi : i ∈ Set.range indices
+    · obtain ⟨k, hk⟩ := hi
+      rw [← hk, extendFromCompl'_at_index indices values h_inj, hf k]
+    · exact extendFromCompl'_at_compl indices values _ i hi
+  right_inv := by
+    intro g; ext ⟨i, hi⟩; simp only
+    exact extendFromCompl'_at_compl indices values _ i hi
+
+end
+EOF
+lake env lean /tmp/test_bijection3.lean 2>&1
+[2026-02-11T05:51:17.181Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_bijection4.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Data.Fin.Basic
+import Mathlib.Data.Set.Card
+
+variable {D T p : ℕ} 
+
+section
+variable (indices : Fin T → Fin D) (values : Fin T → Fin p)
+
+noncomputable def extendFromCompl' (g : {i : Fin D // i ∉ Set.range indices} → Fin p) :
+    (Fin D → Fin p) :=
+  fun i => if h : i ∈ Set.range indices then values (h.choose) else g ⟨i, h⟩
+
+lemma extendFromCompl'_at_index (h_inj : Function.Injective indices)
+    (g : {i : Fin D // i ∉ Set.range indices} → Fin p) (k : Fin T) :
+    extendFromCompl' indices values g (indices k) = values k := by
+  unfold extendFromCompl'
+  have hmem : indices k ∈ Set.range indices := Set.mem_range.mpr ⟨k, rfl⟩
+  rw [dif_pos hmem]
+  congr 1
+  exact h_inj hmem.choose_spec
+
+lemma extendFromCompl'_at_compl 
+    (g : {i : Fin D // i ∉ Set.range indices} → Fin p)
+    (i : Fin D) (hi : i ∉ Set.range indices) :
+    extendFromCompl' indices values g i = g ⟨i, hi⟩ := by
+  unfold extendFromCompl'
+  rw [dif_neg hi]
+
+noncomputable def digitConstraintEquiv' (h_inj : Function.Injective indices) :
+    {f : Fin D → Fin p // ∀ k, f (indices k) = values k} ≃
+    ({i : Fin D // i ∉ Set.range indices} → Fin p) where
+  toFun f := fun ⟨i, hi⟩ => f.val i
+  invFun g := ⟨extendFromCompl' indices values g,
+    fun k => extendFromCompl'_at_index indices values h_inj g k⟩
+  left_inv := by
+    intro ⟨f, hf⟩
+    simp only [Subtype.mk.injEq]
+    ext i
+    by_cases hi : i ∈ Set.range indices
+    · obtain ⟨k, hk⟩ := hi
+      rw [← hk, extendFromCompl'_at_index indices values h_inj, hf k]
+    · exact extendFromCompl'_at_compl indices values _ i hi
+  right_inv := by
+    intro g; ext ⟨i, hi⟩
+    exact extendFromCompl'_at_compl indices values _ i hi
+
+end
+EOF
+lake env lean /tmp/test_bijection4.lean 2>&1
+[2026-02-11T05:51:31.708Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_bijection5.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Data.Fin.Basic
+import Mathlib.Data.Set.Card
+
+variable {D T p : ℕ} 
+
+section
+variable (indices : Fin T → Fin D) (values : Fin T → Fin p)
+
+noncomputable def extendFromCompl' (g : {i : Fin D // i ∉ Set.range indices} → Fin p) :
+    (Fin D → Fin p) :=
+  fun i => if h : i ∈ Set.range indices then values (h.choose) else g ⟨i, h⟩
+
+lemma extendFromCompl'_at_index (h_inj : Function.Injective indices)
+    (g : {i : Fin D // i ∉ Set.range indices} → Fin p) (k : Fin T) :
+    extendFromCompl' indices values g (indices k) = values k := by
+  unfold extendFromCompl'
+  have hmem : indices k ∈ Set.range indices := Set.mem_range.mpr ⟨k, rfl⟩
+  rw [dif_pos hmem]
+  congr 1
+  exact h_inj hmem.choose_spec
+
+lemma extendFromCompl'_at_compl 
+    (g : {i : Fin D // i ∉ Set.range indices} → Fin p)
+    (i : Fin D) (hi : i ∉ Set.range indices) :
+    extendFromCompl' indices values g i = g ⟨i, hi⟩ := by
+  unfold extendFromCompl'
+  rw [dif_neg hi]
+
+noncomputable def digitConstraintEquiv' (h_inj : Function.Injective indices) :
+    {f : Fin D → Fin p // ∀ k, f (indices k) = values k} ≃
+    ({i : Fin D // i ∉ Set.range indices} → Fin p) where
+  toFun f := fun ⟨i, _⟩ => f.val i
+  invFun g := ⟨extendFromCompl' indices values g,
+    fun k => extendFromCompl'_at_index indices values h_inj g k⟩
+  left_inv := by
+    intro ⟨f, hf⟩
+    apply Subtype.ext
+    funext i
+    show extendFromCompl' indices values (fun ⟨j, _⟩ => f j) i = f i
+    by_cases hi : i ∈ Set.range indices
+    · obtain ⟨k, hk⟩ := hi
+      rw [← hk, extendFromCompl'_at_index indices values h_inj, hf k]
+    · exact extendFromCompl'_at_compl indices values _ i hi
+  right_inv := by
+    intro g; funext ⟨i, hi⟩
+    show extendFromCompl' indices values g i = g ⟨i, hi⟩
+    exact extendFromCompl'_at_compl indices values _ i hi
+
+end
+EOF
+lake env lean /tmp/test_bijection5.lean 2>&1
+[2026-02-11T05:51:58.368Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_full.lean << 'EOF'
+import Mathlib.Data.Nat.Digits.Lemmas
+import Mathlib.Data.Nat.Choose.Factorization
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Data.Int.CardIntervalMod
+import Mathlib.NumberTheory.Padics.PadicVal.Basic
+import Mathlib.Data.Set.Card
+import Erdos.Digits
+import Erdos.Lemma3Common
+
+open Nat BigOperators Finset Real
+
+namespace Erdos728
+
+section TestCommon
+variable {p : ℕ} (hp : p.Prime) (D : ℕ)
+
+-- toDigitSpace and toDigitSpace_bijective are assumed to exist already
+
+-- Helper: extending a function from the complement
+private noncomputable def extendFromCompl
+    {T : ℕ} (indices : Fin T → Fin D) (values : Fin T → Fin p)
+    (g : {i : Fin D // i ∉ Set.range indices} → Fin p) :
+    (Fin D → Fin p) :=
+  fun i => if h : i ∈ Set.range indices then values (h.choose) else g ⟨i, h⟩
+
+private lemma extendFromCompl_at_index {T : ℕ} (indices : Fin T → Fin D) (values : Fin T → Fin p)
+    (h_inj : Function.Injective indices)
+    (g : {i : Fin D // i ∉ Set.range indices} → Fin p) (k : Fin T) :
+    extendFromCompl D indices values g (indices k) = values k := by
+  unfold extendFromCompl
+  have hmem : indices k ∈ Set.range indices := Set.mem_range.mpr ⟨k, rfl⟩
+  rw [dif_pos hmem]
+  congr 1
+  exact h_inj hmem.choose_spec
+
+private lemma extendFromCompl_at_compl {T : ℕ} (indices : Fin T → Fin D) (values : Fin T → Fin p)
+    (g : {i : Fin D // i ∉ Set.range indices} → Fin p)
+    (i : Fin D) (hi : i ∉ Set.range indices) :
+    extendFromCompl D indices values g i = g ⟨i, hi⟩ := by
+  unfold extendFromCompl
+  rw [dif_neg hi]
+
+-- The core equivalence
+private noncomputable def digitConstraintEquiv {T : ℕ} (indices : Fin T → Fin D)
+    (values : Fin T → Fin p) (h_inj : Function.Injective indices) :
+    {f : Fin D → Fin p // ∀ k, f (indices k) = values k} ≃
+    ({i : Fin D // i ∉ Set.range indices} → Fin p) where
+  toFun f := fun ⟨i, _⟩ => f.val i
+  invFun g := ⟨extendFromCompl D indices values g,
+    fun k => extendFromCompl_at_index D indices values h_inj g k⟩
+  left_inv := by
+    intro ⟨f, hf⟩
+    apply Subtype.ext; funext i
+    show extendFromCompl D indices values (fun ⟨j, _⟩ => f j) i = f i
+    by_cases hi : i ∈ Set.range indices
+    · obtain ⟨k, hk⟩ := hi
+      rw [← hk, extendFromCompl_at_index D indices values h_inj, hf k]
+    · exact extendFromCompl_at_compl D indices values _ i hi
+  right_inv := by
+    intro g; funext ⟨i, hi⟩
+    show extendFromCompl D indices values g i = g ⟨i, hi⟩
+    exact extendFromCompl_at_compl D indices values _ i hi
+
+end TestCommon
+end Erdos728
+EOF
+lake env lean /tmp/test_full.lean 2>&1
+[2026-02-11T05:52:34.472Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count.lean << 'EOF'
+import Mathlib.Data.Nat.Digits.Lemmas
+import Mathlib.Data.Nat.Choose.Factorization
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Data.Int.CardIntervalMod
+import Mathlib.NumberTheory.Padics.PadicVal.Basic
+import Mathlib.Data.Set.Card
+import Erdos.Digits
+import Erdos.Lemma3Common
+
+open Nat BigOperators Finset Real
+
+namespace Erdos728
+
+variable {p : ℕ} (hp : p.Prime) (D : ℕ)
+
+def toDigitSpace' (m : Fin (p^D)) : DigitSpace D p := fun i => ⟨digit p m i, Nat.mod_lt _ hp.pos⟩
+
+lemma toDigitSpace'_bijective : Function.Bijective (toDigitSpace' hp D) := by
+  sorry -- assume this is proved
+
+-- The main lemma to prove
+lemma count_digits_fixed' {T : ℕ} (indices : Fin T → Fin D) (values : Fin T → Fin p)
+    (h_inj : Function.Injective indices) :
+    ((range (p^D)).filter (fun m => ∀ k : Fin T, digit p m (indices k) = values k)).card = p ^ (D - T) := by
+  classical
+  -- Step 1: Transfer from range(p^D) to Finset.univ (Fin (p^D))
+  have h1 : ((range (p^D)).filter (fun m => ∀ k, digit p m (indices k) = (values k).val)).card =
+      ((Finset.univ : Finset (Fin (p^D))).filter
+        (fun m : Fin (p^D) => ∀ k, digit p m.val (indices k) = (values k).val)).card := by
+    apply Finset.card_bij (fun m hm => ⟨m, by rw [Finset.mem_filter] at hm; exact Finset.mem_range.mp hm.1⟩)
+    · intro m hm; rw [Finset.mem_filter] at hm ⊢; exact ⟨Finset.mem_univ _, hm.2⟩
+    · intro a _ b _ h; simp at h; exact h
+    · intro ⟨b, hb⟩ hmem; refine ⟨b, ?_, Fin.ext rfl⟩
+      rw [Finset.mem_filter]; exact ⟨Finset.mem_range.mpr hb, (Finset.mem_filter.mp hmem).2⟩
+  -- Step 2: Transfer to DigitSpace via toDigitSpace bijection
+  have hbij := toDigitSpace'_bijective hp D
+  have h2 : ((Finset.univ : Finset (Fin (p^D))).filter
+        (fun m : Fin (p^D) => ∀ k, digit p m.val (indices k) = (values k).val)).card =
+      ((Finset.univ : Finset (DigitSpace D p)).filter
+        (fun f : DigitSpace D p => ∀ k, f (indices k) = values k)).card := by
+    apply Finset.card_bij (fun m _ => toDigitSpace' hp D m)
+    · intro m hm; rw [Finset.mem_filter] at hm ⊢
+      refine ⟨Finset.mem_univ _, fun k => ?_⟩
+      have := hm.2 k
+      ext; simp [toDigitSpace']; exact this
+    · intro a _ b _ h; exact hbij.1 h
+    · intro f hf; obtain ⟨a, ha⟩ := hbij.2 f
+      refine ⟨a, ?_, ha⟩; rw [Finset.mem_filter]
+      refine ⟨Finset.mem_univ _, fun k => ?_⟩
+      have := (Finset.mem_filter.mp hf).2 k
+      rw [← ha] at this
+      simp [toDigitSpace'] at this
+      exact this
+  -- Step 3: Count the constrained DigitSpace elements
+  -- The filter on DigitSpace is {f | ∀ k, f(indices k) = values k}
+  -- This is in bijection with (complement → Fin p), which has card p^(D-T)
+  have h3 : ((Finset.univ : Finset (DigitSpace D p)).filter
+        (fun f : DigitSpace D p => ∀ k, f (indices k) = values k)).card = p ^ (D - T) := by
+    -- Build an equiv between the filtered subtype and (complement → Fin p)
+    have h_equiv : {f : DigitSpace D p // ∀ k, f (indices k) = values k} ≃
+        ({i : Fin D // i ∉ Set.range indices} → Fin p) := {
+      toFun := fun ⟨f, _⟩ => fun ⟨i, _⟩ => f i
+      invFun := fun g => ⟨fun i => if h : i ∈ Set.range indices then values h.choose else g ⟨i, h⟩,
+        fun k => by
+          have hmem : indices k ∈ Set.range indices := ⟨k, rfl⟩
+          rw [dif_pos hmem]; congr 1; exact h_inj hmem.choose_spec⟩
+      left_inv := by
+        intro ⟨f, hf⟩; apply Subtype.ext; funext i
+        by_cases hi : i ∈ Set.range indices
+        · obtain ⟨k, hk⟩ := hi; simp [dif_pos hi, ← hk, hf k]
+          congr 1; exact h_inj (show indices hi.choose = indices k from hi.choose_spec ▸ hk ▸ hi.choose_spec)
+        · simp [dif_neg hi]
+      right_inv := by
+        intro g; funext ⟨i, hi⟩; simp [dif_neg hi]
+    }
+    rw [← Fintype.card_coe, Finset.card_coe_sort_filter]  -- Hmm, need to relate filter card to Fintype.card
+    sorry
+  linarith [h1, h2, h3]
+EOF
+lake env lean /tmp/test_count.lean 2>&1 | head -40
+[2026-02-11T05:52:54.872Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_direct.lean << 'EOF'
+import Mathlib.Data.Nat.Digits.Lemmas
+import Mathlib.Data.Nat.Choose.Factorization
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Data.Int.CardIntervalMod
+import Mathlib.NumberTheory.Padics.PadicVal.Basic
+import Mathlib.Data.Set.Card
+import Erdos.Digits
+import Erdos.Lemma3Common
+import Erdos.Lemma3Residue
+import Erdos.Chernoff
+
+open Nat BigOperators Finset Real
+
+namespace Erdos728
+
+section Common
+variable {p : ℕ} (hp : p.Prime) (D : ℕ)
+
+def toDigitSpace (m : Fin (p^D)) : DigitSpace D p := fun i => ⟨digit p m i, Nat.mod_lt _ hp.pos⟩
+
+-- Assume toDigitSpace_bijective is available
+-- lemma toDigitSpace_bijective : Function.Bijective (toDigitSpace hp D)
+
+-- Use Fintype.card_subtype to relate filter card to subtype card
+-- Finset.card_univ_filter : #(univ.filter p) = Fintype.card {x // p x}
+-- or maybe Fintype.card_subtype
+
+-- Check what's available
+#check @Finset.card_filter_univ
+#check @Fintype.card_subtype
+end Common
+end Erdos728
+EOF
+lake env lean /tmp/test_direct.lean 2>&1 | head -20
+[2026-02-11T05:53:05.302Z] 
+$ cd /home/jarred/code/erdos-728b && grep -r "card_univ_filter\|filter_univ_card\|card_filter_of\|card.*filter.*univ\|Fintype.card_subtype_eq" .lake/packages/mathlib/Mathlib/ --include="*.lean" | grep -i "lemma\|theorem" | head -10
+[2026-02-11T05:53:11.197Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_card.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+
+-- How to relate (univ.filter p).card and Fintype.card {x // p x}
+#check @Fintype.card_subtype
+-- Fintype.card {x // p x} = #{x | p x}
+
+-- So (univ.filter p).card = Fintype.card {x // p x}?
+-- univ.filter p has type Finset α, and its card is Fintype.card {x // p x}
+-- via Fintype.card_subtype in reverse?
+
+-- Let me check Set.toFinset
+#check @Finset.univ_filter_card_eq
+EOF
+lake env lean /tmp/test_card.lean 2>&1
+[2026-02-11T05:53:16.230Z] 
+$ cd /home/jarred/code/erdos-728b && grep -r "univ_filter_card\|card_univ_filter\b" .lake/packages/mathlib/Mathlib/ --include="*.lean" | head -10
+[2026-02-11T05:53:20.248Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_card2.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+
+-- What is the relationship between filter card and Fintype.card?
+-- Let me just check with a concrete goal
+example {α : Type*} [Fintype α] [DecidableEq α] (p : α → Prop) [DecidablePred p] :
+    (Finset.univ.filter p).card = Fintype.card {x : α // p x} := by
+  rw [Fintype.card_subtype]
+  simp [Finset.filter_congr_decidable]
+EOF
+lake env lean /tmp/test_card2.lean 2>&1
+[2026-02-11T05:53:25.571Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_card2.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+
+example {α : Type*} [Fintype α] [DecidableEq α] (p : α → Prop) [DecidablePred p] :
+    (Finset.univ.filter p).card = Fintype.card {x : α // p x} := by
+  rw [Fintype.card_subtype]
+EOF
+lake env lean /tmp/test_card2.lean 2>&1
+[2026-02-11T05:54:00.963Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T05:54:00.967Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T05:54:11.541Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_full2.lean << 'EOF'
+import Mathlib.Data.Nat.Digits.Lemmas
+import Mathlib.Data.Nat.Choose.Factorization
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Data.Int.CardIntervalMod
+import Mathlib.NumberTheory.Padics.PadicVal.Basic
+import Mathlib.Data.Set.Card
+import Erdos.Digits
+import Erdos.Lemma3Common
+import Erdos.Lemma3Residue
+import Erdos.Chernoff
+
+open Nat BigOperators Finset Real
+
+namespace Erdos728
+
+section Common
+variable {p : ℕ} (hp : p.Prime) (D : ℕ)
+
+def toDigitSpace (m : Fin (p^D)) : DigitSpace D p := fun i => ⟨digit p m i, Nat.mod_lt _ hp.pos⟩
+
+private lemma mod_pow_eq_of_digits_eq (a b : ℕ)
+    (h : ∀ i, i < D → digit p a i = digit p b i) : a % p ^ D = b % p ^ D := by
+  induction D with
+  | zero => simp [pow_zero, Nat.mod_one]
+  | succ D ih =>
+    rw [Nat.mod_pow_succ, Nat.mod_pow_succ]
+    have h_prev : ∀ i, i < D → digit p a i = digit p b i :=
+      fun i hi => h i (Nat.lt_succ_of_lt hi)
+    have h_D : digit p a D = digit p b D := h D (Nat.lt_succ_iff.mpr le_rfl)
+    unfold digit at h_D
+    rw [ih h_prev, h_D]
+
+lemma toDigitSpace_bijective : Function.Bijective (toDigitSpace hp D) := by
+  rw [Fintype.bijective_iff_injective_and_card]
+  constructor
+  · intro ⟨a, ha⟩ ⟨b, hb⟩ h_eq
+    ext
+    have h_digits : ∀ i, i < D → digit p a i = digit p b i := by
+      intro i hi
+      have h_fi := congr_fun h_eq ⟨i, hi⟩
+      simp only [toDigitSpace, Fin.mk.injEq] at h_fi
+      exact h_fi
+    have := mod_pow_eq_of_digits_eq D a b h_digits
+    rwa [Nat.mod_eq_of_lt ha, Nat.mod_eq_of_lt hb] at this
+  · simp [Fintype.card_fin]
+
+-- Core helper: equiv between constrained DigitSpace and complement functions
+private noncomputable def digitConstraintEquiv {T : ℕ} (indices : Fin T → Fin D)
+    (values : Fin T → Fin p) (h_inj : Function.Injective indices) :
+    {f : DigitSpace D p // ∀ k, f (indices k) = values k} ≃
+    ({i : Fin D // i ∉ Set.range indices} → Fin p) where
+  toFun f := fun ⟨i, _⟩ => f.val i
+  invFun g := ⟨fun i => if h : i ∈ Set.range indices then values h.choose else g ⟨i, h⟩,
+    fun k => by
+      have hmem : indices k ∈ Set.range indices := ⟨k, rfl⟩
+      rw [dif_pos hmem]; congr 1; exact h_inj hmem.choose_spec⟩
+  left_inv := by
+    intro ⟨f, hf⟩; apply Subtype.ext; funext i
+    by_cases hi : i ∈ Set.range indices
+    · obtain ⟨k, hk⟩ := hi
+      simp only [dif_pos hi]
+      have : hi.choose = k := h_inj (hi.choose_spec.trans hk.symm)
+      rw [this, ← hk, hf k]
+    · simp [dif_neg hi]
+  right_inv := by
+    intro g; funext ⟨i, hi⟩; simp [dif_neg hi]
+
+lemma count_digits_fixed {T : ℕ} (indices : Fin T → Fin D) (values : Fin T → Fin p)
+    (h_inj : Function.Injective indices) :
+    ((range (p^D)).filter (fun m => ∀ k : Fin T, digit p m (indices k) = values k)).card = p ^ (D - T) := by
+  classical
+  -- Step 1: range(p^D) ↔ univ (Fin (p^D))
+  have h_range_eq :
+      ((range (p^D)).filter (fun m => ∀ k, digit p m (indices k) = (values k).val)).card =
+      ((univ : Finset (Fin (p^D))).filter
+        (fun m : Fin (p^D) => ∀ k, digit p m.val (indices k) = (values k).val)).card := by
+    apply card_bij (fun m hm => ⟨m, by rw [mem_filter] at hm; exact mem_range.mp hm.1⟩)
+    · intro m hm; rw [mem_filter] at hm ⊢; exact ⟨mem_univ _, hm.2⟩
+    · intro a _ b _ h; simp at h; exact h
+    · intro ⟨b, hb⟩ hmem; refine ⟨b, ?_, Fin.ext rfl⟩
+      rw [mem_filter]; exact ⟨mem_range.mpr hb, (mem_filter.mp hmem).2⟩
+  -- Step 2: Fin (p^D) ↔ DigitSpace via toDigitSpace
+  have hbij := toDigitSpace_bijective hp D
+  have h_ds_eq :
+      ((univ : Finset (Fin (p^D))).filter
+        (fun m : Fin (p^D) => ∀ k, digit p m.val (indices k) = (values k).val)).card =
+      ((univ : Finset (DigitSpace D p)).filter
+        (fun f : DigitSpace D p => ∀ k, f (indices k) = values k)).card := by
+    apply card_bij (fun m _ => toDigitSpace hp D m)
+    · intro m hm; rw [mem_filter] at hm ⊢
+      refine ⟨mem_univ _, fun k => ?_⟩
+      have := hm.2 k; ext; simp [toDigitSpace]; exact this
+    · intro a _ b _ h; exact hbij.1 h
+    · intro f hf; obtain ⟨a, ha⟩ := hbij.2 f
+      refine ⟨a, ?_, ha⟩; rw [mem_filter]
+      refine ⟨mem_univ _, fun k => ?_⟩
+      have := (mem_filter.mp hf).2 k; rw [← ha] at this
+      simp [toDigitSpace] at this; exact this
+  -- Step 3: count constrained DigitSpace = p^(D-T)
+  have h_ds_card :
+      ((univ : Finset (DigitSpace D p)).filter
+        (fun f : DigitSpace D p => ∀ k, f (indices k) = values k)).card = p ^ (D - T) := by
+    rw [Fintype.card_subtype]
+    rw [← Fintype.card_congr (digitConstraintEquiv D indices values h_inj)]
+    simp only [Fintype.card_fun, Fintype.card_fin, Fintype.card_subtype_compl,
+        Set.card_range_of_injective h_inj]
+  linarith
+end Common
+end Erdos728
+EOF
+lake env lean /tmp/test_full2.lean 2>&1
+[2026-02-11T05:54:28.791Z] [overseer] 📝 Cleared poke messages
+[2026-02-11T05:54:28.792Z] [overseer] 💓 Heartbeat #29 complete: No intervention needed. Task erdos728b-bu3 is in progress and nearing completion. The DAG is flowing correctly with 12 sorries remaining.
+[2026-02-11T05:54:32.545Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_equiv.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Data.Fin.Basic
+import Mathlib.Data.Set.Card
+
+-- Fix the Equiv proof
+variable {D T p : ℕ}
+
+noncomputable def digitConstraintEquiv (indices : Fin T → Fin D)
+    (values : Fin T → Fin p) (h_inj : Function.Injective indices) :
+    {f : (Fin D → Fin p) // ∀ k, f (indices k) = values k} ≃
+    ({i : Fin D // i ∉ Set.range indices} → Fin p) where
+  toFun f := fun ⟨i, _⟩ => f.val i
+  invFun g := ⟨fun i => if h : i ∈ Set.range indices then values h.choose else g ⟨i, h⟩,
+    fun k => by
+      simp only
+      have hmem : indices k ∈ Set.range indices := ⟨k, rfl⟩
+      rw [show (fun i => if h : i ∈ Set.range indices then values h.choose else g ⟨i, h⟩) (indices k) 
+          = values hmem.choose from dif_pos hmem]
+      congr 1
+      exact h_inj hmem.choose_spec⟩
+  left_inv := by
+    intro ⟨f, hf⟩; apply Subtype.ext; funext i; simp only
+    split
+    · rename_i h
+      have hk := h.choose_spec
+      rw [← hk, hf h.choose]
+    · rfl
+  right_inv := by
+    intro g; funext ⟨i, hi⟩; simp only
+    have : ¬ (i ∈ Set.range indices) := hi
+    rw [show (fun i => if h : i ∈ Set.range indices then values h.choose else g ⟨i, h⟩) i
+        = g ⟨i, this⟩ from dif_neg this]
+EOF
+lake env lean /tmp/test_equiv.lean 2>&1
+[2026-02-11T05:54:46.533Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_equiv2.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Data.Fin.Basic
+import Mathlib.Data.Set.Card
+
+variable {D T p : ℕ}
+
+noncomputable def digitConstraintEquiv (indices : Fin T → Fin D)
+    (values : Fin T → Fin p) (h_inj : Function.Injective indices) :
+    {f : (Fin D → Fin p) // ∀ k, f (indices k) = values k} ≃
+    ({i : Fin D // i ∉ Set.range indices} → Fin p) where
+  toFun f := fun ⟨i, _⟩ => f.val i
+  invFun g := ⟨fun i => if h : i ∈ Set.range indices then values h.choose else g ⟨i, h⟩,
+    fun k => by
+      have hmem : indices k ∈ Set.range indices := ⟨k, rfl⟩
+      simp only [dif_pos hmem]
+      congr 1
+      exact h_inj hmem.choose_spec⟩
+  left_inv := by
+    intro ⟨f, hf⟩; apply Subtype.ext; funext i
+    simp only
+    split
+    · rename_i h
+      rw [← h.choose_spec, hf]
+    · rfl
+  right_inv := by
+    intro g; funext ⟨i, hi⟩
+    simp only [dif_neg hi]
+EOF
+lake env lean /tmp/test_equiv2.lean 2>&1
+[2026-02-11T05:54:57.481Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_equiv3.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Data.Fin.Basic
+import Mathlib.Data.Set.Card
+
+variable {D T p : ℕ}
+
+noncomputable def digitConstraintEquiv (indices : Fin T → Fin D)
+    (values : Fin T → Fin p) (h_inj : Function.Injective indices) :
+    {f : (Fin D → Fin p) // ∀ k, f (indices k) = values k} ≃
+    ({i : Fin D // i ∉ Set.range indices} → Fin p) where
+  toFun f := fun ⟨i, _⟩ => f.val i
+  invFun g := ⟨fun i => if h : i ∈ Set.range indices then values h.choose else g ⟨i, h⟩,
+    fun k => by
+      have hmem : indices k ∈ Set.range indices := ⟨k, rfl⟩
+      simp only [dif_pos hmem]
+      congr 1
+      exact h_inj hmem.choose_spec⟩
+  left_inv := by
+    intro ⟨f, hf⟩; apply Subtype.ext; funext i
+    simp only
+    split
+    · rename_i h
+      -- h : i ∈ Set.range indices, h.choose_spec : indices h.choose = i
+      -- hf : ∀ k, f (indices k) = values k
+      -- Goal: values h.choose = f i
+      rw [← hf h.choose, h.choose_spec]
+    · rfl
+  right_inv := by
+    intro g; funext ⟨i, hi⟩
+    simp only [dif_neg hi]
+EOF
+lake env lean /tmp/test_equiv3.lean 2>&1
+[2026-02-11T05:55:27.868Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_full3.lean << 'EOF'
+import Mathlib.Data.Nat.Digits.Lemmas
+import Mathlib.Data.Nat.Choose.Factorization
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Data.Int.CardIntervalMod
+import Mathlib.NumberTheory.Padics.PadicVal.Basic
+import Mathlib.Data.Set.Card
+import Erdos.Digits
+import Erdos.Lemma3Common
+import Erdos.Lemma3Residue
+import Erdos.Chernoff
+
+open Nat BigOperators Finset Real
+
+namespace Erdos728
+
+section Common
+variable {p : ℕ} (hp : p.Prime) (D : ℕ)
+
+-- Assume these exist (already in the file)
+-- def toDigitSpace (m : Fin (p^D)) : DigitSpace D p
+-- lemma toDigitSpace_bijective : Function.Bijective (toDigitSpace hp D)
+
+-- Core helper: equiv between constrained functions and complement functions
+private noncomputable def digitConstraintEquiv {T : ℕ} (indices : Fin T → Fin D)
+    (values : Fin T → Fin p) (h_inj : Function.Injective indices) :
+    {f : (Fin D → Fin p) // ∀ k, f (indices k) = values k} ≃
+    ({i : Fin D // i ∉ Set.range indices} → Fin p) where
+  toFun f := fun ⟨i, _⟩ => f.val i
+  invFun g := ⟨fun i => if h : i ∈ Set.range indices then values h.choose else g ⟨i, h⟩,
+    fun k => by
+      have hmem : indices k ∈ Set.range indices := ⟨k, rfl⟩
+      simp only [dif_pos hmem]
+      congr 1; exact h_inj hmem.choose_spec⟩
+  left_inv := by
+    intro ⟨f, hf⟩; apply Subtype.ext; funext i; simp only
+    split
+    · rename_i h; rw [← hf h.choose, h.choose_spec]
+    · rfl
+  right_inv := by
+    intro g; funext ⟨i, hi⟩; simp only [dif_neg hi]
+
+-- The main counting lemma
+lemma count_digits_fixed' {T : ℕ} (indices : Fin T → Fin D) (values : Fin T → Fin p)
+    (h_inj : Function.Injective indices)
+    (hbij : Function.Bijective (toDigitSpace hp D)) :
+    ((range (p^D)).filter (fun m => ∀ k : Fin T, digit p m (indices k) = values k)).card = p ^ (D - T) := by
+  classical
+  -- Step 1: Transfer from range to univ Fin
+  have h1 :
+      ((range (p^D)).filter (fun m => ∀ k, digit p m (indices k) = (values k).val)).card =
+      ((univ : Finset (Fin (p^D))).filter
+        (fun m : Fin (p^D) => ∀ k, digit p m.val (indices k) = (values k).val)).card := by
+    apply card_bij (fun m hm => ⟨m, mem_range.mp (mem_filter.mp hm).1⟩)
+    · intro m hm; exact mem_filter.mpr ⟨mem_univ _, (mem_filter.mp hm).2⟩
+    · intro a _ b _ h; exact Fin.val_injective (Fin.mk.inj h)
+    · intro ⟨b, hb⟩ hmem; exact ⟨b, mem_filter.mpr ⟨mem_range.mpr hb, (mem_filter.mp hmem).2⟩, Fin.ext rfl⟩
+  -- Step 2: Transfer to DigitSpace via toDigitSpace
+  have h2 :
+      ((univ : Finset (Fin (p^D))).filter
+        (fun m : Fin (p^D) => ∀ k, digit p m.val (indices k) = (values k).val)).card =
+      ((univ : Finset (DigitSpace D p)).filter
+        (fun f : DigitSpace D p => ∀ k, f (indices k) = values k)).card := by
+    apply card_bij (fun m _ => toDigitSpace hp D m)
+    · intro m hm; rw [mem_filter] at hm ⊢
+      refine ⟨mem_univ _, fun k => ?_⟩
+      have := hm.2 k; exact Fin.ext (by simp [toDigitSpace]; exact this)
+    · intro a _ b _ h; exact hbij.1 h
+    · intro f hf; obtain ⟨a, ha⟩ := hbij.2 f
+      refine ⟨a, mem_filter.mpr ⟨mem_univ _, fun k => ?_⟩, ha⟩
+      have := (mem_filter.mp hf).2 k; rw [← ha] at this
+      exact Fin.mk.inj (by simp [toDigitSpace] at this; exact this)
+  -- Step 3: Count constrained DigitSpace via Equiv
+  have h3 :
+      ((univ : Finset (DigitSpace D p)).filter
+        (fun f : DigitSpace D p => ∀ k, f (indices k) = values k)).card = p ^ (D - T) := by
+    rw [Fintype.card_subtype]
+    rw [← Fintype.card_congr (digitConstraintEquiv D indices values h_inj)]
+    simp only [Fintype.card_fun, Fintype.card_fin, Fintype.card_subtype_compl,
+        Set.card_range_of_injective h_inj]
+  linarith
+
+end Common
+end Erdos728
+EOF
+lake env lean /tmp/test_full3.lean 2>&1
+[2026-02-11T05:55:41.279Z] 
+🛠️  Executing tool: read...
+[2026-02-11T05:56:19.341Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_proof.lean << 'EOF'
+import Mathlib.Data.Nat.Digits.Lemmas
+import Mathlib.Data.Nat.Choose.Factorization
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Data.Int.CardIntervalMod
+import Mathlib.NumberTheory.Padics.PadicVal.Basic
+import Mathlib.Data.Set.Card
+import Erdos.Digits
+import Erdos.Lemma3Common
+import Erdos.Chernoff
+import Erdos.Lemma3Residue
+
+open Nat BigOperators Finset Real
+
+namespace Erdos728
+
+section Common
+variable {p : ℕ} (hp : p.Prime) (D : ℕ)
+
+-- These are already defined in the actual file
+def toDigitSpace' (m : Fin (p^D)) : DigitSpace D p := fun i => ⟨digit p m i, Nat.mod_lt _ hp.pos⟩
+
+private lemma mod_pow_eq_of_digits_eq' (a b : ℕ)
+    (h : ∀ i, i < D → digit p a i = digit p b i) : a % p ^ D = b % p ^ D := by
+  induction D with
+  | zero => simp [pow_zero, Nat.mod_one]
+  | succ D ih =>
+    rw [Nat.mod_pow_succ, Nat.mod_pow_succ]
+    have h_prev : ∀ i, i < D → digit p a i = digit p b i :=
+      fun i hi => h i (Nat.lt_succ_of_lt hi)
+    have h_D : digit p a D = digit p b D := h D (Nat.lt_succ_iff.mpr le_rfl)
+    unfold digit at h_D
+    rw [ih h_prev, h_D]
+
+lemma toDigitSpace_bijective' : Function.Bijective (toDigitSpace' hp D) := by
+  rw [Fintype.bijective_iff_injective_and_card]
+  constructor
+  · intro ⟨a, ha⟩ ⟨b, hb⟩ h_eq; ext
+    have h_digits : ∀ i, i < D → digit p a i = digit p b i := by
+      intro i hi; have h_fi := congr_fun h_eq ⟨i, hi⟩
+      simp only [toDigitSpace', Fin.mk.injEq] at h_fi; exact h_fi
+    have := mod_pow_eq_of_digits_eq' D a b h_digits
+    rwa [Nat.mod_eq_of_lt ha, Nat.mod_eq_of_lt hb] at this
+  · simp [Fintype.card_fin]
+
+-- Helper Equiv for counting
+private noncomputable def digitConstraintEquiv {T : ℕ} (indices : Fin T → Fin D)
+    (values : Fin T → Fin p) (h_inj : Function.Injective indices) :
+    {f : DigitSpace D p // ∀ k, f (indices k) = values k} ≃
+    ({i : Fin D // i ∉ Set.range indices} → Fin p) where
+  toFun f := fun ⟨i, _⟩ => f.val i
+  invFun g := ⟨fun i => if h : i ∈ Set.range indices then values h.choose else g ⟨i, h⟩,
+    fun k => by
+      have hmem : indices k ∈ Set.range indices := ⟨k, rfl⟩
+      simp only [dif_pos hmem]; congr 1; exact h_inj hmem.choose_spec⟩
+  left_inv := by
+    intro ⟨f, hf⟩; apply Subtype.ext; funext i; simp only
+    split
+    · rename_i h; rw [← hf h.choose, h.choose_spec]
+    · rfl
+  right_inv := by
+    intro g; funext ⟨i, hi⟩; simp only [dif_neg hi]
+
+lemma count_digits_fixed' {T : ℕ} (indices : Fin T → Fin D) (values : Fin T → Fin p)
+    (h_inj : Function.Injective indices) :
+    ((range (p^D)).filter (fun m => ∀ k : Fin T, digit p m (indices k) = values k)).card = p ^ (D - T) := by
+  classical
+  -- Step 1: Transfer from range(p^D) to Finset.univ (Fin(p^D))
+  have h1 :
+      ((range (p^D)).filter (fun m => ∀ k, digit p m (indices k) = (values k : ℕ))).card =
+      ((univ : Finset (Fin (p^D))).filter
+        (fun m : Fin (p^D) => ∀ k, digit p m.val (indices k) = (values k : ℕ))).card := by
+    apply card_bij (fun m hm => ⟨m, mem_range.mp (mem_filter.mp hm).1⟩)
+    · intro m hm; exact mem_filter.mpr ⟨mem_univ _, (mem_filter.mp hm).2⟩
+    · intro a _ b _ h; exact Fin.val_injective (congrArg Fin.val h)
+    · intro ⟨b, hb⟩ hmem; exact ⟨b, mem_filter.mpr ⟨mem_range.mpr hb, (mem_filter.mp hmem).2⟩, rfl⟩
+  -- Step 2: Transfer Fin(p^D) → DigitSpace via toDigitSpace bijection
+  have hbij := toDigitSpace_bijective' hp D
+  have h2 :
+      ((univ : Finset (Fin (p^D))).filter
+        (fun m : Fin (p^D) => ∀ k, digit p m.val (indices k) = (values k : ℕ))).card =
+      ((univ : Finset (DigitSpace D p)).filter
+        (fun f : DigitSpace D p => ∀ k, f (indices k) = values k)).card := by
+    apply card_bij (fun m _ => toDigitSpace' hp D m)
+    · intro m hm; rw [mem_filter] at hm ⊢
+      exact ⟨mem_univ _, fun k => Fin.ext (by simp [toDigitSpace']; exact hm.2 k)⟩
+    · intro a _ b _ h; exact hbij.1 h
+    · intro f hf; obtain ⟨a, ha⟩ := hbij.2 f
+      exact ⟨a, mem_filter.mpr ⟨mem_univ _, fun k => by
+        have := (mem_filter.mp hf).2 k
+        rw [← ha] at this
+        exact congrArg Fin.val this⟩, ha⟩
+  -- Step 3: Count constrained DigitSpace = p^(D-T)
+  have h3 :
+      ((univ : Finset (DigitSpace D p)).filter
+        (fun f : DigitSpace D p => ∀ k, f (indices k) = values k)).card = p ^ (D - T) := by
+    rw [Fintype.card_subtype]
+    rw [← Fintype.card_congr (digitConstraintEquiv D indices values h_inj)]
+    simp only [Fintype.card_fun, Fintype.card_fin, Fintype.card_subtype_compl,
+        Set.card_range_of_injective h_inj]
+  linarith
+
+end Common
+end Erdos728
+EOF
+lake env lean /tmp/test_proof.lean 2>&1
+[2026-02-11T05:57:05.634Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_proof2.lean << 'EOF'
+import Mathlib.Data.Nat.Digits.Lemmas
+import Mathlib.Data.Nat.Choose.Factorization
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Data.Int.CardIntervalMod
+import Mathlib.NumberTheory.Padics.PadicVal.Basic
+import Mathlib.Data.Set.Card
+import Erdos.Digits
+import Erdos.Lemma3Common
+import Erdos.Chernoff
+import Erdos.Lemma3Residue
+
+open Nat BigOperators Finset Real
+open scoped Classical
+
+namespace Erdos728
+
+section Common
+variable {p : ℕ} (hp : p.Prime) (D : ℕ)
+
+def toDigitSpace' (m : Fin (p^D)) : DigitSpace D p := fun i => ⟨digit p m i, Nat.mod_lt _ hp.pos⟩
+
+private lemma mod_pow_eq_of_digits_eq' (a b : ℕ)
+    (h : ∀ i, i < D → digit p a i = digit p b i) : a % p ^ D = b % p ^ D := by
+  induction D with
+  | zero => simp [pow_zero, Nat.mod_one]
+  | succ D ih =>
+    rw [Nat.mod_pow_succ, Nat.mod_pow_succ]
+    have h_prev : ∀ i, i < D → digit p a i = digit p b i :=
+      fun i hi => h i (Nat.lt_succ_of_lt hi)
+    have h_D : digit p a D = digit p b D := h D (Nat.lt_succ_iff.mpr le_rfl)
+    unfold digit at h_D
+    rw [ih h_prev, h_D]
+
+lemma toDigitSpace_bijective' : Function.Bijective (toDigitSpace' hp D) := by
+  rw [Fintype.bijective_iff_injective_and_card]
+  constructor
+  · intro ⟨a, ha⟩ ⟨b, hb⟩ h_eq; ext
+    have h_digits : ∀ i, i < D → digit p a i = digit p b i := by
+      intro i hi; have h_fi := congr_fun h_eq ⟨i, hi⟩
+      simp only [toDigitSpace', Fin.mk.injEq] at h_fi; exact h_fi
+    have := mod_pow_eq_of_digits_eq' D a b h_digits
+    rwa [Nat.mod_eq_of_lt ha, Nat.mod_eq_of_lt hb] at this
+  · simp [Fintype.card_fin]
+
+private noncomputable def digitConstraintEquiv {T : ℕ} (indices : Fin T → Fin D)
+    (values : Fin T → Fin p) (h_inj : Function.Injective indices) :
+    {f : DigitSpace D p // ∀ k, f (indices k) = values k} ≃
+    ({i : Fin D // i ∉ Set.range indices} → Fin p) where
+  toFun f := fun ⟨i, _⟩ => f.val i
+  invFun g := ⟨fun i => if h : i ∈ Set.range indices then values h.choose else g ⟨i, h⟩,
+    fun k => by
+      have hmem : indices k ∈ Set.range indices := ⟨k, rfl⟩
+      simp only [dif_pos hmem]; congr 1; exact h_inj hmem.choose_spec⟩
+  left_inv := by
+    intro ⟨f, hf⟩; apply Subtype.ext; funext i; simp only
+    split
+    · rename_i h; rw [← hf h.choose, h.choose_spec]
+    · rfl
+  right_inv := by
+    intro g; funext ⟨i, hi⟩; simp only [dif_neg hi]
+
+lemma count_digits_fixed' {T : ℕ} (indices : Fin T → Fin D) (values : Fin T → Fin p)
+    (h_inj : Function.Injective indices) :
+    ((range (p^D)).filter (fun m => ∀ k : Fin T, digit p m (indices k) = values k)).card = p ^ (D - T) := by
+  -- Step 1: Transfer from range(p^D) to Finset.univ (Fin(p^D))
+  have h1 :
+      ((range (p^D)).filter (fun m => ∀ k, digit p m (indices k) = (values k : ℕ))).card =
+      ((univ : Finset (Fin (p^D))).filter
+        (fun m : Fin (p^D) => ∀ k, digit p m.val (indices k) = (values k : ℕ))).card := by
+    apply card_bij (fun m hm => ⟨m, mem_range.mp (mem_filter.mp hm).1⟩)
+    · intro m hm; exact mem_filter.mpr ⟨mem_univ _, (mem_filter.mp hm).2⟩
+    · intro a _ b _ h; simp at h; exact h
+    · intro ⟨b, hb⟩ hmem; exact ⟨b, mem_filter.mpr ⟨mem_range.mpr hb, (mem_filter.mp hmem).2⟩, rfl⟩
+  -- Step 2: Transfer Fin(p^D) → DigitSpace via toDigitSpace bijection
+  have hbij := toDigitSpace_bijective' hp D
+  have h2 :
+      ((univ : Finset (Fin (p^D))).filter
+        (fun m : Fin (p^D) => ∀ k, digit p m.val (indices k) = (values k : ℕ))).card =
+      ((univ : Finset (DigitSpace D p)).filter
+        (fun f : DigitSpace D p => ∀ k, f (indices k) = values k)).card := by
+    apply card_bij (fun m _ => toDigitSpace' hp D m)
+    · intro m hm; rw [mem_filter] at hm ⊢
+      exact ⟨mem_univ _, fun k => Fin.ext (by simp [toDigitSpace']; exact hm.2 k)⟩
+    · intro a _ b _ h; exact hbij.1 h
+    · intro f hf; obtain ⟨a, ha⟩ := hbij.2 f
+      exact ⟨a, mem_filter.mpr ⟨mem_univ _, fun k => by
+        have := congrArg Fin.val ((mem_filter.mp hf).2 k)
+        rw [← ha] at this
+        simp [toDigitSpace'] at this; exact this⟩, ha⟩
+  -- Step 3: Count constrained DigitSpace = p^(D-T)
+  have h3 :
+      ((univ : Finset (DigitSpace D p)).filter
+        (fun f : DigitSpace D p => ∀ k, f (indices k) = values k)).card = p ^ (D - T) := by
+    rw [Fintype.card_subtype]
+    rw [← Fintype.card_congr (digitConstraintEquiv D indices values h_inj)]
+    simp only [Fintype.card_fun, Fintype.card_fin, Fintype.card_subtype_compl,
+        Set.card_range_of_injective h_inj]
+  linarith
+
+end Common
+end Erdos728
+EOF
+lake env lean /tmp/test_proof2.lean 2>&1
+[2026-02-11T05:57:28.002Z] 
+$ cd /home/jarred/code/erdos-728b && lake build 2>&1 | head -20
+[2026-02-11T05:57:28.794Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T05:57:28.797Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T05:57:35.790Z] 
+$ cd /home/jarred/code/erdos-728b && lake build 2>&1 | tail -20
+[2026-02-11T05:57:45.748Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_check.lean << 'EOF'
+import Erdos.Lemma3Counting
+#check @Erdos728.count_digits_fixed
+EOF
+lake env lean /tmp/test_check.lean 2>&1
+[2026-02-11T05:57:57.283Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_check2.lean << 'EOF'
+import Erdos.Lemma3Counting
+#check @Erdos728.toDigitSpace_bijective
+EOF
+lake env lean /tmp/test_check2.lean 2>&1
+[2026-02-11T05:58:18.810Z] [overseer] 📝 Cleared poke messages
+[2026-02-11T05:58:18.811Z] [overseer] 💓 Heartbeat #30 complete: No intervention needed. Task erdos728b-bu3 is actively progressing through section variable scope issues. Leaf tasks vtv, g8b, and 2zs are unblocked and ready in the backlog.
+[2026-02-11T05:58:19.571Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "count_digits_fixed" Erdos/Lemma3Counting.lean
+[2026-02-11T05:58:27.707Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_section.lean << 'EOF'
+section Test
+variable {p : ℕ} (hp : p.Prime)
+
+-- hp is not in the signature, but if used in the proof, Lean auto-includes it
+lemma test_auto_include : True := by
+  have _ := hp  -- forces hp into scope
+  trivial
+
+#check @test_auto_include  -- should include hp
+end Test
+EOF
+lake env lean /tmp/test_section.lean 2>&1
+[2026-02-11T05:58:32.509Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_section.lean << 'EOF'
+import Mathlib.Data.Nat.Prime.Defs
+
+section Test
+variable {p : ℕ} (hp : Nat.Prime p)
+
+lemma test_auto_include : True := by
+  have _ := hp
+  trivial
+
+#check @test_auto_include
+end Test
+EOF
+lake env lean /tmp/test_section.lean 2>&1
+[2026-02-11T05:58:43.828Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_section2.lean << 'EOF'
+import Mathlib.Data.Nat.Prime.Defs
+
+open Nat
+
+namespace Foo
+
+section Test
+variable {p : ℕ} (hp : p.Prime) (D : ℕ)
+
+def myDef : ℕ := D + 1  -- uses D but not hp
+
+lemma myLemma : myDef D > 0 := by
+  -- can I use hp here?
+  have := hp.pos
+  omega
+
+#check @myLemma  -- should auto-include hp
+end Test
+end Foo
+EOF
+lake env lean /tmp/test_section2.lean 2>&1
+[2026-02-11T05:58:51.688Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_section3.lean << 'EOF'
+import Mathlib.Data.Nat.Prime.Defs
+
+open Nat
+
+namespace Foo
+
+section Test
+variable {p : ℕ} (hp : p.Prime) (D : ℕ)
+
+-- Section variables ARE included if used in the body
+-- Need to use `include` in Lean 4
+include hp in
+lemma myLemma : D + 1 > 0 := by
+  have := hp.pos
+  omega
+
+#check @myLemma
+end Test
+end Foo
+EOF
+lake env lean /tmp/test_section3.lean 2>&1
+[2026-02-11T05:59:02.214Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_finpow.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Data.Fin.Basic
+import Mathlib.Data.Fin.Tuple.Basic
+import Mathlib.Data.Fin.VecNotation
+
+-- Is there an equiv Fin (n^k) ≃ (Fin k → Fin n)?
+#check finFunctionFinEquiv
+#check Fin.consEquiv
+EOF
+lake env lean /tmp/test_finpow.lean 2>&1
+[2026-02-11T05:59:08.362Z] 
+$ cd /home/jarred/code/erdos-728b && grep -r "Fin.*pow.*Equiv\|finPow\|fin_pow\|finFunctionFin" .lake/packages/mathlib/Mathlib/ --include="*.lean" | grep -i "def\|lemma\|theorem\|equiv" | head -10
+[2026-02-11T05:59:17.430Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_finpow2.lean << 'EOF'
+import Mathlib.Algebra.BigOperators.Fin
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Set.Card
+
+-- finFunctionFinEquiv gives (Fin n → Fin m) ≃ Fin (m^n)
+-- Its inverse: Fin(m^n) → (Fin n → Fin m) maps each m < m^n to its digit tuple
+
+-- So I can prove count_digits_fixed by:
+-- 1. Bijecting range(p^D) with Fin(p^D) 
+-- 2. Bijecting Fin(p^D) with (Fin D → Fin p) via finFunctionFinEquiv.symm
+-- 3. The constraint fixes T coordinates, leaving p^(D-T) 
+
+-- Check the API
+#check @finFunctionFinEquiv
+-- (Fin n → Fin m) ≃ Fin (m ^ n)
+
+-- So Fin(p^D) ≃ (Fin D → Fin p) is finFunctionFinEquiv.symm
+-- But what does the correspondence look like? Is it related to digit?
+#check @finFunctionFinEquiv_apply
+-- finFunctionFinEquiv f = ∑ i, f i * m ^ i (little-endian)
+EOF
+lake env lean /tmp/test_finpow2.lean 2>&1
+[2026-02-11T05:59:28.344Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-bu3 --status "Implementing proof with include hp in + toDigitSpace_bijective approach"
+[2026-02-11T06:00:04.554Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_final.lean << 'EOF'
+import Mathlib.Data.Nat.Digits.Lemmas
+import Mathlib.Data.Nat.Choose.Factorization
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Data.Int.CardIntervalMod
+import Mathlib.NumberTheory.Padics.PadicVal.Basic
+import Mathlib.Data.Set.Card
+import Erdos.Digits
+import Erdos.Lemma3Common
+import Erdos.Chernoff
+import Erdos.Lemma3Residue
+
+open Nat BigOperators Finset Real
+open scoped Classical
+
+namespace Erdos728
+
+section Common
+
+variable {p : ℕ} (hp : p.Prime) (D : ℕ)
+
+def toDigitSpaceX (m : Fin (p^D)) : DigitSpace D p := fun i => ⟨digit p m i, Nat.mod_lt _ hp.pos⟩
+
+private lemma mod_pow_eq_of_digits_eqX (a b : ℕ)
+    (h : ∀ i, i < D → digit p a i = digit p b i) : a % p ^ D = b % p ^ D := by
+  induction D with
+  | zero => simp [pow_zero, Nat.mod_one]
+  | succ D ih =>
+    rw [Nat.mod_pow_succ, Nat.mod_pow_succ]
+    have h_prev : ∀ i, i < D → digit p a i = digit p b i :=
+      fun i hi => h i (Nat.lt_succ_of_lt hi)
+    have h_D : digit p a D = digit p b D := h D (Nat.lt_succ_iff.mpr le_rfl)
+    unfold digit at h_D
+    rw [ih h_prev, h_D]
+
+lemma toDigitSpace_bijectiveX : Function.Bijective (toDigitSpaceX hp D) := by
+  rw [Fintype.bijective_iff_injective_and_card]
+  constructor
+  · intro ⟨a, ha⟩ ⟨b, hb⟩ h_eq; ext
+    have h_digits : ∀ i, i < D → digit p a i = digit p b i := by
+      intro i hi; have h_fi := congr_fun h_eq ⟨i, hi⟩
+      simp only [toDigitSpaceX, Fin.mk.injEq] at h_fi; exact h_fi
+    have := mod_pow_eq_of_digits_eqX D a b h_digits
+    rwa [Nat.mod_eq_of_lt ha, Nat.mod_eq_of_lt hb] at this
+  · simp [Fintype.card_fin]
+
+-- Helper Equiv
+private noncomputable def digitConstraintEquivX {T : ℕ} (indices : Fin T → Fin D)
+    (values : Fin T → Fin p) (h_inj : Function.Injective indices) :
+    {f : DigitSpace D p // ∀ k, f (indices k) = values k} ≃
+    ({i : Fin D // i ∉ Set.range indices} → Fin p) where
+  toFun f := fun ⟨i, _⟩ => f.val i
+  invFun g := ⟨fun i => if h : i ∈ Set.range indices then values h.choose else g ⟨i, h⟩,
+    fun k => by
+      have hmem : indices k ∈ Set.range indices := ⟨k, rfl⟩
+      simp only [dif_pos hmem]; congr 1; exact h_inj hmem.choose_spec⟩
+  left_inv := by
+    intro ⟨f, hf⟩; apply Subtype.ext; funext i; simp only
+    split
+    · rename_i h; rw [← hf h.choose, h.choose_spec]
+    · rfl
+  right_inv := by
+    intro g; funext ⟨i, hi⟩; simp only [dif_neg hi]
+
+include hp in
+lemma count_digits_fixedX {T : ℕ} (indices : Fin T → Fin D) (values : Fin T → Fin p)
+    (h_inj : Function.Injective indices) :
+    ((range (p^D)).filter (fun m => ∀ k : Fin T, digit p m (indices k) = values k)).card
+      = p ^ (D - T) := by
+  -- Step 1: Transfer from range(p^D) to Finset.univ (Fin(p^D))
+  have h1 :
+      ((range (p^D)).filter (fun m => ∀ k, digit p m (indices k) = (values k : ℕ))).card =
+      ((univ : Finset (Fin (p^D))).filter
+        (fun m : Fin (p^D) => ∀ k, digit p m.val (indices k) = (values k : ℕ))).card := by
+    apply card_bij (fun m hm => ⟨m, mem_range.mp (mem_filter.mp hm).1⟩)
+    · intro m hm; exact mem_filter.mpr ⟨mem_univ _, (mem_filter.mp hm).2⟩
+    · intro a _ b _ h; simp at h; exact h
+    · intro ⟨b, hb⟩ hmem
+      exact ⟨b, mem_filter.mpr ⟨mem_range.mpr hb, (mem_filter.mp hmem).2⟩, rfl⟩
+  -- Step 2: Transfer Fin(p^D) → DigitSpace via toDigitSpace bijection
+  have hbij := toDigitSpace_bijectiveX hp D
+  have h2 :
+      ((univ : Finset (Fin (p^D))).filter
+        (fun m : Fin (p^D) => ∀ k, digit p m.val (indices k) = (values k : ℕ))).card =
+      ((univ : Finset (DigitSpace D p)).filter
+        (fun f : DigitSpace D p => ∀ k, f (indices k) = values k)).card := by
+    apply card_bij (fun m _ => toDigitSpaceX hp D m)
+    · intro m hm; rw [mem_filter] at hm ⊢
+      exact ⟨mem_univ _, fun k => Fin.ext (by simp [toDigitSpaceX]; exact hm.2 k)⟩
+    · intro a _ b _ h; exact hbij.1 h
+    · intro f hf; obtain ⟨a, ha⟩ := hbij.2 f
+      exact ⟨a, mem_filter.mpr ⟨mem_univ _, fun k => by
+        have := congrArg Fin.val ((mem_filter.mp hf).2 k)
+        rw [← ha] at this
+        simp [toDigitSpaceX] at this; exact this⟩, ha⟩
+  -- Step 3: Count constrained DigitSpace = p^(D-T)
+  have h3 :
+      ((univ : Finset (DigitSpace D p)).filter
+        (fun f : DigitSpace D p => ∀ k, f (indices k) = values k)).card = p ^ (D - T) := by
+    rw [Fintype.card_subtype]
+    rw [← Fintype.card_congr (digitConstraintEquivX D indices values h_inj)]
+    simp only [Fintype.card_fun, Fintype.card_fin, Fintype.card_subtype_compl,
+        Set.card_range_of_injective h_inj]
+  linarith
+
+end Common
+end Erdos728
+EOF
+lake env lean /tmp/test_final.lean 2>&1
+[2026-02-11T06:00:22.545Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_notation.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+
+-- What does #{f | p f} mean?
+-- It seems to be Finset notation, not Fintype.card
+-- The goal says #{f | ∀ (k : Fin T), f (indices k) = values k} = p ^ (D - T)
+-- This is (univ.filter ...).card
+
+-- I need: (univ.filter p).card = Fintype.card {x // p x}
+-- which is Fintype.card_subtype (backwards)
+
+example {α : Type*} [Fintype α] [DecidableEq α] (p : α → Prop) [DecidablePred p] :
+    (univ.filter p).card = Fintype.card {x : α // p x} := by
+  rw [Fintype.card_subtype]
+
+-- But the #{...} notation might be different...
+-- Let's see what `#{f | p f}` desugars to
+example {α : Type*} [Fintype α] (p : α → Prop) [DecidablePred p] :
+    #{x : α | p x} = Fintype.card {x : α // p x} := by
+  rfl
+EOF
+lake env lean /tmp/test_notation.lean 2>&1
+[2026-02-11T06:00:29.395Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_notation2.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+
+-- What is the # notation?
+-- From the error: #{f | ∀ (k : Fin T), f (indices k) = values k} = p ^ (D - T)
+-- In Lean 4 / Mathlib, # is Finset.card notation
+
+-- Let's check
+example {α : Type*} [Fintype α] (p : α → Prop) [DecidablePred p] :
+    (Finset.univ.filter p).card = Fintype.card {x : α // p x} := by
+  rw [Fintype.card_subtype]
+EOF
+lake env lean /tmp/test_notation2.lean 2>&1
+[2026-02-11T06:00:39.171Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_notation3.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+
+-- Fintype.card_subtype : Fintype.card {x // p x} = {x | p x}.card
+-- So I need to go from {x | p x}.card to Fintype.card {x // p x}
+-- That's ← Fintype.card_subtype
+
+example {α : Type*} [Fintype α] (p : α → Prop) [DecidablePred p] :
+    (Finset.univ.filter p).card = 42 := by
+  rw [← Fintype.card_subtype]
+  -- Now goal should be: Fintype.card {x // p x} = 42
+  sorry
+EOF
+lake env lean /tmp/test_notation3.lean 2>&1
+[2026-02-11T06:00:55.607Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_step3.lean << 'EOF'
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Data.Fin.Basic
+import Mathlib.Data.Set.Card
+
+open scoped Classical
+open Finset
+
+variable {D T p : ℕ}
+
+private noncomputable def digitConstraintEquivT (indices : Fin T → Fin D)
+    (values : Fin T → Fin p) (h_inj : Function.Injective indices) :
+    {f : (Fin D → Fin p) // ∀ k, f (indices k) = values k} ≃
+    ({i : Fin D // i ∉ Set.range indices} → Fin p) where
+  toFun f := fun ⟨i, _⟩ => f.val i
+  invFun g := ⟨fun i => if h : i ∈ Set.range indices then values h.choose else g ⟨i, h⟩,
+    fun k => by
+      have hmem : indices k ∈ Set.range indices := ⟨k, rfl⟩
+      simp only [dif_pos hmem]; congr 1; exact h_inj hmem.choose_spec⟩
+  left_inv := by
+    intro ⟨f, hf⟩; apply Subtype.ext; funext i; simp only
+    split
+    · rename_i h; rw [← hf h.choose, h.choose_spec]
+    · rfl
+  right_inv := by
+    intro g; funext ⟨i, hi⟩; simp only [dif_neg hi]
+
+-- Test Step 3 alone
+example (indices : Fin T → Fin D) (values : Fin T → Fin p)
+    (h_inj : Function.Injective indices) :
+    ((univ : Finset (Fin D → Fin p)).filter
+      (fun f => ∀ k, f (indices k) = values k)).card = p ^ (D - T) := by
+  rw [← Fintype.card_subtype]
+  rw [Fintype.card_congr (digitConstraintEquivT indices values h_inj)]
+  simp only [Fintype.card_fun, Fintype.card_fin, Fintype.card_subtype_compl,
+      Set.card_range_of_injective h_inj]
+EOF
+lake env lean /tmp/test_step3.lean 2>&1
+[2026-02-11T06:01:18.814Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T06:01:18.818Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T06:01:30.676Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_full_final.lean << 'EOF'
+import Mathlib.Data.Nat.Digits.Lemmas
+import Mathlib.Data.Nat.Choose.Factorization
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Data.Int.CardIntervalMod
+import Mathlib.NumberTheory.Padics.PadicVal.Basic
+import Mathlib.Data.Set.Card
+import Erdos.Digits
+import Erdos.Lemma3Common
+import Erdos.Chernoff
+import Erdos.Lemma3Residue
+
+open Nat BigOperators Finset Real
+open scoped Classical
+
+namespace Erdos728
+
+section Common
+
+variable {p : ℕ} (hp : p.Prime) (D : ℕ)
+
+def toDigitSpaceY (m : Fin (p^D)) : DigitSpace D p := fun i => ⟨digit p m i, Nat.mod_lt _ hp.pos⟩
+
+private lemma mod_pow_eq_of_digits_eqY (a b : ℕ)
+    (h : ∀ i, i < D → digit p a i = digit p b i) : a % p ^ D = b % p ^ D := by
+  induction D with
+  | zero => simp [pow_zero, Nat.mod_one]
+  | succ D ih =>
+    rw [Nat.mod_pow_succ, Nat.mod_pow_succ]
+    have h_prev : ∀ i, i < D → digit p a i = digit p b i :=
+      fun i hi => h i (Nat.lt_succ_of_lt hi)
+    have h_D : digit p a D = digit p b D := h D (Nat.lt_succ_iff.mpr le_rfl)
+    unfold digit at h_D; rw [ih h_prev, h_D]
+
+lemma toDigitSpace_bijectiveY : Function.Bijective (toDigitSpaceY hp D) := by
+  rw [Fintype.bijective_iff_injective_and_card]
+  constructor
+  · intro ⟨a, ha⟩ ⟨b, hb⟩ h_eq; ext
+    have h_digits : ∀ i, i < D → digit p a i = digit p b i := by
+      intro i hi; have := congr_fun h_eq ⟨i, hi⟩
+      simp only [toDigitSpaceY, Fin.mk.injEq] at this; exact this
+    have := mod_pow_eq_of_digits_eqY D a b h_digits
+    rwa [Nat.mod_eq_of_lt ha, Nat.mod_eq_of_lt hb] at this
+  · simp [Fintype.card_fin]
+
+private noncomputable def digitConstraintEquivY {T : ℕ} (indices : Fin T → Fin D)
+    (values : Fin T → Fin p) (h_inj : Function.Injective indices) :
+    {f : DigitSpace D p // ∀ k, f (indices k) = values k} ≃
+    ({i : Fin D // i ∉ Set.range indices} → Fin p) where
+  toFun f := fun ⟨i, _⟩ => f.val i
+  invFun g := ⟨fun i => if h : i ∈ Set.range indices then values h.choose else g ⟨i, h⟩,
+    fun k => by
+      have hmem : indices k ∈ Set.range indices := ⟨k, rfl⟩
+      simp only [dif_pos hmem]; congr 1; exact h_inj hmem.choose_spec⟩
+  left_inv := by
+    intro ⟨f, hf⟩; apply Subtype.ext; funext i; simp only
+    split
+    · rename_i h; rw [← hf h.choose, h.choose_spec]
+    · rfl
+  right_inv := by
+    intro g; funext ⟨i, hi⟩; simp only [dif_neg hi]
+
+include hp in
+lemma count_digits_fixedY {T : ℕ} (indices : Fin T → Fin D) (values : Fin T → Fin p)
+    (h_inj : Function.Injective indices) :
+    ((range (p^D)).filter (fun m => ∀ k : Fin T, digit p m (indices k) = values k)).card
+      = p ^ (D - T) := by
+  -- Step 1: range(p^D) ↔ univ (Fin(p^D))
+  have h1 :
+      ((range (p^D)).filter (fun m => ∀ k, digit p m (indices k) = (values k : ℕ))).card =
+      ((univ : Finset (Fin (p^D))).filter
+        (fun m : Fin (p^D) => ∀ k, digit p m.val (indices k) = (values k : ℕ))).card := by
+    apply card_bij (fun m hm => ⟨m, mem_range.mp (mem_filter.mp hm).1⟩)
+    · intro m hm; exact mem_filter.mpr ⟨mem_univ _, (mem_filter.mp hm).2⟩
+    · intro a _ b _ h; simp at h; exact h
+    · intro ⟨b, hb⟩ hmem
+      exact ⟨b, mem_filter.mpr ⟨mem_range.mpr hb, (mem_filter.mp hmem).2⟩, rfl⟩
+  -- Step 2: Fin(p^D) ↔ DigitSpace via toDigitSpace
+  have hbij := toDigitSpace_bijectiveY hp D
+  have h2 :
+      ((univ : Finset (Fin (p^D))).filter
+        (fun m : Fin (p^D) => ∀ k, digit p m.val (indices k) = (values k : ℕ))).card =
+      ((univ : Finset (DigitSpace D p)).filter
+        (fun f : DigitSpace D p => ∀ k, f (indices k) = values k)).card := by
+    apply card_bij (fun m _ => toDigitSpaceY hp D m)
+    · intro m hm; rw [mem_filter] at hm ⊢
+      exact ⟨mem_univ _, fun k => Fin.ext (by simp [toDigitSpaceY]; exact hm.2 k)⟩
+    · intro a _ b _ h; exact hbij.1 h
+    · intro f hf; obtain ⟨a, ha⟩ := hbij.2 f
+      exact ⟨a, mem_filter.mpr ⟨mem_univ _, fun k => by
+        have := congrArg Fin.val ((mem_filter.mp hf).2 k)
+        rw [← ha] at this; simp [toDigitSpaceY] at this; exact this⟩, ha⟩
+  -- Step 3: constrained DigitSpace = p^(D-T) via Equiv
+  have h3 :
+      ((univ : Finset (DigitSpace D p)).filter
+        (fun f : DigitSpace D p => ∀ k, f (indices k) = values k)).card = p ^ (D - T) := by
+    rw [← Fintype.card_subtype]
+    rw [Fintype.card_congr (digitConstraintEquivY D indices values h_inj)]
+    simp only [Fintype.card_fun, Fintype.card_fin, Fintype.card_subtype_compl,
+        Set.card_range_of_injective h_inj]
+  linarith
+
+end Common
+end Erdos728
+EOF
+lake env lean /tmp/test_full_final.lean 2>&1
+[2026-02-11T06:01:46.044Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "classical\|Classical\|DecidableEq\|decidable" Erdos/Lemma3Counting.lean | head -10
+[2026-02-11T06:01:47.937Z] [overseer] 📝 Cleared poke messages
+[2026-02-11T06:01:47.937Z] [overseer] 💓 Heartbeat #31 complete: No intervention needed. Task erdos728b-bu3 is active and the system is moving forward as planned.
+[2026-02-11T06:01:52.707Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:01:57.529Z] 
+🛠️  Executing tool: edit...
+[2026-02-11T06:02:01.084Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:02:26.881Z] 
+🛠️  Executing tool: edit...
+[2026-02-11T06:02:29.065Z] 
+$ cd /home/jarred/code/erdos-728b && lake build 2>&1 | tail -30
+[2026-02-11T06:03:18.329Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "sorry" Erdos/Lemma3Counting.lean | head -20
+[2026-02-11T06:03:22.381Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_check_final.lean << 'EOF'
+import Erdos.Lemma3Counting
+#check @Erdos728.count_digits_fixed
+EOF
+lake env lean /tmp/test_check_final.lean 2>&1
+[2026-02-11T06:03:40.011Z] 
+$ cd /home/jarred/code/erdos-728b && git add -A && git commit -m "Close sorry: count_digits_fixed (Lemma3Counting.lean)
+
+Prove that the count of m ∈ {0,...,p^D-1} with T specified base-p digits
+fixed at injectively-chosen positions equals p^(D-T).
+
+Proof strategy:
+1. Bijection range(p^D) ↔ Fin(p^D) (trivial reindexing)
+2. Bijection Fin(p^D) ↔ DigitSpace D p via toDigitSpace_bijective
+3. Equiv between constrained DigitSpace (T positions fixed) and
+   unconstrained functions on the D-T complement positions
+4. Cardinality: |complement → Fin p| = p^(D-T) by Fintype.card_fun
+
+Added digitConstraintEquiv helper and import Mathlib.Data.Set.Card.
+Added 'include hp in' since proof requires toDigitSpace_bijective."

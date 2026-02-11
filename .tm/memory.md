@@ -10,6 +10,7 @@
 - [2026-02-11 05:01] erdos728b-co5 CLOSED. Proved valuation_ge_high_digits.
 - [2026-02-11 05:15] erdos728b-9pu CLOSED. Proved count_few_high_digits using Chernoff.
 - [2026-02-11 05:17] erdos728b-at0 CLOSED. Proved h_T_val arithmetic.
-- [2026-02-11 05:25] Sorry count: 13 total.
-- [2026-02-11 05:25] erdos728b-hga (bad_residue_sets) is nearing completion; proved invariance of cascade/high digits under mod.
-- [2026-02-11 05:25] Tier 0 status: hga (in_progress), bu3, vtv, 2zs unblocked. Tier 1 g8b unblocked.
+- [2026-02-11 05:47] erdos728b-hga CLOSED. bad_residue_sets fully proved with no new sorries.
+- [2026-02-11 06:05] Sorry count: 12 total.
+- [2026-02-11 06:05] erdos728b-bu3 (count_digits_fixed) in progress.
+- [2026-02-11 06:05] Tier 0 status: bu3 (in_progress), vtv, g8b, 2zs unblocked. No intervention needed.
