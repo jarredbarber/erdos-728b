@@ -68,8 +68,56 @@ def cascade_length (m : ℕ) : ℕ :=
 
 def carry_cond (p k m i : ℕ) : Prop := p ^ i ≤ k % p ^ i + m % p ^ i
 
-lemma carry_propagate (m i : ℕ) (hi : i > log p k + 1) (h_carry : carry_cond p k m i) (hk : k ≥ 1) :
-    digit p m (i - 1) = p - 1 ∧ carry_cond p k m (i - 1) := sorry
+lemma carry_propagate (hp : p.Prime) (m i : ℕ) (hi : i > log p k + 1) (h_carry : carry_cond p k m i) (hk : k ≥ 1) :
+    digit p m (i - 1) = p - 1 ∧ carry_cond p k m (i - 1) := by
+  -- Rewrite i as (i-1)+1 to use Nat.mod_pow_succ without subtraction issues
+  set j := i - 1 with hj_def
+  have hj_eq : i = j + 1 := by omega
+  have hj_ge : j ≥ Nat.log p k + 1 := by omega
+  rw [hj_eq] at h_carry
+  unfold carry_cond at *
+  -- Key facts about p
+  have hp2 : p ≥ 2 := Nat.Prime.two_le hp
+  have hp_pos : p > 0 := by omega
+  have hpj_pos : p ^ j > 0 := Nat.pos_of_ne_zero (by positivity)
+  -- Since j ≥ log_p(k) + 1, we have k < p^j (all digits of k above position s are 0)
+  have hk_lt_pj : k < p ^ j :=
+    lt_of_lt_of_le (Nat.lt_pow_succ_log_self (by omega) k) (Nat.pow_le_pow_right hp_pos hj_ge)
+  -- So k % p^j = k and k % p^(j+1) = k
+  have hk_mod_j : k % p ^ j = k := Nat.mod_eq_of_lt hk_lt_pj
+  have hk_mod_j1 : k % p ^ (j + 1) = k :=
+    Nat.mod_eq_of_lt (lt_of_lt_of_le hk_lt_pj (Nat.pow_le_pow_right hp_pos (by omega)))
+  -- Decompose m % p^(j+1) = m % p^j + p^j * digit(p, m, j)
+  have h_decomp : m % p ^ (j + 1) = m % p ^ j + p ^ j * (m / p ^ j % p) :=
+    Nat.mod_pow_succ
+  set d := m / p ^ j % p with hd_def
+  rw [hk_mod_j1, h_decomp] at h_carry
+  -- h_carry : p^(j+1) ≤ k + (m%p^j + p^j * d)
+  have hm_mod_lt : m % p ^ j < p ^ j := Nat.mod_lt _ hpj_pos
+  have hd_lt : d < p := Nat.mod_lt _ hp_pos
+  -- Part 1: d must be p-1 (otherwise the sum is too small)
+  have hd_eq : d = p - 1 := by
+    by_contra h_ne
+    have hd_le : d ≤ p - 2 := by omega
+    have : p ^ j * d ≤ p ^ j * (p - 2) := Nat.mul_le_mul_left _ hd_le
+    -- Total ≤ (p^j-1) + (p^j-1) + p^j*(p-2) = p^j*p - 2 < p^(j+1)
+    have h_sum : k + (m % p ^ j + p ^ j * d) < p ^ j + (p ^ j + p ^ j * (p - 2)) := by omega
+    have h_rw : p ^ j + (p ^ j + p ^ j * (p - 2)) = p ^ j * p := by
+      have : p ^ j * (p - 2) + p ^ j + p ^ j = p ^ j * p := by
+        rw [← Nat.mul_succ, ← Nat.mul_succ]; congr 1; omega
+      omega
+    rw [pow_succ] at h_carry; omega
+  constructor
+  · -- digit p m j = p - 1
+    exact hd_eq
+  · -- carry_cond at j: p^j ≤ k + m%p^j
+    rw [hk_mod_j]
+    rw [hd_eq] at h_carry; rw [pow_succ] at h_carry
+    -- h_carry: p^j*p ≤ k + (m%p^j + p^j*(p-1))
+    -- Since p^j*(p-1) + p^j = p^j*p, we get p^j ≤ k + m%p^j
+    have : p ^ j * (p - 1) + p ^ j = p ^ j * p := by
+      rw [← Nat.mul_succ]; congr 1; omega
+    omega
 
 lemma valuation_le_cascade (hp : p.Prime) (m : ℕ) (hk : k ≥ 1) (hm : m < p ^ D) :
     padicValNat p ((m + k).choose k) ≤ (log p k + 1) + cascade_length (p:=p) k D m := sorry
