@@ -1,5 +1,5 @@
 # Overseer Heartbeat 39
 
-**Time:** 2026-02-11T06:32:53.886Z
-**Summary:** No intervention needed. Task erdos728b-vtv is in progress, and the system is moving forward through the dependency graph. Sorry count is 11.
-**Details:** Sorry count: 11. Axioms: 0. Literature: 6. Currently 1 task in progress (vtv) and 6 open tasks. Unblocked leaf tasks: nqx, g8b, 2zs. System health is good.
+**Time:** 2026-02-11T15:15:31.673Z
+**Summary:** No intervention needed. Planner is unblocked to decompose the monolithic proof for erdos_729.
+**Details:** Erdős 728b is complete and sorry-free. Erdős 729 reached zero sorries but failed to compile with 20+ errors. The formalization task erdos728b-sms has been closed as failed, and the decomposition task erdos728b-vyc is open and ready for the planner to pick up. Sorry count is 1. verified NL proofs: 6. Axiom count: 0.

@@ -17,6 +17,6 @@
 - [2026-02-11 13:40] erdos728b-51l CLOSED. Proved sumDigits_le_log.
 - [2026-02-11 13:40] erdos728b-15q CLOSED. Proved delta_le_sumDigits using Legendre's formula and Nat arithmetic (omega).
 - [2026-02-11 14:15] erdos728b-yta is nearly complete; lemma a_lt_two_n is fully proved in Erdos/Problem729.lean.
-- [2026-02-11 14:15] Backlog: 1 task remains for 729 (main theorem erdos728b-sms).
-- [2026-02-11 14:05] Erdos 729: sumDigits_le_log and delta_le_sumDigits are SORRY-FREE.
-- [2026-02-11 14:05] Sorry count: 1 in main project (erdos_729), 1 in scratch file.
+- [2026-02-11 15:30] erdos728b-vyc (planner) is OPEN to decompose the broken erdos_729 monolithic proof.
+- [2026-02-11 15:30] Project 729 is sorry-free but non-compiling in Erdos/Problem729.lean.
+- [2026-02-11 15:30] If erdos728b-vyc produces a good plan, we will re-introduce sorries for the decomposed parts.
