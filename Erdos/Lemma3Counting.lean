@@ -7,6 +7,7 @@ import Mathlib.Data.Int.CardIntervalMod
 import Mathlib.NumberTheory.Padics.PadicVal.Basic
 import Erdos.Digits
 import Erdos.Lemma3Common
+import Erdos.Chernoff
 
 open Nat BigOperators Finset Real
 
@@ -71,9 +72,11 @@ lemma highDigitCount_eq (m : Fin (p^D)) :
     simp only [mem_filter, mem_univ, true_and]
     exact hb.2
 
-lemma count_few_high_digits_bound (t : ℝ) (ht : t < (D * probHigh p)) :
+lemma count_few_high_digits_bound (hp : p.Prime) (t : ℝ) (ht : t < (D * probHigh p)) :
     (Finset.univ.filter (fun m : DigitSpace D p => (highDigitCount m : ℝ) ≤ t)).card ≤
-    p ^ D * exp (-2 * ((D * probHigh p) - t)^2 / D) := sorry -- Citation axiom
+    p ^ D * exp (-2 * ((D * probHigh p) - t)^2 / D) := by
+  have : NeZero p := ⟨Nat.Prime.ne_zero hp⟩
+  apply count_few_high_digits_bound_chernoff t ht
 
 lemma count_few_high_digits (hp : p.Prime) (t : ℕ) (ht : t ≤ D/6) (hp_ge_3 : p ≥ 3) :
     ((range (p^D)).filter (fun m => count_high_digits p m D < t)).card ≤ p^D / 2^(D/36) := sorry
