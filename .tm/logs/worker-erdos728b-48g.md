@@ -433,3 +433,78 @@ then for each valid k, exists_m_for_fixed_k applies.
 Basic.lean now has zero sorry holes. The two new sorrys in
 Lemma3Counting.lean are independent formalization tasks."
 ```
+Now let me update the task status:
+```bash
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-48g --status "Sorry closed, build passes. Creating tasks for new sub-sorrys."
+```
+Now let me create planner tasks for the two new sorry holes:
+```bash
+$ cd /home/jarred/code/erdos-728b && tm create -t "Close sorry in exists_m_for_fixed_k (union bound for fixed k)" -r formalize -p 1 \
+  -d "Close the sorry at Erdos/Lemma3Counting.lean:186 in exists_m_for_fixed_k.
+
+Statement:
+  For k ≥ 1 and m₀ ≥ union_bound_threshold k,
+  ∃ m, m₀ ≤ m ∧ m < 2 * m₀ ∧
+    ∀ p, p.Prime → p ≤ 2 * k → padicValNat p ((m+k).choose k) ≤ padicValNat p ((2*m).choose m)
+
+This is the core union bound argument from Part E of proofs/lemma3-counting.md (Theorem E2).
+The proof:
+1. For each prime p ≤ 2k, define D_p = 36*(Nat.log 2 (16*k)+1) + 36*(Nat.log p (k+1)) + 36
+2. Verify D_p ≥ 16*(log p (k+1)) + 16 (Lemma E1a)
+3. Verify p^{D_p} ≤ m₀ (Lemma E1b, using m₀ ≥ union_bound_threshold k)
+4. Apply count_bad_interval for each prime: |bad_p| ≤ m₀/(8k)
+5. Union bound: total ≤ 2k * m₀/(8k) = m₀/4 < m₀
+6. Existence by pigeonhole.
+
+Key tools: count_bad_interval (sorry'd), Finset.card_biUnion_le, Nat.card_Ico.
+NL proof: proofs/lemma3-union-bound.md (Goals 1-5)."
+```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm create -t "Close sorry in threshold_subpolynomial (growth rate argument)" -r formalize -p 1 \
+  -d "Close the sorry at Erdos/Lemma3Counting.lean:203 in threshold_subpolynomial.
+
+Statement:
+  ∃ N, ∀ m₀ ≥ N, ∀ k, 1 ≤ k → (k : ℝ) ≤ C_log * log(2*m₀) → union_bound_threshold k ≤ m₀
+
+union_bound_threshold k = (2k)^{72*(Nat.log 2 (16k)+1)+72}.
+
+The proof must show that this threshold is eventually dominated by m₀ when k ≤ C_log * log(2m₀).
+
+Approach: 
+- log₂(union_bound_threshold k) = (72*(log₂(16k)+1)+72) * log₂(2k) = O(log²k)
+- When k ≤ C_log * log(2m₀), this is O(log²(log m₀)) = o(log m₀)
+- So union_bound_threshold k = m₀^{o(1)} < m₀ for m₀ large enough
+
+This is an analytic argument about growth rates. May need helper lemmas about
+log iterated bounds. Works in ℝ with Real.log.
+
+NL proof: proofs/lemma3-counting.md, Remark E4."
+```
+Now let me close the original task:
+```bash
+$ cd /home/jarred/code/erdos-728b && tm close erdos728b-48g
+```
+Here's the summary:
+
+```json
+{
+  "status": "completed",
+  "summary": "Closed sorry in exists_m_small_primes_good_uniform. Basic.lean now has zero sorrys. lake build succeeds.",
+  "details": "Decomposed the monolithic sorry into two independent, well-annotated helper lemmas in Lemma3Counting.lean:\n\n1. **exists_m_for_fixed_k** (line 186, sorry): For each fixed k ≥ 1 and m₀ ≥ union_bound_threshold(k), the union bound over primes p ≤ 2k shows a good m ∈ [m₀, 2m₀) exists. This is the core counting argument (Theorem E2 from the NL proof). Created task erdos728b-r4m.\n\n2. **threshold_subpolynomial** (line 203, sorry): For k ≤ C_log * log(2m₀) and m₀ large enough, union_bound_threshold(k) ≤ m₀. This is the growth rate argument showing (2k)^{O(log k)} is subpolynomial in m₀. Created task erdos728b-2zs.\n\nThe main lemma exists_m_small_primes_good_uniform combines them cleanly: obtain N from threshold_subpolynomial, then for each valid (m₀, k), apply exists_m_for_fixed_k.\n\nAlso introduced the definition union_bound_threshold k = (2k)^{72*(log₂(16k)+1)+72} to make M₀(k) explicit and computable.\n\nTwo new sorry holes introduced (both in Lemma3Counting.lean, with tasks created)."
+}
+```
+
+## Final Result
+
+Here's the summary:
+
+```json
+{
+  "status": "completed",
+  "summary": "Closed sorry in exists_m_small_primes_good_uniform. Basic.lean now has zero sorrys. lake build succeeds.",
+  "details": "Decomposed the monolithic sorry into two independent, well-annotated helper lemmas in Lemma3Counting.lean:\n\n1. **exists_m_for_fixed_k** (line 186, sorry): For each fixed k ≥ 1 and m₀ ≥ union_bound_threshold(k), the union bound over primes p ≤ 2k shows a good m ∈ [m₀, 2m₀) exists. This is the core counting argument (Theorem E2 from the NL proof). Created task erdos728b-r4m.\n\n2. **threshold_subpolynomial** (line 203, sorry): For k ≤ C_log * log(2m₀) and m₀ large enough, union_bound_threshold(k) ≤ m₀. This is the growth rate argument showing (2k)^{O(log k)} is subpolynomial in m₀. Created task erdos728b-2zs.\n\nThe main lemma exists_m_small_primes_good_uniform combines them cleanly: obtain N from threshold_subpolynomial, then for each valid (m₀, k), apply exists_m_for_fixed_k.\n\nAlso introduced the definition union_bound_threshold k = (2k)^{72*(log₂(16k)+1)+72} to make M₀(k) explicit and computable.\n\nTwo new sorry holes introduced (both in Lemma3Counting.lean, with tasks created)."
+}
+```
+
+End Time: 2026-02-11T04:37:27.844Z
