@@ -28155,3 +28155,120 @@ $ tm update erdos728b-5ms --status "Completed"
 📊 Task erdos728b-5ms completed:
 [2026-02-11T12:49:07.757Z]    Summary: Created Erdos/Problem729.lean with erdos_729 statement
 [2026-02-11T12:49:07.757Z]    Details: Defined theorem erdos_729 with correct imports. Verified compilation with 'lake build'.
+[2026-02-11T13:15:14.014Z] ✓ Task-specific changes rolled back
+
+[2026-02-11T13:15:14.014Z] 
+📊 Task erdos728b-15q failed:
+[2026-02-11T13:15:14.014Z]    Details: Agent did not return a valid JSON status block. Raw response:
+
+The lemma `delta_le_sumDigits` has been successfully formalized and proven in `Erdos/Problem729.lean`.
+
+Key steps taken:
+1.  Located the relevant Mathlib theorem `sub_one_mul_padicValNat_factorial` (Legendre's formula).
+2.  Defined the lemma `delta_le_sumDigits` in `Erdos/Problem729.lean` with proper imports.
+3.  Proved the lemma by using Legendre's formula to convert the inequality on valuations to an inequality on sums of digits.
+4.  Used `zify` and `linarith` (and `Nat.cast_add/sub`) to handle the arithmetic manipulations, carefully dealing with the transition between `ℕ` and `ℤ` to handle subtraction properly.
+5.  Verified compilation with `lake build`.
+
+```lean
+lemma delta_le_sumDigits {p : ℕ} (hp : p.Prime) (a b n : ℕ)
+    (h : padicValNat p a.factorial + padicValNat p b.factorial ≤ padicValNat p n.factorial) :
+    a + b - n ≤ (digits p a).sum + (digits p b).sum - (digits p n).sum
+```
+
+The file `Erdos/Problem729.lean` now contains this lemma and the main theorem skeleton. The proof uses `sumDigits p n` implemented as `(digits p n).sum`.
+[2026-02-11T13:15:14.014Z]    Summary: Could not parse agent response
+[2026-02-11T13:15:14.019Z] ❌ Task erdos728b-15q failed
+
+[2026-02-11T13:15:15.099Z] 
+================================================================================
+[2026-02-11T13:15:15.099Z] 📌 Processing task: erdos728b-51l - Prove sumDigits_le_log upper bound
+[2026-02-11T13:15:15.099Z]    Role: formalize | Priority: 1 
+[2026-02-11T13:15:15.099Z] ================================================================================
+
+[2026-02-11T13:15:15.104Z] ✓ Claimed task erdos728b-51l
+
+[2026-02-11T13:15:15.104Z] 🤖 Using agent: formalize with models: google-antigravity/gemini-3-pro-high:high, google-antigravity/claude-opus-4-6-thinking
+
+[2026-02-11T13:15:15.105Z] 💭 Starting pi agent session with model: google-antigravity/gemini-3-pro-high:high...
+[2026-02-11T13:15:15.142Z] 📸 Capturing file state before agent execution...
+[2026-02-11T13:15:15.157Z] ✓ Captured state: 180 tracked, 2 untracked files
+
+[2026-02-11T13:16:00.062Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T13:16:00.067Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T13:16:06.954Z] 
+$ ls -R Erdos
+[2026-02-11T13:16:10.740Z] 
+🛠️  Executing tool: read...
+[2026-02-11T13:17:04.948Z] 
+$ grep -r "sumDigits_le_log" Erdos
+[2026-02-11T13:17:12.056Z] 
+🛠️  Executing tool: read...
+[2026-02-11T13:18:08.103Z] 
+🛠️  Executing tool: read...
+[2026-02-11T13:18:18.410Z] 
+🛠️  Executing tool: write...
+[2026-02-11T13:19:04.426Z] 
+$ lake env lean test_digits.lean
+[2026-02-11T13:19:11.930Z] 
+🛠️  Executing tool: write...
+[2026-02-11T13:19:32.869Z] [overseer] 💓 Heartbeat #11 complete: Reopened erdos728b-15q and restored lemma skeletons to Erdos/Problem729.lean.
+[2026-02-11T13:20:03.194Z] 
+$ lake env lean test_digits_2.lean
+[2026-02-11T13:20:18.303Z] 
+$ grep "lemma sum_le" .lake/packages/mathlib/Mathlib/Data/List/Basic.lean
+[2026-02-11T13:21:06.752Z] 
+$ grep -r "sum_le" .lake/packages/mathlib/Mathlib/Data/List/
+[2026-02-11T13:21:12.894Z] 
+$ grep -r "sum_le" .lake/packages/mathlib/Mathlib/Data/List/ | head -n 5
+[2026-02-11T13:22:03.369Z] 
+$ grep -r "sum_le" .lake/packages/mathlib/ | head -n 5
+[2026-02-11T13:22:10.666Z] 
+🛠️  Executing tool: write...
+[2026-02-11T13:22:32.890Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T13:22:32.894Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T13:23:04.490Z] 
+$ lake env lean test_sum_le.lean
+[2026-02-11T13:23:24.252Z] 
+🛠️  Executing tool: write...
+[2026-02-11T13:23:25.069Z] [overseer] 💓 Heartbeat #12 complete: No intervention needed. Erdős 729 formalization is in progress.
+[2026-02-11T13:23:26.707Z] 
+$ lake env lean check_lemma.lean
+[2026-02-11T13:23:54.650Z] 
+🛠️  Executing tool: edit...
+[2026-02-11T13:23:59.076Z] 
+$ lake build
+[2026-02-11T13:24:14.492Z] 
+🛠️  Executing tool: read...
+[2026-02-11T13:25:23.659Z] 
+🛠️  Executing tool: read...
+[2026-02-11T13:26:09.800Z] 
+🛠️  Executing tool: read...
+[2026-02-11T13:26:25.080Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T13:26:25.083Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T13:26:52.129Z] [overseer] 💓 Heartbeat #13 complete: No intervention needed. Project 729 formalization is proceeding smoothly.
+[2026-02-11T13:27:11.422Z] 
+🛠️  Executing tool: write...
+[2026-02-11T13:27:14.517Z] 
+$ lake build
+[2026-02-11T13:27:51.781Z] 
+🛠️  Executing tool: edit...
+[2026-02-11T13:28:00.860Z] 
+$ lake build
+[2026-02-11T13:29:28.297Z] 
+🛠️  Executing tool: edit...
+[2026-02-11T13:29:32.362Z] 
+$ lake build
+[2026-02-11T13:29:52.132Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T13:29:52.136Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T13:29:55.092Z] 
+$ tm update erdos728b-51l --status "Completed"
+[2026-02-11T13:30:00.956Z] 
+
+📝 Agent response complete.
+
+[2026-02-11T13:30:00.957Z] 📄 Log saved to .tm/logs/worker-erdos728b-51l.md
+[2026-02-11T13:30:00.957Z] 
+📊 Task erdos728b-51l completed:
+[2026-02-11T13:30:00.957Z]    Summary: Proven lemma sumDigits_le_log in Erdos/Problem729.lean. lake build succeeds.
+[2026-02-11T13:30:00.957Z]    Details: Defined sumDigits and proved sumDigits_le_log using List.sum induction and Nat.digits_lt_base. Cleaned up duplicate sorry'd definition.

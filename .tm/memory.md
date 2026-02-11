@@ -13,7 +13,8 @@
 - [2026-02-11 05:47] erdos728b-hga CLOSED. bad_residue_sets fully proved with no new sorries.
 - [2026-02-11 06:03] erdos728b-bu3 CLOSED. Proved count_digits_fixed.
 - [2026-02-11 12:35] Erdos 728b is COMPLETE. All sorries in Erdos/Basic.lean and Erdos/Lemma3Counting.lean are closed.
-- [2026-02-11 12:40] Problem 729: Formalization started. erdos728b-5ms is setting up Erdos/Problem729.lean. Overseer manually fixed a broken import (Mathlib.Data.Nat.Digits -> Mathlib.Data.Nat.Digits.Lemmas) to unblock the agent.
-- [2026-02-11 12:45] Backlog populated with 4 tasks for 729.
+- [2026-02-11 12:40] Problem 729: Formalization started.
+- [2026-02-11 13:17] erdos728b-15q REOPENED. Previous attempt failed to persist changes and output JSON.
+- [2026-02-11 13:17] Skeletons for delta_le_sumDigits, sumDigits_le_log, and a_lt_two_n restored to Erdos/Problem729.lean.
 - [2026-02-11 12:50] Project 728b confirmed sorry-free.
 - [2026-02-11 12:35] Sorry count: 0 (excluding scratch file reproduce_lemma.lean).
