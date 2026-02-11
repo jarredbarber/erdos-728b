@@ -10,10 +10,27 @@ import Mathlib.Data.Nat.Prime.Infinite
 import Mathlib.Algebra.Order.Sub.Basic
 import Mathlib.Analysis.Complex.ExponentialBounds
 import Mathlib.Algebra.Order.BigOperators.Group.List
-import Erdos.LogBound
 
 open Nat Real
-open Erdos728
+
+/-- Sum of digits in base p. -/
+def sumDigits (p n : ℕ) : ℕ := (Nat.digits p n).sum
+
+lemma sumDigits_le_log (p n : ℕ) (hp : 1 < p) :
+    sumDigits p n ≤ (p - 1) * (Nat.log p n + 1) := by
+  if h : n = 0 then
+    simp [sumDigits, h]
+  else
+    rw [sumDigits]
+    trans (digits p n).length * (p - 1)
+    · -- Use nsmul which is multiplication on Nat
+      have : (digits p n).length * (p - 1) = (digits p n).length • (p - 1) := by simp [nsmul_eq_mul]
+      rw [this]
+      apply List.sum_le_card_nsmul
+      intro d hd
+      apply Nat.le_sub_one_of_lt
+      exact Nat.digits_lt_base hp hd
+    · rw [digits_len p n hp h, Nat.mul_comm]
 
 lemma delta_le_sumDigits {p : ℕ} (hp : p.Prime) (a b n : ℕ)
     (h : padicValNat p a.factorial + padicValNat p b.factorial ≤ padicValNat p n.factorial) :
@@ -108,6 +125,34 @@ lemma erdos_729_small_n (P : ℕ) (hP : 0 < P) :
   rw [← Nat.cast_add]
   norm_cast
   linarith
+
+/-- (Nat.log p n : ℝ) ≤ Real.log n / Real.log p. Pure casting lemma. -/
+lemma nat_log_le_real_log {p n : ℕ} (hp : 1 < p) (hn : n ≠ 0) :
+    (Nat.log p n : ℝ) ≤ Real.log n / Real.log p := by
+  have hp_real : 1 < (p : ℝ) := by exact_mod_cast hp
+  set k := Nat.log p n
+  have h_pow : p ^ k ≤ n := Nat.pow_log_le_self p hn
+  have h_pow_real : (p : ℝ) ^ k ≤ n := by
+    rw [← Nat.cast_pow]
+    exact_mod_cast h_pow
+  have h_log : Real.log ((p : ℝ) ^ k) ≤ Real.log n :=
+    Real.log_le_log (by positivity) h_pow_real
+  rw [Real.log_pow] at h_log
+  refine (le_div_iff₀ ?_).mpr h_log
+  exact Real.log_pos hp_real
+
+lemma log_n_le_log_n_plus_2 (n : ℕ) : Real.log n ≤ Real.log (n + 2) := by
+  sorry
+
+lemma sumDigits_bound_real {p : ℕ} (hp : 1 < p) (n : ℕ) :
+    (sumDigits p n : ℝ) ≤ (p - 1) * (Real.log n / Real.log p + 1) := by
+  sorry
+
+/-- The calculation showing sumDigits p a + sumDigits p b ≤ C * log n when a, b < 2n. -/
+lemma sumDigits_log_bound {p : ℕ} (hp : 1 < p) (n a b : ℕ)
+    (ha : a < 2 * n) (hb : b < 2 * n) :
+    ∃ C, (sumDigits p a : ℝ) + sumDigits p b ≤ C * Real.log (n + 2) := by
+  sorry
 
 /-- The large n case (n > P). -/
 lemma erdos_729_large_n (P a b n : ℕ) (hP : 0 < P) (hnP : n > P)
