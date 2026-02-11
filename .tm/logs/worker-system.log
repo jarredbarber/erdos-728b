@@ -13536,3 +13536,1214 @@ $ cd /home/jarred/code/erdos-728b && tm update erdos728b-co5 --state closed --st
 📊 Task erdos728b-co5 completed:
 [2026-02-11T05:01:35.350Z]    Summary: Closed sorry in valuation_ge_high_digits. lake build succeeds.
 [2026-02-11T05:01:35.350Z]    Details: The proof was a straightforward bridge between two equivalent representations. `lower_bound_valuation_by_high_digits` in Erdos/Digits.lean already proves `count_high_digits p m D ≤ ((2*m).choose m).factorization p`. Using `Nat.factorization_def` to rewrite `.factorization p` as `padicValNat p`, the result immediately gives `padicValNat p ((2*m).choose m) ≥ count_high_digits p m D`. No new sorry holes introduced.
+[2026-02-11T05:01:35.355Z] ✅ Closed task erdos728b-co5
+
+[2026-02-11T05:01:35.422Z] 🔄 Checking git status...
+[2026-02-11T05:01:35.436Z] 📝 Committing changes...
+[2026-02-11T05:01:35.483Z] 🚀 Pushing to remote...
+[2026-02-11T05:01:37.214Z] 
+================================================================================
+[2026-02-11T05:01:37.214Z] 📌 Processing task: erdos728b-9pu - Close sorry: count_few_high_digits (L3C:82)
+[2026-02-11T05:01:37.214Z]    Role: formalize | Priority: 1 
+[2026-02-11T05:01:37.214Z] ================================================================================
+
+[2026-02-11T05:01:37.218Z] ✓ Claimed task erdos728b-9pu
+
+[2026-02-11T05:01:37.219Z] 🤖 Using agent: formalize with models: google-antigravity/claude-opus-4-6-thinking, google-antigravity/gemini-3-pro-high:high
+
+[2026-02-11T05:01:37.219Z] 💭 Starting pi agent session with model: google-antigravity/claude-opus-4-6-thinking...
+[2026-02-11T05:01:37.253Z] 📸 Capturing file state before agent execution...
+[2026-02-11T05:01:37.266Z] ✓ Captured state: 159 tracked, 1 untracked files
+
+[2026-02-11T05:01:40.555Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-9pu --status "Reading relevant files to understand the sorry"
+[2026-02-11T05:01:42.509Z] 
+🛠️  Executing tool: read...
+[2026-02-11T05:01:46.109Z] 
+🛠️  Executing tool: read...
+[2026-02-11T05:01:49.557Z] 
+🛠️  Executing tool: read...
+[2026-02-11T05:01:51.466Z] 
+🛠️  Executing tool: read...
+[2026-02-11T05:01:53.804Z] 
+$ cd /home/jarred/code/erdos-728b && ls proofs/
+[2026-02-11T05:01:56.817Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "count_few_high_digits\|high_digits\|Chernoff\|exp(-D/18)\|2\^(D/36)\|ln 2" proofs/lemma3-counting.md | head -40
+[2026-02-11T05:01:58.551Z] 
+$ cd /home/jarred/code/erdos-728b && sed -n '140,170p' proofs/lemma3-counting.md
+[2026-02-11T05:02:02.270Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-9pu --status "Analyzing the sorry and planning the proof approach"
+[2026-02-11T05:02:18.080Z] 
+$ cd /home/jarred/code/erdos-728b && lake build 2>&1 | tail -20
+[2026-02-11T05:02:29.475Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_api.lean << 'EOF'
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
+
+open Real
+
+-- Check key lemmas
+#check Real.exp_le_exp
+#check Real.rpow_natCast
+#check Real.exp_neg
+#check Real.log_le_log_of_le
+#check Nat.div_le_self
+#check Nat.floor_le
+#check Real.exp_log
+#check Real.log_two_gt_half
+EOF
+lake env lean /tmp/test_api.lean 2>&1
+[2026-02-11T05:02:36.981Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_api2.lean << 'EOF'
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
+
+open Real
+
+#check Real.log_le_log
+#check Real.exp_le_one_of_nonpos
+#check Real.rpow_le_rpow
+#check Real.rpow_le_one
+#check Real.log_two_pos
+#check exp_le_exp
+#check pow_le_pow_left
+#check inv_pow
+#check Real.rpow_neg
+EOF
+lake env lean /tmp/test_api2.lean 2>&1
+[2026-02-11T05:02:47.275Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_api3.lean << 'EOF'
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
+
+open Real
+
+#check Real.add_pow_le_pow_mul_pow_of_sq_le_sq
+#check Real.log_lt_one_of_lt
+#check Real.log_two_gt_half  
+#check @Real.log_lt
+-- log 2 < 2
+example : Real.log 2 < 2 := by
+  calc Real.log 2 < Real.log (Real.exp 2) := by
+    apply Real.log_lt_log (by norm_num : (0:ℝ) < 2)
+    calc (2:ℝ) < 3 := by norm_num
+    _ ≤ Real.exp 2 := by
+      have : Real.exp 2 = Real.exp 1 * Real.exp 1 := by rw [← Real.exp_add]; norm_num
+      rw [this]
+      have h1 : (2.5 : ℝ) ≤ Real.exp 1 := by
+        sorry
+      linarith
+  _ = 2 := Real.log_exp 2
+EOF
+lake env lean /tmp/test_api3.lean 2>&1
+[2026-02-11T05:02:56.871Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_api4.lean << 'EOF'
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
+
+open Real
+
+-- Key fact we need: log 2 ≤ 2 (or more precisely log 2 < 1)
+#check Real.log_le_sub_one_of_le  
+#check Real.log_le_of_le_exp
+#check @Real.exp_ge_one_add_of_nonneg
+example : Real.log 2 ≤ 1 := by
+  rw [← Real.log_exp 1]
+  apply Real.log_le_log (by norm_num : (0:ℝ) < 2)
+  calc (2:ℝ) ≤ 1 + 1 := by norm_num
+    _ ≤ Real.exp 1 := Real.add_one_le_exp 1
+EOF
+lake env lean /tmp/test_api4.lean 2>&1
+[2026-02-11T05:03:04.400Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_api4b.lean << 'EOF'
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
+
+open Real
+
+#check @Real.add_one_le_exp
+example : Real.log 2 ≤ 1 := by
+  rw [← Real.log_exp 1]
+  apply Real.log_le_log (by norm_num : (0:ℝ) < 2)
+  calc (2:ℝ) ≤ 1 + 1 := by norm_num
+    _ ≤ Real.exp 1 := Real.add_one_le_exp 1
+EOF
+lake env lean /tmp/test_api4b.lean 2>&1
+[2026-02-11T05:03:32.450Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T05:03:32.454Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T05:03:40.783Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_floor.lean << 'EOF'
+import Mathlib.Data.Nat.Defs
+import Mathlib.Order.Defs.Basic
+
+open Nat
+
+-- If (card : ℝ) ≤ (a : ℝ) / (b : ℝ), and card, a, b are ℕ, then card ≤ a / b
+-- This is because a / b in ℕ = ⌊(a : ℝ) / (b : ℝ)⌋
+-- and card : ℕ with ↑card ≤ ↑a / ↑b means card ≤ ⌊↑a / ↑b⌋ = a / b
+
+#check Nat.cast_le
+#check Nat.le_div_iff_mul_le
+#check Nat.div_le_iff_le_mul
+#check @Nat.le_of_cast_le_cast
+EOF
+lake env lean /tmp/test_floor.lean 2>&1
+[2026-02-11T05:03:48.132Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_floor.lean << 'EOF'
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+
+-- From (card : ℝ) ≤ (a : ℝ) / (b : ℝ) where card a b : ℕ
+-- we want card ≤ a / b (nat div)
+-- Approach: Nat.cast_le + floor
+
+example (card a b : ℕ) (hb : b > 0) (h : (card : ℝ) ≤ (a : ℝ) / (b : ℝ)) : card ≤ a / b := by
+  rw [Nat.le_div_iff_mul_le hb]
+  have : (card * b : ℝ) ≤ a := by
+    rw [← div_le_iff₀ (by positivity : (b : ℝ) > 0)]
+    exact h
+  exact_mod_cast this
+EOF
+lake env lean /tmp/test_floor.lean 2>&1
+[2026-02-11T05:03:55.267Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_floor.lean << 'EOF'
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+
+example (card a b : ℕ) (hb : b > 0) (h : (card : ℝ) ≤ (a : ℝ) / (b : ℝ)) : card ≤ a / b := by
+  rw [Nat.le_div_iff_mul_le hb]
+  have : (card * b : ℝ) ≤ a := by
+    rwa [le_div_iff₀ (by positivity : (b : ℝ) > 0)] at h
+  exact_mod_cast this
+EOF
+lake env lean /tmp/test_floor.lean 2>&1
+[2026-02-11T05:04:03.446Z] [overseer] 📝 Cleared poke messages
+[2026-02-11T05:04:03.447Z] [overseer] 💓 Heartbeat #15 complete: Task erdos728b-co5 closed successfully; erdos728b-9pu is in progress. Sorry count decreased to 15.
+[2026-02-11T05:04:05.823Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_bij.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat BigOperators Finset Real Erdos728
+
+-- Check that we can relate card of filter on range to card of filter on DigitSpace
+variable {p : ℕ} (hp : p.Prime) (D : ℕ)
+
+#check @toDigitSpace_bijective
+#check @highDigitCount_eq
+#check @count_few_high_digits_bound_chernoff
+#check @count_few_high_digits_bound
+EOF
+lake env lean /tmp/test_bij.lean 2>&1
+[2026-02-11T05:04:19.935Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_proof.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat BigOperators Finset Real Erdos728
+
+-- First, let me verify probHigh p ≥ 1/3 for p ≥ 3
+example (p : ℕ) (hp : p ≥ 3) : probHigh p ≥ 1/3 := by
+  unfold probHigh
+  rw [ge_iff_le, div_le_div_iff (by norm_num : (0:ℝ) < 3) (by positivity : (0:ℝ) < p)]
+  have : p / 2 * 3 ≥ p := by omega
+  exact_mod_cast this
+EOF
+lake env lean /tmp/test_proof.lean 2>&1
+[2026-02-11T05:04:30.438Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_proof.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat BigOperators Finset Real Erdos728
+
+example (p : ℕ) (hp : p ≥ 3) : probHigh p ≥ 1/3 := by
+  unfold probHigh
+  rw [ge_iff_le, div_le_div_iff₀ (by norm_num : (0:ℝ) < 3) (by positivity : (0:ℝ) < p)]
+  push_cast
+  have : p / 2 * 3 ≥ p := by omega
+  linarith
+EOF
+lake env lean /tmp/test_proof.lean 2>&1
+[2026-02-11T05:04:42.207Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_proof.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat BigOperators Finset Real Erdos728
+
+example (p : ℕ) (hp : p ≥ 3) : probHigh p ≥ 1/3 := by
+  unfold probHigh
+  rw [ge_iff_le, div_le_div_iff₀ (by norm_num : (0:ℝ) < 3) (by positivity : (0:ℝ) < p)]
+  have : p / 2 * 3 ≥ p := by omega
+  have : (↑(p / 2) : ℝ) * 3 ≥ 1 * ↑p := by
+    have h1 : (↑(p / 2 * 3) : ℝ) ≥ (↑p : ℝ) := by exact_mod_cast this
+    push_cast at h1
+    linarith
+  linarith
+EOF
+lake env lean /tmp/test_proof.lean 2>&1
+[2026-02-11T05:04:57.421Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_proof2.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat BigOperators Finset Real Erdos728
+
+-- The filter on range(p^D) with count_high_digits < t
+-- maps bijectively to the filter on Fin(p^D) with count_high_digits < t
+-- which maps bijectively to the filter on DigitSpace D p with highDigitCount < t
+
+-- Step 1: range(p^D) ↔ Fin(p^D)
+example (p D : ℕ) :
+    ((range (p^D)).filter (fun m => count_high_digits p m D < 3)).card =
+    ((Finset.univ : Finset (Fin (p^D))).filter (fun m => count_high_digits p m.val D < 3)).card := by
+  rw [← Finset.card_map (Fin.equivSubtype.toEmbedding)]
+  sorry
+EOF
+lake env lean /tmp/test_proof2.lean 2>&1
+[2026-02-11T05:05:13.025Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_proof2.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat BigOperators Finset Real Erdos728
+
+-- Better: use Finset.card_map or equivFin
+-- range(p^D) and Fin(p^D) have same cardinality
+-- Let me try a simpler approach: just convert range to univ via Fin
+
+-- The key relation: for m : Fin(p^D), count_high_digits p m D = highDigitCount (toDigitSpace hp D m)
+-- So we need a bijection between filters
+
+-- Let me try the approach of directly establishing the card equality
+-- between filter on range and filter on DigitSpace
+
+-- Actually, the simplest: use Finset.card_bij
+example (p D t : ℕ) (hp : Nat.Prime p) :
+    ((range (p^D)).filter (fun m => count_high_digits p m D < t)).card =
+    ((Finset.univ : Finset (Fin (p^D))).filter (fun m : Fin (p^D) => count_high_digits p m.val D < t)).card := by
+  apply Finset.card_nbij (fun m hm => ⟨m, by simp [mem_filter] at hm; exact hm.1⟩)
+  · intro m hm; simp [mem_filter] at hm ⊢; exact hm.2
+  · intro a ha b hb h; simp at h; exact h
+  · intro b hb; simp [mem_filter] at hb ⊢; exact ⟨b.val, ⟨b.isLt, hb⟩, Fin.ext rfl⟩
+EOF
+lake env lean /tmp/test_proof2.lean 2>&1
+[2026-02-11T05:05:23.653Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_proof2.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat BigOperators Finset Real Erdos728
+
+-- Use Finset.card_bij
+example (p D t : ℕ) (hp : Nat.Prime p) :
+    ((range (p^D)).filter (fun m => count_high_digits p m D < t)).card =
+    ((Finset.univ : Finset (Fin (p^D))).filter (fun m : Fin (p^D) => count_high_digits p m.val D < t)).card := by
+  apply Finset.card_bij (fun m _ => (⟨m, by sorry⟩ : Fin (p^D)))
+  · sorry
+  · sorry
+  · sorry
+EOF
+lake env lean /tmp/test_proof2.lean 2>&1
+[2026-02-11T05:05:35.696Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_proof2.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat BigOperators Finset Real Erdos728
+
+-- Use Finset.card_bij
+example (p D t : ℕ) (hp : Nat.Prime p) :
+    ((range (p^D)).filter (fun m => count_high_digits p m D < t)).card =
+    ((Finset.univ : Finset (Fin (p^D))).filter
+      (fun m : Fin (p^D) => count_high_digits p m.val D < t)).card := by
+  apply Finset.card_bij (fun m hm => ⟨m, by rw [mem_filter] at hm; exact mem_range.mp hm.1⟩)
+  · intro m hm
+    rw [mem_filter] at hm ⊢
+    exact ⟨mem_univ _, hm.2⟩
+  · intro a ha b hb h
+    simp at h; exact h
+  · intro b hb
+    exact ⟨b.val, by rw [mem_filter] at hb ⊢; exact ⟨mem_range.mpr b.isLt, hb.2⟩,
+      Fin.ext rfl⟩
+EOF
+lake env lean /tmp/test_proof2.lean 2>&1
+[2026-02-11T05:05:49.735Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_proof3.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat BigOperators Finset Real Erdos728
+
+-- Now relate filter on Fin(p^D) to filter on DigitSpace via toDigitSpace
+example (p D t : ℕ) (hp : Nat.Prime p) :
+    ((Finset.univ : Finset (Fin (p^D))).filter
+      (fun m : Fin (p^D) => count_high_digits p m.val D < t)).card =
+    ((Finset.univ : Finset (DigitSpace D p)).filter
+      (fun m : DigitSpace D p => highDigitCount m < t)).card := by
+  have hbij := toDigitSpace_bijective hp D
+  apply Finset.card_bij (fun m _ => toDigitSpace hp D m)
+  · intro m hm
+    rw [mem_filter] at hm ⊢
+    constructor
+    · exact mem_univ _
+    · rw [highDigitCount_eq hp D m]; exact hm.2
+  · intro a _ b _ h
+    exact hbij.1 h
+  · intro b _
+    obtain ⟨a, ha⟩ := hbij.2 b
+    exact ⟨a, by simp [mem_filter, ← ha, highDigitCount_eq], ha⟩
+EOF
+lake env lean /tmp/test_proof3.lean 2>&1
+[2026-02-11T05:06:02.211Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_proof3.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat BigOperators Finset Real Erdos728
+
+example (p D t : ℕ) (hp : Nat.Prime p) :
+    ((Finset.univ : Finset (Fin (p^D))).filter
+      (fun m : Fin (p^D) => count_high_digits p m.val D < t)).card =
+    ((Finset.univ : Finset (DigitSpace D p)).filter
+      (fun m : DigitSpace D p => highDigitCount m < t)).card := by
+  have hbij := toDigitSpace_bijective hp D
+  apply Finset.card_bij (fun m _ => toDigitSpace hp D m)
+  · intro m hm
+    rw [mem_filter] at hm ⊢
+    constructor
+    · exact mem_univ _
+    · rw [highDigitCount_eq hp D m]; exact hm.2
+  · intro a _ b _ h
+    exact hbij.1 h
+  · intro b _
+    obtain ⟨a, ha⟩ := hbij.2 b
+    refine ⟨a, ?_, ha⟩
+    rw [mem_filter]
+    constructor
+    · exact mem_univ _
+    · rw [← highDigitCount_eq hp D a, ha]; 
+      simp [mem_filter] at *
+      assumption
+EOF
+lake env lean /tmp/test_proof3.lean 2>&1
+[2026-02-11T05:06:48.456Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_proof4.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat BigOperators Finset Real Erdos728
+
+-- Key helper: subset relationship between < t and ≤ (t : ℝ)
+-- in the DigitSpace world
+example (p D t : ℕ) :
+    ((Finset.univ : Finset (DigitSpace D p)).filter
+      (fun m : DigitSpace D p => highDigitCount m < t)) ⊆
+    ((Finset.univ : Finset (DigitSpace D p)).filter
+      (fun m : DigitSpace D p => (highDigitCount m : ℝ) ≤ (t : ℝ))) := by
+  apply Finset.filter_subset_filter
+  · exact Finset.Subset.rfl
+  · intro m hm
+    exact_mod_cast Nat.lt_add_one_iff.mp (Nat.lt_add_of_lt_right hm)
+EOF
+lake env lean /tmp/test_proof4.lean 2>&1
+[2026-02-11T05:06:59.635Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_proof4.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat BigOperators Finset Real Erdos728
+
+example (p D t : ℕ) :
+    ((Finset.univ : Finset (DigitSpace D p)).filter
+      (fun m : DigitSpace D p => highDigitCount m < t)) ⊆
+    ((Finset.univ : Finset (DigitSpace D p)).filter
+      (fun m : DigitSpace D p => (highDigitCount m : ℝ) ≤ (t : ℝ))) := by
+  intro m
+  simp only [mem_filter, mem_univ, true_and]
+  intro h
+  exact_mod_cast le_of_lt h
+EOF
+lake env lean /tmp/test_proof4.lean 2>&1
+[2026-02-11T05:07:03.453Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T05:07:03.458Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T05:07:18.572Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_exp.lean << 'EOF'
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
+
+open Real
+
+-- We need: exp(-D/18) ≤ (1/2)^(D/36 : ℕ) for natural D
+-- Strategy: (1/2)^(D/36 : ℕ) = exp(-(D/36 : ℕ) * ln 2)
+-- exp(-D/18) ≤ exp(-(D/36 : ℕ) * ln 2)
+-- iff -D/18 ≤ -(D/36 : ℕ) * ln 2
+-- iff (D/36 : ℕ) * ln 2 ≤ D/18
+
+-- Key fact: ln 2 ≤ 1, so (D/36 : ℕ) * ln 2 ≤ (D/36 : ℕ) ≤ D/36 ≤ D/18
+-- Wait, D/36 is NOT ≤ D/18 in general! D/36 < D/18 iff 18 < 36, but (D/36 : ℕ) ≤ D/36 ≤ D/18
+-- So (D/36 : ℕ) * ln 2 ≤ (D/36 : ℕ) * 1 ≤ D/36 ≤ D/18. Yes!
+
+-- Step 1: ln 2 ≤ 1
+example : Real.log 2 ≤ 1 := by
+  rw [← Real.log_exp 1]
+  apply Real.log_le_log (by norm_num : (0:ℝ) < 2)
+  calc (2:ℝ) ≤ 1 + 1 := by norm_num
+    _ ≤ Real.exp 1 := add_one_le_exp 1
+
+-- Step 2: (D/36 : ℕ) ≤ D/36 (real)
+example (D : ℕ) : (↑(D / 36) : ℝ) ≤ (D : ℝ) / 36 := by
+  exact_mod_cast Nat.div_le_self D 36  -- wrong, this gives D/36 ≤ D
+  
+EOF
+lake env lean /tmp/test_exp.lean 2>&1
+[2026-02-11T05:07:23.442Z] [overseer] 📝 Cleared poke messages
+[2026-02-11T05:07:23.444Z] [overseer] 💓 Heartbeat #16 complete: No intervention needed. Task erdos728b-9pu is active and the Tier 0 backlog is well-populated.
+[2026-02-11T05:07:34.848Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_exp.lean << 'EOF'
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+
+open Real
+
+-- (D/36 : ℕ) ≤ D/36 (real)
+example (D : ℕ) : (↑(D / 36) : ℝ) ≤ (D : ℝ) / 36 := by
+  rw [le_div_iff₀ (by norm_num : (0:ℝ) < 36)]
+  have := Nat.div_mul_le_self D 36
+  exact_mod_cast this
+
+-- (D/36 : ℕ) * ln 2 ≤ D/18
+-- Since (D/36 : ℕ) * ln 2 ≤ (D/36 : ℕ) * 1 ≤ D/36 ≤ D/18
+-- Wait, D/36 ≤ D/18 is correct since 18 ≤ 36, so D/36 = D/(2*18) ≤ D/18
+
+-- Hmm, actually we need the full bound. Let me think again.
+-- We need: exp(-2 * ((D * probHigh p) - t)^2 / D) ≤ 1/2^(D/36)
+-- With probHigh p ≥ 1/3 and t ≤ D/6:
+-- D * probHigh p - t ≥ D/3 - D/6 = D/6
+-- So exponent ≤ -2 * (D/6)^2 / D = -2*D^2/(36*D) = -D/18  (for D > 0)
+-- So we need exp(-D/18) ≤ 2^(-(D/36 : ℕ))
+-- 
+-- Now 2^(-(D/36 : ℕ)) = exp(-(D/36 : ℕ) * ln 2)
+-- So we need -D/18 ≤ -(D/36 : ℕ) * ln 2
+-- i.e., (D/36 : ℕ) * ln 2 ≤ D/18
+-- Since ln 2 ≤ 1 and (D/36 : ℕ) ≤ D/36 (real), we get:
+-- (D/36 : ℕ) * ln 2 ≤ D/36 * 1 = D/36 ≤ D/18
+-- Yes! This works since D/36 ≤ D/18 (for D ≥ 0).
+
+example (D : ℕ) : (D : ℝ) / 36 ≤ (D : ℝ) / 18 := by
+  apply div_le_div_of_nonneg_left (by positivity : (0:ℝ) < D + 1) (by norm_num) (by norm_num)
+  -- hmm this is wrong approach
+  sorry
+EOF
+lake env lean /tmp/test_exp.lean 2>&1
+[2026-02-11T05:07:43.227Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_exp.lean << 'EOF'
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+
+open Real
+
+example (D : ℕ) : (D : ℝ) / 36 ≤ (D : ℝ) / 18 := by
+  apply div_le_div_of_nonneg_left _ (by norm_num) (by norm_num)
+  exact_mod_cast Nat.zero_le D
+  -- oops, div_le_div_of_nonneg_left needs a > 0 
+  sorry
+EOF
+lake env lean /tmp/test_exp.lean 2>&1
+[2026-02-11T05:07:49.696Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_exp.lean << 'EOF'
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+
+open Real
+
+example (D : ℕ) : (D : ℝ) / 36 ≤ (D : ℝ) / 18 := by
+  apply div_le_div_of_nonneg_left _ (by norm_num) (by norm_num)
+  exact_mod_cast Nat.zero_le D
+EOF
+lake env lean /tmp/test_exp.lean 2>&1
+[2026-02-11T05:08:07.082Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_exp2.lean << 'EOF'
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
+
+open Real
+
+-- Main inequality: exp(-D/18) ≤ (1/2)^(D/36 : ℕ)
+-- We'll prove this step by step
+
+-- Step 1: (1/2)^n = exp(-n * ln 2)
+#check Real.rpow_natCast  
+#check Real.exp_mul_rpow
+
+-- Actually let me use a different approach
+-- (1/2 : ℝ)^n = 1 / 2^n, and we want exp(-D/18) ≤ 1/2^(D/36)
+-- equivalent: 2^(D/36) ≤ exp(D/18)
+-- equivalent: exp((D/36) * ln 2) ≤ exp(D/18)  
+-- equivalent: (D/36) * ln 2 ≤ D/18
+-- equivalent: ln 2 ≤ 2 (dividing by D/36, assuming D > 0; for D = 0 trivial)
+
+-- But working with ℕ exponents is easier. Let's use pow instead of rpow.
+
+example (D : ℕ) : exp (-(D : ℝ) / 18) ≤ ((1 : ℝ) / 2)^(D/36) := by
+  by_cases hD : D = 0
+  · simp [hD]
+  · -- (1/2)^(D/36) ≥ exp(-(D/36) * ln 2) ≥ exp(-D/18)
+    -- Use: (1/2)^n = exp(n * ln(1/2)) = exp(-n * ln 2)
+    have hln2 : Real.log 2 ≤ 1 := by
+      rw [← Real.log_exp 1]
+      apply Real.log_le_log (by norm_num : (0:ℝ) < 2)
+      linarith [add_one_le_exp 1]
+    have hln2_pos : 0 < Real.log 2 := by positivity
+    -- Convert pow to exp
+    have h_pow : ((1:ℝ)/2)^(D/36) = exp (-(↑(D/36) * Real.log 2)) := by
+      rw [one_div, inv_pow, ← exp_nat_mul, ← exp_neg]
+      congr 1
+      rw [neg_mul, ← Real.log_inv, inv_eq_one_div]
+      rfl
+    sorry
+EOF
+lake env lean /tmp/test_exp2.lean 2>&1
+[2026-02-11T05:08:17.982Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_exp2.lean << 'EOF'
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
+
+open Real
+
+#check @Real.exp_natMul
+-- exp_natMul : rexp (↑n * x) = rexp x ^ n
+#check @Real.rpow_natCast
+-- For 2^n as exp:
+-- 2^n = exp(n * ln 2) 
+-- (1/2)^n = exp(-n * ln 2) = (exp(ln 2))^(-n)... 
+-- Actually simpler: 2 = exp(ln 2), so 2^n = exp(ln 2)^n = exp(n * ln 2)
+
+example (n : ℕ) : (2 : ℝ)^n = exp (↑n * Real.log 2) := by
+  rw [← exp_natMul, Real.exp_log (by norm_num : (0:ℝ) < 2)]
+
+example (n : ℕ) : ((2 : ℝ)^n)⁻¹ = exp (-(↑n * Real.log 2)) := by
+  rw [exp_neg, ← exp_natMul, Real.exp_log (by norm_num : (0:ℝ) < 2)]
+EOF
+lake env lean /tmp/test_exp2.lean 2>&1
+[2026-02-11T05:08:24.880Z] 
+$ cd /home/jarred/code/erdos-728b && grep -r "exp_nat" .lake/packages/mathlib/Mathlib/Analysis/SpecialFunctions/Log/ --include="*.lean" | head -5
+grep -r "exp.*natMul\|exp.*mul.*nat\|exp_nsmul" .lake/packages/mathlib/Mathlib/Analysis/SpecialFunctions/ --include="*.lean" -l | head -5
+[2026-02-11T05:08:31.148Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_exp3.lean << 'EOF'
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
+
+open Real
+
+#check @exp_nsmul
+-- Maybe this doesn't exist. Let me try a different approach.
+-- 2^n = exp(n * log 2) can be proved by induction
+
+-- Or: use rpow
+-- (2 : ℝ) ^ (n : ℕ) = (2 : ℝ) ^ ((n : ℕ) : ℝ) via rpow_natCast
+-- and x ^ y = exp(y * log x) for x > 0
+
+#check @Real.rpow_def_of_pos
+-- rpow_def_of_pos : 0 < x → x ^ y = exp (log x * y)
+
+example (n : ℕ) : (2 : ℝ) ^ n = exp (↑n * Real.log 2) := by
+  rw [← rpow_natCast]
+  rw [rpow_def_of_pos (by norm_num : (0:ℝ) < 2)]
+  ring_nf
+EOF
+lake env lean /tmp/test_exp3.lean 2>&1
+[2026-02-11T05:08:46.807Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_exp4.lean << 'EOF'
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
+
+open Real
+
+-- Main bound: exp(-D/18) ≤ (1/2)^(D/36)
+-- Strategy: show both sides as exp(...) and compare exponents
+
+lemma exp_bound_aux (D : ℕ) : exp (-(D : ℝ) / 18) ≤ ((2 : ℝ)^(D/36))⁻¹ := by
+  -- Write RHS as exp(-(D/36) * log 2)
+  have h2_pow : ((2 : ℝ)^(D/36))⁻¹ = exp (-(↑(D/36) * Real.log 2)) := by
+    rw [exp_neg]
+    congr 1
+    rw [← rpow_natCast]
+    rw [rpow_def_of_pos (by norm_num : (0:ℝ) < 2)]
+    ring_nf
+  rw [h2_pow]
+  rw [exp_le_exp]
+  -- Goal: -D/18 ≤ -(D/36 : ℕ) * log 2
+  -- i.e., (D/36 : ℕ) * log 2 ≤ D/18
+  linarith [show Real.log 2 ≤ 1 from by
+    rw [← Real.log_exp 1]
+    exact Real.log_le_log (by norm_num) (by linarith [add_one_le_exp 1]),
+    show (↑(D/36) : ℝ) ≤ (D : ℝ) / 18 from by
+      have h1 : (↑(D/36) : ℝ) ≤ (D : ℝ) / 36 := by
+        rw [le_div_iff₀ (by norm_num : (0:ℝ) < 36)]
+        exact_mod_cast Nat.div_mul_le_self D 36
+      linarith [show (D : ℝ) / 36 ≤ (D : ℝ) / 18 from by
+        apply div_le_div_of_nonneg_left _ (by norm_num) (by norm_num)
+        exact_mod_cast Nat.zero_le D],
+    show (↑(D/36) : ℝ) ≥ 0 from by exact_mod_cast Nat.zero_le _,
+    show Real.log 2 > 0 from by positivity]
+EOF
+lake env lean /tmp/test_exp4.lean 2>&1
+[2026-02-11T05:09:01.272Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_exp4.lean << 'EOF'
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
+
+open Real
+
+lemma exp_bound_aux (D : ℕ) : exp (-(D : ℝ) / 18) ≤ ((2 : ℝ)^(D/36))⁻¹ := by
+  have h2_pow : ((2 : ℝ)^(D/36))⁻¹ = exp (-(↑(D/36) * Real.log 2)) := by
+    rw [exp_neg]
+    congr 1
+    rw [← rpow_natCast]
+    rw [rpow_def_of_pos (by norm_num : (0:ℝ) < 2)]
+    ring_nf
+  rw [h2_pow, exp_le_exp]
+  -- Goal: -D/18 ≤ -(D/36 : ℕ) * log 2
+  -- Equiv: (D/36 : ℕ) * log 2 ≤ D/18
+  have hln2 : Real.log 2 ≤ 1 := by
+    rw [← Real.log_exp 1]
+    exact Real.log_le_log (by norm_num) (by linarith [add_one_le_exp 1])
+  have hln2_pos : 0 < Real.log 2 := by positivity
+  have h_nat_div : (↑(D/36) : ℝ) ≤ (D : ℝ) / 36 := by
+    rw [le_div_iff₀ (by norm_num : (0:ℝ) < 36)]
+    exact_mod_cast Nat.div_mul_le_self D 36
+  have h_36_18 : (D : ℝ) / 36 ≤ (D : ℝ) / 18 := by
+    apply div_le_div_of_nonneg_left _ (by norm_num) (by norm_num)
+    exact_mod_cast Nat.zero_le D
+  -- (D/36 : ℕ) * log 2 ≤ (D/36 : ℕ) * 1 ≤ D/36 ≤ D/18
+  have h1 : (↑(D/36) : ℝ) * Real.log 2 ≤ ↑(D/36) := by
+    calc (↑(D/36) : ℝ) * Real.log 2 ≤ ↑(D/36) * 1 := by
+          apply mul_le_mul_of_nonneg_left hln2 (by exact_mod_cast Nat.zero_le _)
+      _ = ↑(D/36) := by ring
+  -- Chain: (D/36) * log 2 ≤ D/36 ≤ D/36 ≤ D/18
+  -- so -D/18 ≤ -(D/36) * log 2
+  nlinarith
+EOF
+lake env lean /tmp/test_exp4.lean 2>&1
+[2026-02-11T05:09:23.671Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_exp5.lean << 'EOF'
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Erdos.Lemma3Common
+
+open Real Erdos728
+
+-- For p ≥ 3, probHigh p ≥ 1/3
+-- For t ≤ D/6, D * probHigh p - t ≥ D/3 - D/6 = D/6
+-- So -2 * (D*probHigh p - t)^2 / D ≤ -2*(D/6)^2/D = -D/18
+
+lemma chernoff_exponent_bound (D : ℕ) (p : ℕ) (hp_ge_3 : p ≥ 3) (t : ℕ) (ht : t ≤ D / 6) 
+    (hD : D > 0) :
+    -2 * ((↑D * probHigh p - ↑t)^2) / (↑D : ℝ) ≤ -(↑D : ℝ) / 18 := by
+  -- probHigh p ≥ 1/3
+  have h_prob : probHigh p ≥ 1/3 := by
+    unfold probHigh
+    rw [ge_iff_le, div_le_div_iff₀ (by norm_num : (0:ℝ) < 3) (by positivity : (0:ℝ) < p)]
+    have : p / 2 * 3 ≥ p := by omega
+    have : (↑(p / 2 * 3) : ℝ) ≥ (↑p : ℝ) := by exact_mod_cast this
+    push_cast at this
+    linarith
+  -- D * probHigh p ≥ D/3
+  have h_mu : (↑D : ℝ) * probHigh p ≥ ↑D / 3 := by nlinarith [show (D:ℝ) ≥ 0 from by positivity]
+  -- t ≤ D/6 as reals
+  have h_t : (↑t : ℝ) ≤ ↑D / 6 := by
+    have := Nat.div_mul_le_self D 6
+    have : t * 6 ≤ D := by omega
+    have : (↑(t * 6) : ℝ) ≤ (↑D : ℝ) := by exact_mod_cast this
+    push_cast at this; linarith
+  -- D * probHigh p - t ≥ D/3 - D/6 = D/6
+  have h_gap : ↑D * probHigh p - ↑t ≥ ↑D / 6 := by linarith
+  -- (gap)^2 ≥ (D/6)^2
+  have h_sq : (↑D * probHigh p - ↑t)^2 ≥ ((↑D : ℝ) / 6)^2 := by
+    apply sq_le_sq' <;> linarith
+  -- -2 * gap^2 / D ≤ -2 * (D/6)^2 / D = -D/18
+  have hD_pos : (↑D : ℝ) > 0 := by exact_mod_cast hD
+  have h1 : -2 * (↑D * probHigh p - ↑t)^2 / (↑D : ℝ) ≤ -2 * ((↑D : ℝ) / 6)^2 / ↑D := by
+    apply div_le_div_of_nonneg_right _ (le_of_lt hD_pos)
+    · nlinarith
+  calc -2 * (↑D * probHigh p - ↑t)^2 / ↑D 
+      ≤ -2 * ((↑D : ℝ) / 6)^2 / ↑D := h1
+    _ = -(↑D : ℝ) / 18 := by field_simp; ring
+EOF
+lake env lean /tmp/test_exp5.lean 2>&1
+[2026-02-11T05:09:35.828Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-9pu --status "Writing the full proof for count_few_high_digits"
+[2026-02-11T05:10:22.650Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_full.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat BigOperators Finset Real Erdos728
+
+-- Test the full proof
+set_option maxHeartbeats 800000
+
+lemma count_few_high_digits' {p : ℕ} (hp : p.Prime) (D : ℕ) (t : ℕ) (ht : t ≤ D/6) (hp_ge_3 : p ≥ 3) :
+    ((range (p^D)).filter (fun m => count_high_digits p m D < t)).card ≤ p^D / 2^(D/36) := by
+  -- Handle trivial case t = 0
+  by_cases ht0 : t = 0
+  · simp [ht0]
+  -- Now t ≥ 1, hence D ≥ 6 (since t ≤ D/6 and t ≥ 1 implies D/6 ≥ 1 implies D ≥ 6)
+  have ht_pos : t ≥ 1 := Nat.pos_of_ne_zero ht0
+  have hD_ge_6 : D ≥ 6 := by omega
+  have hD_pos : D > 0 := by omega
+  -- Step 1: Relate range(p^D) filter to DigitSpace filter
+  -- First, range(p^D) → Fin(p^D)
+  have h_card_eq_fin :
+      ((range (p^D)).filter (fun m => count_high_digits p m D < t)).card =
+      ((Finset.univ : Finset (Fin (p^D))).filter
+        (fun m : Fin (p^D) => count_high_digits p m.val D < t)).card := by
+    apply Finset.card_bij (fun m hm => ⟨m, by rw [mem_filter] at hm; exact mem_range.mp hm.1⟩)
+    · intro m hm; rw [mem_filter] at hm ⊢; exact ⟨mem_univ _, hm.2⟩
+    · intro a _ b _ h; simp at h; exact h
+    · intro b _; exact ⟨b.val, by rw [mem_filter]; exact ⟨mem_range.mpr b.isLt, by simpa [mem_filter] using ‹_›⟩, Fin.ext rfl⟩
+  -- Then, Fin(p^D) → DigitSpace via toDigitSpace
+  have h_card_eq_ds :
+      ((Finset.univ : Finset (Fin (p^D))).filter
+        (fun m : Fin (p^D) => count_high_digits p m.val D < t)).card =
+      ((Finset.univ : Finset (DigitSpace D p)).filter
+        (fun m : DigitSpace D p => highDigitCount m < t)).card := by
+    have hbij := toDigitSpace_bijective hp D
+    apply Finset.card_bij (fun m _ => toDigitSpace hp D m)
+    · intro m hm; rw [mem_filter] at hm ⊢
+      exact ⟨mem_univ _, by rw [highDigitCount_eq hp D m]; exact hm.2⟩
+    · intro a _ b _ h; exact hbij.1 h
+    · intro b _; obtain ⟨a, ha⟩ := hbij.2 b
+      refine ⟨a, ?_, ha⟩; rw [mem_filter]
+      constructor; exact mem_univ _
+      rw [← highDigitCount_eq hp D a, ha]; simpa [mem_filter] using ‹_›
+  -- Step 2: The DigitSpace filter with < t is a subset of filter with ≤ (t : ℝ)  
+  have h_subset :
+      ((Finset.univ : Finset (DigitSpace D p)).filter
+        (fun m : DigitSpace D p => highDigitCount m < t)) ⊆
+      ((Finset.univ : Finset (DigitSpace D p)).filter
+        (fun m : DigitSpace D p => (highDigitCount m : ℝ) ≤ (t : ℝ))) := by
+    intro m; simp only [mem_filter, mem_univ, true_and]
+    intro h; exact_mod_cast le_of_lt h
+  -- Step 3: Show t < D * probHigh p (needed for Chernoff)
+  have h_prob_ge : probHigh p ≥ 1/3 := by
+    unfold probHigh
+    rw [ge_iff_le, div_le_div_iff₀ (by norm_num : (0:ℝ) < 3) (by positivity : (0:ℝ) < p)]
+    have : p / 2 * 3 ≥ p := by omega
+    have : (↑(p / 2 * 3) : ℝ) ≥ (↑p : ℝ) := by exact_mod_cast this
+    push_cast at this; linarith
+  have h_t_lt : (t : ℝ) < ↑D * probHigh p := by
+    have : (↑t : ℝ) ≤ ↑D / 6 := by
+      have : t * 6 ≤ D := by omega
+      have : (↑(t * 6) : ℝ) ≤ (↑D : ℝ) := by exact_mod_cast this
+      push_cast at this; linarith
+    have : (↑D : ℝ) / 6 < ↑D * probHigh p := by
+      have : (↑D : ℝ) / 6 < ↑D / 3 := by
+        apply div_lt_div_of_pos_left (by exact_mod_cast hD_pos : (0:ℝ) < ↑D) (by norm_num) (by norm_num)
+      linarith [show ↑D / 3 ≤ ↑D * probHigh p from by nlinarith [show (D:ℝ) ≥ 0 from by positivity]]
+    linarith
+  -- Step 4: Apply Chernoff bound
+  have hne : NeZero p := ⟨Nat.Prime.ne_zero hp⟩
+  have h_chernoff := @count_few_high_digits_bound_chernoff D p hne (↑t) h_t_lt
+  -- Step 5: Bound the exponent
+  -- -2 * (D*probHigh p - t)^2 / D ≤ -D/18
+  have h_exp_bound : exp (-2 * ((↑D * probHigh p - ↑t)^2) / (↑D : ℝ)) ≤ ((2 : ℝ)^(D/36))⁻¹ := by
+    -- First show exponent ≤ -D/18
+    have h_exp_le : -2 * ((↑D * probHigh p - ↑t)^2) / (↑D : ℝ) ≤ -(↑D : ℝ) / 18 := by
+      have h_gap : ↑D * probHigh p - ↑t ≥ ↑D / 6 := by
+        have h_t_le : (↑t : ℝ) ≤ ↑D / 6 := by
+          have : t * 6 ≤ D := by omega
+          have : (↑(t * 6) : ℝ) ≤ (↑D : ℝ) := by exact_mod_cast this
+          push_cast at this; linarith
+        nlinarith [show (D:ℝ) ≥ 0 from by positivity]
+      have h_sq : (↑D * probHigh p - ↑t)^2 ≥ ((↑D : ℝ) / 6)^2 := by
+        apply sq_le_sq' <;> linarith
+      have hD_r : (↑D : ℝ) > 0 := by exact_mod_cast hD_pos
+      have h1 : -2 * (↑D * probHigh p - ↑t)^2 / ↑D ≤ -2 * ((↑D : ℝ) / 6)^2 / ↑D := by
+        apply div_le_div_of_nonneg_right _ (le_of_lt hD_r); nlinarith
+      calc -2 * (↑D * probHigh p - ↑t)^2 / ↑D 
+          ≤ -2 * ((↑D : ℝ) / 6)^2 / ↑D := h1
+        _ = -(↑D : ℝ) / 18 := by field_simp; ring
+    -- Then show exp(-D/18) ≤ (2^(D/36))⁻¹ 
+    calc exp (-2 * ((↑D * probHigh p - ↑t)^2) / ↑D)
+        ≤ exp (-(↑D : ℝ) / 18) := by rw [exp_le_exp]; exact h_exp_le
+      _ ≤ ((2 : ℝ)^(D/36))⁻¹ := by
+          -- (2^(D/36))⁻¹ = exp(-(D/36)*ln 2)
+          have h2_pow : ((2 : ℝ)^(D/36))⁻¹ = exp (-(↑(D/36) * Real.log 2)) := by
+            rw [exp_neg]; congr 1
+            rw [← rpow_natCast]; rw [rpow_def_of_pos (by norm_num : (0:ℝ) < 2)]; ring_nf
+          rw [h2_pow, exp_le_exp]
+          have hln2 : Real.log 2 ≤ 1 := by
+            rw [← Real.log_exp 1]
+            exact Real.log_le_log (by norm_num) (by linarith [add_one_le_exp 1])
+          have h_nat_div : (↑(D/36) : ℝ) ≤ (D : ℝ) / 18 := by
+            have h1 : (↑(D/36) : ℝ) ≤ (D : ℝ) / 36 := by
+              rw [le_div_iff₀ (by norm_num : (0:ℝ) < 36)]
+              exact_mod_cast Nat.div_mul_le_self D 36
+            linarith [show (D : ℝ) / 36 ≤ (D : ℝ) / 18 from by
+              apply div_le_div_of_nonneg_left _ (by norm_num) (by norm_num)
+              exact_mod_cast Nat.zero_le D]
+          nlinarith [show (↑(D/36) : ℝ) ≥ 0 from by exact_mod_cast Nat.zero_le _]
+  -- Step 6: Combine all bounds
+  -- card ≤ chernoff_card ≤ p^D * exp(...) ≤ p^D * (2^(D/36))⁻¹ = p^D / 2^(D/36)
+  rw [h_card_eq_fin, h_card_eq_ds]
+  -- card of < t filter ≤ card of ≤ t filter
+  have h_card_le := card_le_card h_subset
+  -- chernoff gives: card of ≤ t filter ≤ p^D * exp(...)
+  -- Then p^D * exp(...) ≤ p^D / 2^(D/36)
+  -- Combined: card ≤ p^D / 2^(D/36)
+  apply Nat.le_div_iff_mul_le (Nat.pos_of_ne_zero (by positivity)).mp
+  sorry
+EOF
+lake env lean /tmp/test_full.lean 2>&1
+[2026-02-11T05:10:23.447Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T05:10:23.451Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T05:10:48.656Z] [overseer] 📝 Cleared poke messages
+[2026-02-11T05:10:48.657Z] [overseer] 💓 Heartbeat #17 complete: No intervention needed
+[2026-02-11T05:11:28.631Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_full2.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat BigOperators Finset Real Erdos728
+
+set_option maxHeartbeats 800000
+
+lemma count_few_high_digits' {p : ℕ} (hp : p.Prime) (D : ℕ) (t : ℕ) (ht : t ≤ D/6) (hp_ge_3 : p ≥ 3) :
+    ((range (p^D)).filter (fun m => count_high_digits p m D < t)).card ≤ p^D / 2^(D/36) := by
+  -- Handle trivial case t = 0
+  by_cases ht0 : t = 0
+  · simp [ht0]
+  have ht_pos : t ≥ 1 := Nat.pos_of_ne_zero ht0
+  have hD_ge_6 : D ≥ 6 := by omega
+  have hD_pos : D > 0 := by omega
+  -- Step 1: Relate range(p^D) filter to DigitSpace filter
+  have h_card_eq_fin :
+      ((range (p^D)).filter (fun m => count_high_digits p m D < t)).card =
+      ((Finset.univ : Finset (Fin (p^D))).filter
+        (fun m : Fin (p^D) => count_high_digits p m.val D < t)).card := by
+    apply Finset.card_bij (fun m hm => ⟨m, by rw [mem_filter] at hm; exact mem_range.mp hm.1⟩)
+    · intro m hm; rw [mem_filter] at hm ⊢; exact ⟨mem_univ _, hm.2⟩
+    · intro a _ b _ h; simp at h; exact h
+    · intro b hb
+      refine ⟨b.val, ?_, Fin.ext rfl⟩
+      rw [mem_filter]; constructor
+      · exact mem_range.mpr b.isLt
+      · rw [mem_filter] at hb; exact hb.2
+  have h_card_eq_ds :
+      ((Finset.univ : Finset (Fin (p^D))).filter
+        (fun m : Fin (p^D) => count_high_digits p m.val D < t)).card =
+      ((Finset.univ : Finset (DigitSpace D p)).filter
+        (fun m : DigitSpace D p => highDigitCount m < t)).card := by
+    have hbij := toDigitSpace_bijective hp D
+    apply Finset.card_bij (fun m _ => toDigitSpace hp D m)
+    · intro m hm; rw [mem_filter] at hm ⊢
+      exact ⟨mem_univ _, by rw [highDigitCount_eq hp D m]; exact hm.2⟩
+    · intro a _ b _ h; exact hbij.1 h
+    · intro b hb; obtain ⟨a, ha⟩ := hbij.2 b
+      refine ⟨a, ?_, ha⟩; rw [mem_filter]
+      constructor; · exact mem_univ _
+      · rw [mem_filter] at hb; rw [← highDigitCount_eq hp D a, ha]; exact hb.2
+  -- Step 2: Filter subset
+  have h_subset :
+      ((Finset.univ : Finset (DigitSpace D p)).filter
+        (fun m : DigitSpace D p => highDigitCount m < t)) ⊆
+      ((Finset.univ : Finset (DigitSpace D p)).filter
+        (fun m : DigitSpace D p => (highDigitCount m : ℝ) ≤ (t : ℝ))) := by
+    intro m; simp only [mem_filter, mem_univ, true_and]
+    intro h; exact_mod_cast le_of_lt h
+  -- Step 3: probHigh p ≥ 1/3 and t < D * probHigh p
+  have h_prob_ge : probHigh p ≥ 1/3 := by
+    unfold probHigh
+    rw [ge_iff_le, div_le_div_iff₀ (by norm_num : (0:ℝ) < 3) (by positivity : (0:ℝ) < p)]
+    have : p / 2 * 3 ≥ p := by omega
+    have : (↑(p / 2 * 3) : ℝ) ≥ (↑p : ℝ) := by exact_mod_cast this
+    push_cast at this; linarith
+  have h_t_lt : (t : ℝ) < ↑D * probHigh p := by
+    have ht_le : (↑t : ℝ) ≤ ↑D / 6 := by
+      have : t * 6 ≤ D := by omega
+      have : (↑(t * 6) : ℝ) ≤ (↑D : ℝ) := by exact_mod_cast this
+      push_cast at this; linarith
+    have : (↑D : ℝ) / 6 < ↑D / 3 := by
+      apply div_lt_div_of_pos_left (by exact_mod_cast hD_pos : (0:ℝ) < ↑D) (by norm_num) (by norm_num)
+    have : ↑D / 3 ≤ ↑D * probHigh p := by nlinarith [show (D:ℝ) ≥ 0 from by positivity]
+    linarith
+  -- Step 4: Apply Chernoff
+  have hne : NeZero p := ⟨Nat.Prime.ne_zero hp⟩
+  have h_chernoff := @count_few_high_digits_bound_chernoff D p hne (↑t) h_t_lt
+  -- Step 5: Bound exponent
+  have h_exp_bound : exp (-2 * ((↑D * probHigh p - ↑t)^2) / (↑D : ℝ)) ≤ ((2 : ℝ)^(D/36))⁻¹ := by
+    have h_exp_le : -2 * ((↑D * probHigh p - ↑t)^2) / (↑D : ℝ) ≤ -(↑D : ℝ) / 18 := by
+      have h_gap : ↑D * probHigh p - ↑t ≥ ↑D / 6 := by
+        have : (↑t : ℝ) ≤ ↑D / 6 := by
+          have : t * 6 ≤ D := by omega
+          exact_mod_cast show (↑(t * 6) : ℝ) ≤ ↑D from by exact_mod_cast (by omega : t * 6 ≤ D)
+        nlinarith [show (D:ℝ) ≥ 0 from by positivity]
+      have h_sq : (↑D * probHigh p - ↑t)^2 ≥ ((↑D : ℝ) / 6)^2 := by
+        apply sq_le_sq' <;> linarith
+      have hD_r : (↑D : ℝ) > 0 := by exact_mod_cast hD_pos
+      calc -2 * (↑D * probHigh p - ↑t)^2 / ↑D 
+          ≤ -2 * ((↑D : ℝ) / 6)^2 / ↑D := by
+            apply div_le_div_of_nonneg_right _ (le_of_lt hD_r); nlinarith
+        _ = -(↑D : ℝ) / 18 := by field_simp; ring
+    calc exp (-2 * ((↑D * probHigh p - ↑t)^2) / ↑D)
+        ≤ exp (-(↑D : ℝ) / 18) := by rw [exp_le_exp]; exact h_exp_le
+      _ ≤ ((2 : ℝ)^(D/36))⁻¹ := by
+          have h2_pow : ((2 : ℝ)^(D/36))⁻¹ = exp (-(↑(D/36) * Real.log 2)) := by
+            rw [exp_neg]; congr 1
+            rw [← rpow_natCast]; rw [rpow_def_of_pos (by norm_num : (0:ℝ) < 2)]; ring_nf
+          rw [h2_pow, exp_le_exp]
+          have hln2 : Real.log 2 ≤ 1 := by
+            rw [← Real.log_exp 1]
+            exact Real.log_le_log (by norm_num) (by linarith [add_one_le_exp 1])
+          have h_nat_div : (↑(D/36) : ℝ) ≤ (D : ℝ) / 18 := by
+            have : (↑(D/36) : ℝ) ≤ (D : ℝ) / 36 := by
+              rw [le_div_iff₀ (by norm_num : (0:ℝ) < 36)]
+              exact_mod_cast Nat.div_mul_le_self D 36
+            linarith [show (D : ℝ) / 36 ≤ (D : ℝ) / 18 from by
+              apply div_le_div_of_nonneg_left _ (by norm_num) (by norm_num)
+              exact_mod_cast Nat.zero_le D]
+          nlinarith [show (↑(D/36) : ℝ) ≥ 0 from by exact_mod_cast Nat.zero_le _]
+  -- Step 6: Combine to get natural number bound
+  -- We have: card_ds_lt ≤ card_ds_le ≤ p^D * exp(...) ≤ p^D * (2^(D/36))⁻¹ = p^D / 2^(D/36)
+  rw [h_card_eq_fin, h_card_eq_ds]
+  have h_card_le := card_le_card h_subset
+  -- card (< t) ≤ card (≤ t) ≤ p^D * exp(...)
+  have h_real_bound : (((Finset.univ : Finset (DigitSpace D p)).filter
+      (fun m => highDigitCount m < t)).card : ℝ) ≤ ↑(p^D) / ↑(2^(D/36)) := by
+    calc (((Finset.univ.filter (fun m => highDigitCount m < t)).card : ℝ))
+        ≤ ((Finset.univ.filter (fun m : DigitSpace D p => (highDigitCount m : ℝ) ≤ ↑t)).card : ℝ) := by
+          exact_mod_cast h_card_le
+      _ ≤ ↑p ^ D * exp (-2 * ((↑D * probHigh p - ↑t)^2) / ↑D) := h_chernoff
+      _ ≤ ↑p ^ D * ((2 : ℝ)^(D/36))⁻¹ := by
+          apply mul_le_mul_of_nonneg_left h_exp_bound
+          positivity
+      _ = ↑(p^D) / ↑(2^(D/36)) := by
+          push_cast
+          rw [mul_inv_cancel_comm₀ (by positivity : (2:ℝ)^(D/36) ≠ 0)]
+          sorry -- need to rewrite this
+  sorry
+EOF
+lake env lean /tmp/test_full2.lean 2>&1
+[2026-02-11T05:12:31.425Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_full3.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat BigOperators Finset Real Erdos728
+
+set_option maxHeartbeats 800000
+
+lemma count_few_high_digits' {p : ℕ} (hp : p.Prime) (D : ℕ) (t : ℕ) (ht : t ≤ D/6) (hp_ge_3 : p ≥ 3) :
+    ((range (p^D)).filter (fun m => count_high_digits p m D < t)).card ≤ p^D / 2^(D/36) := by
+  by_cases ht0 : t = 0
+  · simp [ht0]
+  have ht_pos : t ≥ 1 := Nat.pos_of_ne_zero ht0
+  have hD_ge_6 : D ≥ 6 := by omega
+  have hD_pos : D > 0 := by omega
+  -- Step 1: Relate range(p^D) filter to DigitSpace filter via bijection
+  have h_card_eq_fin :
+      ((range (p^D)).filter (fun m => count_high_digits p m D < t)).card =
+      ((Finset.univ : Finset (Fin (p^D))).filter
+        (fun m : Fin (p^D) => count_high_digits p m.val D < t)).card := by
+    apply Finset.card_bij (fun m hm => ⟨m, by rw [mem_filter] at hm; exact mem_range.mp hm.1⟩)
+    · intro m hm; rw [mem_filter] at hm ⊢; exact ⟨mem_univ _, hm.2⟩
+    · intro a _ b _ h; simp at h; exact h
+    · intro b hb; refine ⟨b.val, ?_, Fin.ext rfl⟩
+      rw [mem_filter]; exact ⟨mem_range.mpr b.isLt, (mem_filter.mp hb).2⟩
+  have h_card_eq_ds :
+      ((Finset.univ : Finset (Fin (p^D))).filter
+        (fun m : Fin (p^D) => count_high_digits p m.val D < t)).card =
+      ((Finset.univ : Finset (DigitSpace D p)).filter
+        (fun m : DigitSpace D p => highDigitCount m < t)).card := by
+    have hbij := toDigitSpace_bijective hp D
+    apply Finset.card_bij (fun m _ => toDigitSpace hp D m)
+    · intro m hm; rw [mem_filter] at hm ⊢
+      exact ⟨mem_univ _, by rw [highDigitCount_eq hp D m]; exact hm.2⟩
+    · intro a _ b _ h; exact hbij.1 h
+    · intro b hb; obtain ⟨a, ha⟩ := hbij.2 b
+      refine ⟨a, ?_, ha⟩; rw [mem_filter]
+      exact ⟨mem_univ _, by rw [← highDigitCount_eq hp D a, ha]; exact (mem_filter.mp hb).2⟩
+  -- Step 2: Filter subset (< t implies ≤ (t : ℝ))
+  have h_subset :
+      ((Finset.univ : Finset (DigitSpace D p)).filter (fun m => highDigitCount m < t)) ⊆
+      ((Finset.univ : Finset (DigitSpace D p)).filter (fun m => (highDigitCount m : ℝ) ≤ ↑t)) := by
+    intro m; simp only [mem_filter, mem_univ, true_and]
+    exact fun h => by exact_mod_cast le_of_lt h
+  -- Step 3: probHigh p ≥ 1/3 and t < D * probHigh p
+  have h_prob_ge : probHigh p ≥ 1/3 := by
+    unfold probHigh
+    rw [ge_iff_le, div_le_div_iff₀ (by norm_num : (0:ℝ) < 3) (by positivity : (0:ℝ) < p)]
+    have : (↑(p / 2 * 3) : ℝ) ≥ (↑p : ℝ) := by exact_mod_cast (show p / 2 * 3 ≥ p by omega)
+    push_cast at this; linarith
+  have h_t_le_D6 : (↑t : ℝ) ≤ ↑D / 6 := by
+    have : (↑(t * 6) : ℝ) ≤ (↑D : ℝ) := by exact_mod_cast (show t * 6 ≤ D by omega)
+    push_cast at this; linarith
+  have h_t_lt : (t : ℝ) < ↑D * probHigh p := by
+    have : (↑D : ℝ) / 6 < ↑D / 3 := by
+      apply div_lt_div_of_pos_left (by exact_mod_cast hD_pos : (0:ℝ) < ↑D) (by norm_num) (by norm_num)
+    nlinarith [show (D:ℝ) ≥ 0 from by positivity]
+  -- Step 4: Apply Chernoff
+  have hne : NeZero p := ⟨Nat.Prime.ne_zero hp⟩
+  have h_chernoff := @count_few_high_digits_bound_chernoff D p hne (↑t) h_t_lt
+  -- Step 5: Exponent bound
+  have h_exp_bound : exp (-2 * ((↑D * probHigh p - ↑t)^2) / (↑D : ℝ)) ≤ ((2 : ℝ)^(D/36))⁻¹ := by
+    have h_gap : ↑D * probHigh p - ↑t ≥ ↑D / 6 := by nlinarith [show (D:ℝ) ≥ 0 from by positivity]
+    have hD_r : (↑D : ℝ) > 0 := by exact_mod_cast hD_pos
+    have h_exp_le : -2 * ((↑D * probHigh p - ↑t)^2) / (↑D : ℝ) ≤ -(↑D : ℝ) / 18 := by
+      calc -2 * (↑D * probHigh p - ↑t)^2 / ↑D 
+          ≤ -2 * ((↑D : ℝ) / 6)^2 / ↑D := by
+            apply div_le_div_of_nonneg_right _ (le_of_lt hD_r)
+            nlinarith [show (↑D * probHigh p - ↑t)^2 ≥ ((↑D : ℝ) / 6)^2 from sq_le_sq' (by linarith) h_gap]
+        _ = -(↑D : ℝ) / 18 := by field_simp; ring
+    calc exp (-2 * ((↑D * probHigh p - ↑t)^2) / ↑D)
+        ≤ exp (-(↑D : ℝ) / 18) := by rw [exp_le_exp]; exact h_exp_le
+      _ ≤ ((2 : ℝ)^(D/36))⁻¹ := by
+          rw [show ((2 : ℝ)^(D/36))⁻¹ = exp (-(↑(D/36) * Real.log 2)) from by
+            rw [exp_neg]; congr 1
+            rw [← rpow_natCast, rpow_def_of_pos (by norm_num : (0:ℝ) < 2)]; ring_nf]
+          rw [exp_le_exp]
+          nlinarith [
+            show Real.log 2 ≤ 1 from by
+              rw [← Real.log_exp 1]; exact Real.log_le_log (by norm_num) (by linarith [add_one_le_exp 1]),
+            show (↑(D/36) : ℝ) ≤ (D : ℝ) / 18 from by
+              have : (↑(D/36) : ℝ) ≤ (D : ℝ) / 36 := by
+                rw [le_div_iff₀ (by norm_num : (0:ℝ) < 36)]
+                exact_mod_cast Nat.div_mul_le_self D 36
+              linarith [show (D : ℝ) / 36 ≤ (D : ℝ) / 18 from by
+                apply div_le_div_of_nonneg_left _ (by norm_num) (by norm_num)
+                exact_mod_cast Nat.zero_le D],
+            show (↑(D/36) : ℝ) ≥ 0 from by exact_mod_cast Nat.zero_le _]
+  -- Step 6: Combine to get nat bound
+  rw [h_card_eq_fin, h_card_eq_ds]
+  -- Use the approach: show (card : ℝ) ≤ p^D / 2^(D/36) as reals, then cast
+  have h2_pos : (2 : ℕ)^(D/36) > 0 := by positivity
+  rw [Nat.le_div_iff_mul_le h2_pos]
+  -- Goal: card * 2^(D/36) ≤ p^D
+  have h_card_le := card_le_card h_subset
+  have h_real : (((Finset.univ.filter (fun m : DigitSpace D p => highDigitCount m < t)).card * 2^(D/36) : ℕ) : ℝ) ≤ ↑(p^D) := by
+    push_cast
+    calc ↑((Finset.univ.filter (fun m : DigitSpace D p => highDigitCount m < t)).card) * ↑(2^(D/36))
+        ≤ ↑((Finset.univ.filter (fun m : DigitSpace D p => (highDigitCount m : ℝ) ≤ ↑t)).card) * ↑(2^(D/36)) := by
+          apply mul_le_mul_of_nonneg_right (by exact_mod_cast h_card_le) (by positivity)
+      _ ≤ (↑p ^ D * exp (-2 * ((↑D * probHigh p - ↑t)^2) / ↑D)) * ↑(2^(D/36)) := by
+          apply mul_le_mul_of_nonneg_right h_chernoff (by positivity)
+      _ ≤ (↑p ^ D * ((2 : ℝ)^(D/36))⁻¹) * ↑(2^(D/36)) := by
+          apply mul_le_mul_of_nonneg_right _ (by positivity)
+          apply mul_le_mul_of_nonneg_left h_exp_bound (by positivity)
+      _ = ↑p ^ D := by
+          rw [mul_assoc, inv_mul_cancel₀ (by positivity : (2:ℝ)^(D/36) ≠ 0), mul_one]
+          push_cast; rfl
+  exact_mod_cast h_real
+EOF
+lake env lean /tmp/test_full3.lean 2>&1
+[2026-02-11T05:13:27.958Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_full3b.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat BigOperators Finset Real Erdos728
+
+set_option maxHeartbeats 800000
+
+lemma count_few_high_digits' {p : ℕ} (hp : p.Prime) (D : ℕ) (t : ℕ) (ht : t ≤ D/6) (hp_ge_3 : p ≥ 3) :
+    ((range (p^D)).filter (fun m => count_high_digits p m D < t)).card ≤ p^D / 2^(D/36) := by
+  by_cases ht0 : t = 0
+  · simp [ht0]
+  have ht_pos : t ≥ 1 := Nat.pos_of_ne_zero ht0
+  have hD_ge_6 : D ≥ 6 := by omega
+  have hD_pos : D > 0 := by omega
+  have h_card_eq_fin :
+      ((range (p^D)).filter (fun m => count_high_digits p m D < t)).card =
+      ((Finset.univ : Finset (Fin (p^D))).filter
+        (fun m : Fin (p^D) => count_high_digits p m.val D < t)).card := by
+    apply Finset.card_bij (fun m hm => ⟨m, by rw [mem_filter] at hm; exact mem_range.mp hm.1⟩)
+    · intro m hm; rw [mem_filter] at hm ⊢; exact ⟨mem_univ _, hm.2⟩
+    · intro a _ b _ h; simp at h; exact h
+    · intro b hb; refine ⟨b.val, ?_, Fin.ext rfl⟩
+      rw [mem_filter]; exact ⟨mem_range.mpr b.isLt, (mem_filter.mp hb).2⟩
+  have h_card_eq_ds :
+      ((Finset.univ : Finset (Fin (p^D))).filter
+        (fun m : Fin (p^D) => count_high_digits p m.val D < t)).card =
+      ((Finset.univ : Finset (DigitSpace D p)).filter
+        (fun m : DigitSpace D p => highDigitCount m < t)).card := by
+    have hbij := toDigitSpace_bijective hp D
+    apply Finset.card_bij (fun m _ => toDigitSpace hp D m)
+    · intro m hm; rw [mem_filter] at hm ⊢
+      exact ⟨mem_univ _, by rw [highDigitCount_eq hp D m]; exact hm.2⟩
+    · intro a _ b _ h; exact hbij.1 h
+    · intro b hb; obtain ⟨a, ha⟩ := hbij.2 b
+      refine ⟨a, ?_, ha⟩; rw [mem_filter]
+      exact ⟨mem_univ _, by rw [← highDigitCount_eq hp D a, ha]; exact (mem_filter.mp hb).2⟩
+  have h_subset :
+      ((Finset.univ : Finset (DigitSpace D p)).filter (fun m => highDigitCount m < t)) ⊆
+      ((Finset.univ : Finset (DigitSpace D p)).filter (fun m => (highDigitCount m : ℝ) ≤ ↑t)) := by
+    intro m; simp only [mem_filter, mem_univ, true_and]
+    exact fun h => by exact_mod_cast le_of_lt h
+  have h_prob_ge : probHigh p ≥ 1/3 := by
+    unfold probHigh
+    rw [ge_iff_le, div_le_div_iff₀ (by norm_num : (0:ℝ) < 3) (by positivity : (0:ℝ) < p)]
+    have : (↑(p / 2 * 3) : ℝ) ≥ (↑p : ℝ) := by exact_mod_cast (show p / 2 * 3 ≥ p by omega)
+    push_cast at this; linarith
+  have h_t_le_D6 : (↑t : ℝ) ≤ ↑D / 6 := by
+    have : (↑(t * 6) : ℝ) ≤ (↑D : ℝ) := by exact_mod_cast (show t * 6 ≤ D by omega)
+    push_cast at this; linarith
+  have h_t_lt : (t : ℝ) < ↑D * probHigh p := by
+    have : (↑D : ℝ) / 6 < ↑D / 3 := by
+      apply div_lt_div_of_pos_left (by exact_mod_cast hD_pos : (0:ℝ) < ↑D) (by norm_num) (by norm_num)
+    nlinarith [show (D:ℝ) ≥ 0 from by positivity]
+  have hne : NeZero p := ⟨Nat.Prime.ne_zero hp⟩
+  have h_chernoff := @count_few_high_digits_bound_chernoff D p hne (↑t) h_t_lt
+  have h_exp_bound : exp (-2 * ((↑D * probHigh p - ↑t)^2) / (↑D : ℝ)) ≤ ((2 : ℝ)^(D/36))⁻¹ := by
+    have h_gap : ↑D * probHigh p - ↑t ≥ ↑D / 6 := by nlinarith [show (D:ℝ) ≥ 0 from by positivity]
+    have hD_r : (↑D : ℝ) > 0 := by exact_mod_cast hD_pos
+    have h_exp_le : -2 * ((↑D * probHigh p - ↑t)^2) / (↑D : ℝ) ≤ -(↑D : ℝ) / 18 := by
+      calc -2 * (↑D * probHigh p - ↑t)^2 / ↑D 
+          ≤ -2 * ((↑D : ℝ) / 6)^2 / ↑D := by
+            apply div_le_div_of_nonneg_right _ (le_of_lt hD_r)
+            nlinarith [show (↑D * probHigh p - ↑t)^2 ≥ ((↑D : ℝ) / 6)^2 from sq_le_sq' (by linarith) h_gap]
+        _ = -(↑D : ℝ) / 18 := by field_simp; ring
+    calc exp (-2 * ((↑D * probHigh p - ↑t)^2) / ↑D)
+        ≤ exp (-(↑D : ℝ) / 18) := by rw [exp_le_exp]; exact h_exp_le
+      _ ≤ ((2 : ℝ)^(D/36))⁻¹ := by
+          rw [show ((2 : ℝ)^(D/36))⁻¹ = exp (-(↑(D/36) * Real.log 2)) from by
+            rw [exp_neg]; congr 1
+            rw [← rpow_natCast, rpow_def_of_pos (by norm_num : (0:ℝ) < 2)]; ring_nf]
+          rw [exp_le_exp]
+          nlinarith [
+            show Real.log 2 ≤ 1 from by
+              rw [← Real.log_exp 1]; exact Real.log_le_log (by norm_num) (by linarith [add_one_le_exp 1]),
+            show (↑(D/36) : ℝ) ≤ (D : ℝ) / 18 from by
+              have : (↑(D/36) : ℝ) ≤ (D : ℝ) / 36 := by
+                rw [le_div_iff₀ (by norm_num : (0:ℝ) < 36)]
+                exact_mod_cast Nat.div_mul_le_self D 36
+              linarith [show (D : ℝ) / 36 ≤ (D : ℝ) / 18 from by
+                apply div_le_div_of_nonneg_left _ (by norm_num) (by norm_num)
+                exact_mod_cast Nat.zero_le D],
+            show (↑(D/36) : ℝ) ≥ 0 from by exact_mod_cast Nat.zero_le _]
+  -- Final step: combine in ℕ
+  rw [h_card_eq_fin, h_card_eq_ds]
+  have h2_pos : (2 : ℕ)^(D/36) > 0 := by positivity
+  rw [Nat.le_div_iff_mul_le h2_pos]
+  have h_card_le := card_le_card h_subset
+  suffices h : (((Finset.univ.filter (fun m : DigitSpace D p => highDigitCount m < t)).card
+      * 2^(D/36) : ℕ) : ℝ) ≤ ↑(p^D) from by exact_mod_cast h
+  push_cast
+  calc ↑((Finset.univ.filter (fun m : DigitSpace D p => highDigitCount m < t)).card) * (2:ℝ)^(D/36)
+      ≤ ↑((Finset.univ.filter (fun m : DigitSpace D p => (highDigitCount m : ℝ) ≤ ↑t)).card) * (2:ℝ)^(D/36) := by
+        apply mul_le_mul_of_nonneg_right (by exact_mod_cast h_card_le) (by positivity)
+    _ ≤ (↑p ^ D * exp (-2 * ((↑D * probHigh p - ↑t)^2) / ↑D)) * (2:ℝ)^(D/36) := by
+        apply mul_le_mul_of_nonneg_right h_chernoff (by positivity)
+    _ ≤ (↑p ^ D * ((2 : ℝ)^(D/36))⁻¹) * (2:ℝ)^(D/36) := by
+        apply mul_le_mul_of_nonneg_right _ (by positivity)
+        exact mul_le_mul_of_nonneg_left h_exp_bound (by positivity)
+    _ = ↑p ^ D := by
+        rw [mul_assoc, inv_mul_cancel₀ (by positivity : (2:ℝ)^(D/36) ≠ 0), mul_one]
+EOF
+lake env lean /tmp/test_full3b.lean 2>&1
+[2026-02-11T05:13:48.659Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T05:13:48.662Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T05:13:49.143Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-9pu --status "Proof compiles in test file, integrating into Lemma3Counting.lean"
+[2026-02-11T05:14:24.115Z] [overseer] 📝 Cleared poke messages
+[2026-02-11T05:14:24.116Z] [overseer] 💓 Heartbeat #18 complete: System healthy and making steady progress. Tier 0 leaf lemmas are being closed.
+[2026-02-11T05:14:36.053Z] 
+🛠️  Executing tool: edit...
+[2026-02-11T05:14:39.340Z] 
+$ cd /home/jarred/code/erdos-728b && lake build 2>&1 | tail -30
+[2026-02-11T05:15:24.789Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "sorry" Erdos/Lemma3Counting.lean
+[2026-02-11T05:15:34.463Z] 
+$ cd /home/jarred/code/erdos-728b && git add -A && git commit -m "Close sorry: count_few_high_digits in Lemma3Counting.lean
+
+Prove that #{m ∈ {0..p^D-1} : count_high_digits p m D < t} ≤ p^D/2^(D/36)
+for t ≤ D/6 and p ≥ 3.
+
+Proof strategy:
+1. Biject range(p^D) → Fin(p^D) → DigitSpace D p via toDigitSpace
+2. Relate count_high_digits to highDigitCount via highDigitCount_eq
+3. Apply count_few_high_digits_bound_chernoff from Erdos/Chernoff.lean
+4. Show the Chernoff exponent ≤ -D/18 (since probHigh p ≥ 1/3 for p ≥ 3
+   and the gap D*probHigh(p) - t ≥ D/6)
+5. Show exp(-D/18) ≤ 2^(-D/36) since ln 2 ≤ 1 and ⌊D/36⌋ ≤ D/18
+6. Convert real bound to natural number floor division"

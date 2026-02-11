@@ -160,7 +160,156 @@ lemma count_few_high_digits_bound (hp : p.Prime) (t : ℝ) (ht : t < (D * probHi
   apply count_few_high_digits_bound_chernoff t ht
 
 lemma count_few_high_digits (hp : p.Prime) (t : ℕ) (ht : t ≤ D/6) (hp_ge_3 : p ≥ 3) :
-    ((range (p^D)).filter (fun m => count_high_digits p m D < t)).card ≤ p^D / 2^(D/36) := sorry
+    ((range (p^D)).filter (fun m => count_high_digits p m D < t)).card ≤
+    p^D / 2^(D/36) := by
+  -- Handle trivial case t = 0 (empty filter)
+  by_cases ht0 : t = 0
+  · simp [ht0]
+  have ht_pos : t ≥ 1 := Nat.pos_of_ne_zero ht0
+  have hD_ge_6 : D ≥ 6 := by omega
+  have hD_pos : D > 0 := by omega
+  -- Step 1: Relate range(p^D) filter to DigitSpace filter via bijection
+  have h_card_eq_fin :
+      ((range (p^D)).filter (fun m => count_high_digits p m D < t)).card =
+      ((Finset.univ : Finset (Fin (p^D))).filter
+        (fun m : Fin (p^D) =>
+          count_high_digits p m.val D < t)).card := by
+    apply Finset.card_bij
+      (fun m hm => ⟨m, by rw [mem_filter] at hm; exact mem_range.mp hm.1⟩)
+    · intro m hm; rw [mem_filter] at hm ⊢; exact ⟨mem_univ _, hm.2⟩
+    · intro a _ b _ h; simp at h; exact h
+    · intro b hb; refine ⟨b.val, ?_, Fin.ext rfl⟩
+      rw [mem_filter]
+      exact ⟨mem_range.mpr b.isLt, (mem_filter.mp hb).2⟩
+  have h_card_eq_ds :
+      ((Finset.univ : Finset (Fin (p^D))).filter
+        (fun m : Fin (p^D) =>
+          count_high_digits p m.val D < t)).card =
+      ((Finset.univ : Finset (DigitSpace D p)).filter
+        (fun m : DigitSpace D p => highDigitCount m < t)).card := by
+    have hbij := toDigitSpace_bijective hp D
+    apply Finset.card_bij (fun m _ => toDigitSpace hp D m)
+    · intro m hm; rw [mem_filter] at hm ⊢
+      exact ⟨mem_univ _,
+        by rw [highDigitCount_eq hp D m]; exact hm.2⟩
+    · intro a _ b _ h; exact hbij.1 h
+    · intro b hb; obtain ⟨a, ha⟩ := hbij.2 b
+      refine ⟨a, ?_, ha⟩; rw [mem_filter]
+      exact ⟨mem_univ _, by
+        rw [← highDigitCount_eq hp D a, ha]
+        exact (mem_filter.mp hb).2⟩
+  -- Step 2: Filter subset (< t implies ≤ (t : ℝ))
+  have h_subset :
+      (Finset.univ.filter
+        (fun m : DigitSpace D p => highDigitCount m < t)) ⊆
+      (Finset.univ.filter
+        (fun m : DigitSpace D p =>
+          (highDigitCount m : ℝ) ≤ ↑t)) := by
+    intro m; simp only [mem_filter, mem_univ, true_and]
+    exact fun h => by exact_mod_cast le_of_lt h
+  -- Step 3: probHigh p ≥ 1/3 and t < D * probHigh p
+  have h_prob_ge : probHigh p ≥ 1/3 := by
+    unfold probHigh
+    rw [ge_iff_le, div_le_div_iff₀
+      (by norm_num : (0:ℝ) < 3) (by positivity : (0:ℝ) < p)]
+    have : (↑(p / 2 * 3) : ℝ) ≥ (↑p : ℝ) := by
+      exact_mod_cast (show p / 2 * 3 ≥ p by omega)
+    push_cast at this; linarith
+  have h_t_le_D6 : (↑t : ℝ) ≤ ↑D / 6 := by
+    have : (↑(t * 6) : ℝ) ≤ (↑D : ℝ) := by
+      exact_mod_cast (show t * 6 ≤ D by omega)
+    push_cast at this; linarith
+  have h_t_lt : (t : ℝ) < ↑D * probHigh p := by
+    have : (↑D : ℝ) / 6 < ↑D / 3 := by
+      apply div_lt_div_of_pos_left
+        (by exact_mod_cast hD_pos : (0:ℝ) < ↑D)
+        (by norm_num) (by norm_num)
+    nlinarith [show (D:ℝ) ≥ 0 from by positivity]
+  -- Step 4: Apply Chernoff bound from Erdos/Chernoff.lean
+  have hne : NeZero p := ⟨Nat.Prime.ne_zero hp⟩
+  have h_chernoff :=
+    @count_few_high_digits_bound_chernoff D p hne (↑t) h_t_lt
+  -- Step 5: Bound exp(-2*(gap)^2/D) ≤ (2^(D/36))⁻¹
+  -- Gap ≥ D/6, so exponent ≤ -D/18, and exp(-D/18) ≤ 2^(-D/36)
+  -- since ln 2 ≤ 1 ≤ 2 and (D/36 : ℕ) ≤ D/18.
+  have h_exp_bound :
+      exp (-2 * ((↑D * probHigh p - ↑t)^2) / (↑D : ℝ)) ≤
+      ((2 : ℝ)^(D/36))⁻¹ := by
+    have h_gap : ↑D * probHigh p - ↑t ≥ ↑D / 6 := by
+      nlinarith [show (D:ℝ) ≥ 0 from by positivity]
+    have hD_r : (↑D : ℝ) > 0 := by exact_mod_cast hD_pos
+    have h_exp_le :
+        -2 * ((↑D * probHigh p - ↑t)^2) / (↑D : ℝ) ≤
+        -(↑D : ℝ) / 18 := by
+      calc -2 * (↑D * probHigh p - ↑t)^2 / ↑D
+          ≤ -2 * ((↑D : ℝ) / 6)^2 / ↑D := by
+            apply div_le_div_of_nonneg_right _ (le_of_lt hD_r)
+            nlinarith [sq_le_sq'
+              (by linarith) h_gap]
+        _ = -(↑D : ℝ) / 18 := by field_simp; ring
+    calc exp (-2 * ((↑D * probHigh p - ↑t)^2) / ↑D)
+        ≤ exp (-(↑D : ℝ) / 18) := by
+          rw [exp_le_exp]; exact h_exp_le
+      _ ≤ ((2 : ℝ)^(D/36))⁻¹ := by
+          rw [show ((2 : ℝ)^(D/36))⁻¹ =
+              exp (-(↑(D/36) * Real.log 2)) from by
+            rw [exp_neg]; congr 1
+            rw [← rpow_natCast,
+              rpow_def_of_pos (by norm_num : (0:ℝ) < 2)]
+            ring_nf]
+          rw [exp_le_exp]
+          nlinarith [
+            show Real.log 2 ≤ 1 from by
+              rw [← Real.log_exp 1]
+              exact Real.log_le_log (by norm_num)
+                (by linarith [add_one_le_exp 1]),
+            show (↑(D/36) : ℝ) ≤ (D : ℝ) / 18 from by
+              have : (↑(D/36) : ℝ) ≤ (D : ℝ) / 36 := by
+                rw [le_div_iff₀
+                  (by norm_num : (0:ℝ) < 36)]
+                exact_mod_cast Nat.div_mul_le_self D 36
+              linarith [show (D:ℝ) / 36 ≤ (D:ℝ) / 18
+                from by
+                  apply div_le_div_of_nonneg_left _
+                    (by norm_num) (by norm_num)
+                  exact_mod_cast Nat.zero_le D],
+            show (↑(D/36) : ℝ) ≥ 0 from by
+              exact_mod_cast Nat.zero_le _]
+  -- Step 6: Combine bounds to get ℕ inequality
+  rw [h_card_eq_fin, h_card_eq_ds]
+  have h2_pos : (2 : ℕ)^(D/36) > 0 := by positivity
+  rw [Nat.le_div_iff_mul_le h2_pos]
+  have h_card_le := card_le_card h_subset
+  suffices h : ((((Finset.univ.filter
+      (fun m : DigitSpace D p => highDigitCount m < t)).card
+      * 2^(D/36) : ℕ) : ℝ) ≤ ↑(p^D)) from by
+    exact_mod_cast h
+  push_cast
+  calc ↑((Finset.univ.filter
+        (fun m : DigitSpace D p =>
+          highDigitCount m < t)).card) *
+        (2:ℝ)^(D/36)
+      ≤ ↑((Finset.univ.filter
+        (fun m : DigitSpace D p =>
+          (highDigitCount m : ℝ) ≤ ↑t)).card) *
+        (2:ℝ)^(D/36) := by
+        apply mul_le_mul_of_nonneg_right
+          (by exact_mod_cast h_card_le) (by positivity)
+    _ ≤ (↑p ^ D *
+        exp (-2 * ((↑D * probHigh p - ↑t)^2) / ↑D)) *
+        (2:ℝ)^(D/36) := by
+        apply mul_le_mul_of_nonneg_right h_chernoff
+          (by positivity)
+    _ ≤ (↑p ^ D * ((2 : ℝ)^(D/36))⁻¹) *
+        (2:ℝ)^(D/36) := by
+        apply mul_le_mul_of_nonneg_right _ (by positivity)
+        exact mul_le_mul_of_nonneg_left h_exp_bound
+          (by positivity)
+    _ = ↑p ^ D := by
+        rw [mul_assoc,
+          inv_mul_cancel₀
+            (by positivity : (2:ℝ)^(D/36) ≠ 0),
+          mul_one]
 
 end HighDigits
 

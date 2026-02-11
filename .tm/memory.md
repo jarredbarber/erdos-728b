@@ -7,5 +7,7 @@
 - [2026-02-11 04:47] erdos728b-zvo CLOSED. Proved count_congruent_le and wired residue_count_interval.
 - [2026-02-11 04:51] erdos728b-tor CLOSED. Proved toDigitSpace_bijective.
 - [2026-02-11 05:00] erdos728b-zs3 CLOSED. Proved carry_propagate.
-- [2026-02-11 05:00] Sorry count: 16 total (13 actionable in L3C).
-- [2026-02-11 05:00] Tier 0 unblocked: co5 (in_progress), bu3, vtv, 9pu, at0, hga, 2zs.
+- [2026-02-11 05:01] erdos728b-co5 CLOSED. Proved valuation_ge_high_digits.
+- [2026-02-11 05:05] Sorry count: 15 total.
+- [2026-02-11 05:10] erdos728b-9pu (count_few_high_digits) is nearing completion; proof compiles in test file.
+- [2026-02-11 05:10] Tier 0 unblocked: bu3, vtv, at0, hga, 2zs.
