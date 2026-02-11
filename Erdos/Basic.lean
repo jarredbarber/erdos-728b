@@ -1,5 +1,6 @@
 import Mathlib
 import Erdos.Lemmas
+import Erdos.Lemma3Counting
 
 open Real Nat Filter Asymptotics
 open scoped Nat Topology
@@ -20,23 +21,71 @@ The main theorem then follows by choosing k ≈ (C+C')/2 · log(2m₀) and verif
 the size and gap constraints.
 -/
 
-/-- **Core existence lemma (uniform version)**: For all sufficiently large m₀,
-for every k with 1 ≤ k ≤ m₀, there exists m ∈ [m₀, 2m₀] such that
-C(m+k, k) | C(2m, m).
+/-- If for all primes p, padicValNat p a ≤ padicValNat p b, then a ∣ b.
+    Converts pointwise p-adic valuation comparisons into divisibility. -/
+private lemma dvd_of_padicValNat_le {a b : ℕ} (ha : a ≠ 0) (hb : b ≠ 0)
+    (h : ∀ p : ℕ, p.Prime → padicValNat p a ≤ padicValNat p b) : a ∣ b := by
+  rw [← Nat.factorization_le_iff_dvd ha hb]
+  intro p
+  by_cases hp : p.Prime
+  · rw [Nat.factorization_def a hp, Nat.factorization_def b hp]; exact h p hp
+  · simp [Nat.factorization_eq_zero_of_not_prime _ hp]
 
-This combines carry dominance for large primes with a counting argument
-for small primes:
-1. For p > 2k: carry_dominance gives v_p(C(m+k,k)) ≤ v_p(C(2m,m)) for ALL m.
-2. For p ≤ 2k: Among m ∈ [m₀, 2m₀], the fraction of "bad" m for prime p
-   (where v_p(C(m+k,k)) > v_p(C(2m,m))) decays exponentially in log_p(m₀).
-3. Union bound: total bad fraction < 1 for m₀ sufficiently large.
+/-- **Union bound over small primes (uniform in k)**: For any C_log and m₀
+    sufficiently large, for every k with 1 ≤ k ≤ C_log * log(2m₀), there exists
+    m ∈ [m₀, 2m₀) such that for ALL primes p ≤ 2k,
+    v_p(C(m+k,k)) ≤ v_p(C(2m,m)).
 
-The threshold M₀ is independent of k (as long as k ≤ m₀), because the
-per-prime failure probability decreases as m₀ grows regardless of k. -/
-lemma exists_m_choose_dvd_uniform :
-    ∃ M₀ : ℕ, ∀ m₀ : ℕ, M₀ ≤ m₀ → ∀ k : ℕ, 1 ≤ k → k ≤ m₀ →
-      ∃ m : ℕ, m₀ ≤ m ∧ m ≤ 2 * m₀ ∧ (m + k).choose k ∣ (2 * m).choose m := by
+    This combines:
+    - Theorem E2 from proofs/lemma3-counting.md (per-k union bound)
+    - The observation that M₀(k) = (2k)^{O(log k)} is subpolynomial in m₀
+      when k ≤ C_log * log(2m₀), so a single M₀ suffices for all k.
+
+    The proof structure:
+    1. For each prime p ≤ 2k, choose D_p = 36⌈log₂(16k)⌉ + 36⌊log_p(k+1)⌋ + 36
+    2. Apply count_bad_interval for each such prime (from Lemma3Counting.lean)
+    3. Each prime contributes ≤ m₀/(8k) bad m values
+    4. Union bound: total bad ≤ π(2k) · m₀/(8k) ≤ 2k · m₀/(8k) = m₀/4 < m₀
+    5. Since |bad| < |[m₀, 2m₀)| = m₀, a good m exists
+
+    SORRY: The union bound arithmetic is verified in the NL proof
+    (proofs/lemma3-counting.md, Part E) but requires substantial formalization:
+    - Explicit D_p computation and hypothesis verification
+    - Summation over primes with Finset arithmetic
+    - The M₀(k) ≤ m₀ bound when k = O(log m₀) -/
+private lemma exists_m_small_primes_good_uniform (C_log : ℝ) :
+    ∃ M₀ : ℕ, ∀ m₀ : ℕ, M₀ ≤ m₀ → ∀ k : ℕ, 1 ≤ k →
+      (k : ℝ) ≤ C_log * Real.log (2 * m₀) →
+      ∃ m : ℕ, m₀ ≤ m ∧ m < 2 * m₀ ∧
+        ∀ p : ℕ, p.Prime → p ≤ 2 * k →
+          padicValNat p ((m + k).choose k) ≤ padicValNat p ((2 * m).choose m) := by
   sorry
+
+/-- **Core existence lemma**: For any constant C > 0 and all sufficiently large m₀,
+for every k with 1 ≤ k ≤ C * log(2m₀), there exists m ∈ [m₀, 2m₀] such that
+C(m+k, k) | C(2m, m). -/
+lemma exists_m_choose_dvd_uniform (C_log : ℝ) :
+    ∃ M₀ : ℕ, ∀ m₀ : ℕ, M₀ ≤ m₀ → ∀ k : ℕ, 1 ≤ k → (k : ℝ) ≤ C_log * Real.log (2 * m₀) →
+      ∃ m : ℕ, m₀ ≤ m ∧ m ≤ 2 * m₀ ∧ (m + k).choose k ∣ (2 * m).choose m := by
+  -- Get the M₀ that handles all small primes uniformly
+  obtain ⟨M₀, hM₀⟩ := exists_m_small_primes_good_uniform C_log
+  refine ⟨max M₀ 1, fun m₀ hm₀ k hk hk_bound => ?_⟩
+  have hm₀_M₀ : M₀ ≤ m₀ := le_of_max_le_left hm₀
+  have hm₀_pos : 0 < m₀ := by omega
+  -- Get m ∈ [m₀, 2m₀) good for all small primes
+  obtain ⟨m, hm_lb, hm_ub_strict, hsmall⟩ := hM₀ m₀ hm₀_M₀ k hk hk_bound
+  refine ⟨m, hm_lb, by omega, ?_⟩
+  -- Prove C(m+k,k) | C(2m,m) by comparing all prime valuations
+  apply dvd_of_padicValNat_le
+  · exact Nat.ne_of_gt (Nat.choose_pos (Nat.le_add_left k m))
+  · exact Nat.ne_of_gt (Nat.choose_pos (Nat.le_mul_of_pos_left m (by omega)))
+  intro p hp
+  by_cases hpk : 2 * k < p
+  · -- Large prime (p > 2k): carry_dominance handles it unconditionally
+    exact carry_dominance_padicValNat p m k hp hpk
+  · -- Small prime (p ≤ 2k): the counting/union bound argument handles it
+    push_neg at hpk
+    exact hsmall p hp hpk
 
 -- Helper lemmas for log_gap_bounds
 
@@ -126,7 +175,11 @@ lemma log_gap_bounds (C C' : ℝ) (hC : 0 < C) (hCC' : C < C') :
   have hm₀_pos : (0 : ℝ) < (m₀ : ℝ) := by exact_mod_cast show 0 < m₀ by omega
   have h2m₀_pos : (0 : ℝ) < 2 * (m₀ : ℝ) := by linarith
   have hlog_pos : 0 < Real.log (2 * ↑m₀) := Real.log_pos (by linarith)
-  have hk_le : (k : ℝ) ≤ avg * Real.log (2 * ↑m₀) := Nat.floor_le (by positivity)
+  have hk_le : (k : ℝ) ≤ avg * Real.log (2 * ↑m₀) := Nat.floor_le (by 
+    have : 0 ≤ avg := by linarith
+    have : 0 ≤ Real.log (2 * m₀) := by 
+      apply Real.log_nonneg; linarith
+    positivity)
   have hk_lb : avg * Real.log (2 * ↑m₀) - 1 < (k : ℝ) := Nat.sub_one_lt_floor _
   refine ⟨?_, ?_, ?_⟩
   · rwa [Nat.one_le_floor_iff]
@@ -171,13 +224,24 @@ lemma exists_good_m (C C' : ℝ) (hC : 0 < C) (hCC' : C < C') :
         C * Real.log (2 * ↑m) < ↑k ∧
         (↑k : ℝ) < C' * Real.log (2 * ↑m) := by
   obtain ⟨M₁, hM₁⟩ := log_gap_bounds C C' hC hCC'
-  obtain ⟨M₂, hM₂⟩ := exists_m_choose_dvd_uniform
+  obtain ⟨M₂, hM₂⟩ := exists_m_choose_dvd_uniform (C' + 1)
   refine ⟨max M₁ M₂, fun m₀ hm₀ => ?_⟩
   have hm₀₁ : M₁ ≤ m₀ := le_of_max_le_left hm₀
   have hm₀₂ : M₂ ≤ m₀ := le_of_max_le_right hm₀
-  obtain ⟨hk, hk_le, hgap⟩ := hM₁ m₀ hm₀₁
+  obtain ⟨hk, hk_le_m₀, hgap⟩ := hM₁ m₀ hm₀₁
   set k := ⌊(C + C') / 2 * Real.log (2 * ↑m₀)⌋₊
-  obtain ⟨m, hm_lb, hm_ub, hdvd⟩ := hM₂ m₀ hm₀₂ k hk hk_le
+  have hm₀_ge_1 : 1 ≤ m₀ := by omega
+  have h2m₀_ge_1 : (1 : ℝ) ≤ 2 * (m₀ : ℝ) := by
+    exact_mod_cast show 1 ≤ 2 * m₀ by omega
+  have hlog_nn : (0 : ℝ) ≤ Real.log (2 * m₀) := Real.log_nonneg h2m₀_ge_1
+  have hk_le_log : (k : ℝ) ≤ (C' + 1) * Real.log (2 * m₀) := by
+    calc (k : ℝ) ≤ (C + C') / 2 * Real.log (2 * m₀) := Nat.floor_le (by
+          exact mul_nonneg (by linarith) hlog_nn)
+      _ ≤ C' * Real.log (2 * m₀) := by
+          apply mul_le_mul_of_nonneg_right _ hlog_nn; linarith
+      _ ≤ (C' + 1) * Real.log (2 * m₀) := by
+          apply mul_le_mul_of_nonneg_right _ hlog_nn; linarith
+  obtain ⟨m, hm_lb, hm_ub, hdvd⟩ := hM₂ m₀ hm₀₂ k hk hk_le_log
   exact ⟨m, k, hm_lb, hm_ub, hk, hdvd, (hgap m hm_lb hm_ub).1, (hgap m hm_lb hm_ub).2⟩
 
 /--
@@ -212,18 +276,23 @@ theorem erdos_728 :
   · -- n > 0: since m ≥ m₀ ≥ 1
     omega
   · -- ε * n < a: since ε < 1/4, ε * (2m) < m/2 < m
-    have : (0 : ℝ) < (m : ℝ) := by exact_mod_cast show 0 < m by omega
-    push_cast; nlinarith [hε.2]
+    have hm_pos : (0 : ℝ) < (m : ℝ) := by exact_mod_cast (show 0 < m by omega)
+    have : ε < 1 / 4 := hε.2
+    push_cast; nlinarith
   · -- ε * n < b: since ε * (2m) < m ≤ m + k
-    have : (0 : ℝ) < (m : ℝ) := by exact_mod_cast show 0 < m by omega
-    push_cast; nlinarith [hε.2, show (0 : ℝ) ≤ (k : ℝ) from Nat.cast_nonneg k]
+    have hm_pos : (0 : ℝ) < (m : ℝ) := by exact_mod_cast (show 0 < m by omega)
+    have hk_nonneg : (0 : ℝ) ≤ (k : ℝ) := Nat.cast_nonneg k
+    have : ε < 1 / 4 := hε.2
+    push_cast; nlinarith
   · -- a! * b! ∣ n! * (a + b - n)!
     -- By reduction_lemma: C(m+k,k) | C(2m,m) ↔ m!(m+k)! | (2m)!k!
     rw [show m + (m + k) - 2 * m = k from by omega]
     exact (reduction_lemma m k).mp hdvd
   · -- a + b > n + C * log n: follows from k > C * log(2m)
+    have hm_pos : (0 : ℝ) < (m : ℝ) := by exact_mod_cast (show 0 < m by omega)
     push_cast; linarith
   · -- a + b < n + C' * log n: follows from k < C' * log(2m)
+    have hm_pos : (0 : ℝ) < (m : ℝ) := by exact_mod_cast (show 0 < m by omega)
     push_cast; linarith
 
 end Erdos728

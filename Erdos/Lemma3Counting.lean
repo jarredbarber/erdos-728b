@@ -146,36 +146,7 @@ lemma count_bad_interval (m0 : ℕ) (hm0 : m0 ≥ p^D) (hD : D ≥ 16 * (log p (
     (hp : p.Prime) (hp_ge_3 : p ≥ 3) (hk : k ≥ 1) :
     ((Ico m0 (2 * m0)).filter (fun m => padicValNat p ((m + k).choose k) > padicValNat p ((2 * m).choose m))).card
     ≤ (2 * m0) / 2 ^ (D / 36) + (2 * p^D) / 2 ^ (D / 36) := by
-  let Bad := (Ico m0 (2 * m0)).filter (fun m => padicValNat p ((m + k).choose k) > padicValNat p ((2 * m).choose m))
-  
-  -- Define bad residues
-  let R1 := (range (p^D)).filter (fun r => cascade_length (p:=p) k D r ≥ D/6 - log p k)
-  let R2 := (range (p^D)).filter (fun r => count_high_digits p r D < D/6)
-  
-  have h_bad_subset : Bad ⊆ (Ico m0 (2 * m0)).filter (fun m => m % p^D ∈ R1 ∪ R2) := by
-    intro m hm
-    simp only [Bad, mem_filter, mem_Ico] at hm
-    simp only [mem_filter, mem_Ico, mem_union]
-    constructor
-    · exact hm.1
-    · have h_or : padicValNat p ((m + k).choose k) > D/6 ∨ padicValNat p ((2 * m).choose m) < D/6 := by
-         by_contra h_not; push_neg at h_not; linarith [hm.2]
-      rcases h_or with h1 | h2
-      · left; exact (bad_residue_sets D k hp hD).1 m h1
-      · right; exact (bad_residue_sets D k hp hD).2 m h2
-      
-  apply le_trans (card_le_card h_bad_subset)
-  apply le_trans (residue_count_interval (R:=R1 ∪ R2) (hR:=by intro r hr; rw [mem_union] at hr; rcases hr with h|h <;> exact mem_range.mp (mem_filter.mp h).1) (a:=m0) (b:=2*m0) (h_ba:=Nat.le_mul_of_pos_left m0 (by norm_num)))
-  · -- Bound |R1 U R2|
-    have hR1 : R1.card ≤ p^D / 2^(D/36) := by
-      -- Use count_large_cascade
-      -- Need to verify D/6 - log p k <= D - (log p k + 1)
-      have hR1 : R1.card ≤ p^D / 2^(D/36) := sorry
-    
-    have hR2 : R2.card ≤ p^D / 2^(D/36) := sorry
-    
-    sorry
-  · intro r hr; simp at hr; apply Nat.mod_lt _ (pow_pos hp.pos D)
+  sorry
 
 end ResidueCounting
 
