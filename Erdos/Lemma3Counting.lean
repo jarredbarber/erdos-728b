@@ -8,6 +8,7 @@ import Mathlib.NumberTheory.Padics.PadicVal.Basic
 import Erdos.Digits
 import Erdos.Lemma3Common
 import Erdos.Chernoff
+import Erdos.Lemma3Residue
 
 open Nat BigOperators Finset Real
 
@@ -131,10 +132,41 @@ section ResidueCounting
 variable {p : ℕ} (hp : p.Prime) (D : ℕ) (k : ℕ)
 
 lemma count_congruent_le (a b K r : ℕ) (hK : K > 0) :
-    ((Ico a b).filter (fun m => m % K = r)).card ≤ (b - a) / K + 1 := sorry
+    ((Ico a b).filter (fun m => m % K = r)).card ≤ (b - a) / K + 1 := by
+  by_cases hab : a ≤ b
+  swap
+  · push_neg at hab; rw [Ico_eq_empty (by omega)]; simp
+  rw [← card_range ((b - a) / K + 1)]
+  apply card_le_card_of_injOn (fun m => (m - a) / K)
+  · intro m hm
+    rw [mem_coe, mem_filter, mem_Ico] at hm
+    exact mem_range.mpr (Nat.lt_succ_of_le (Nat.div_le_div_right (by omega)))
+  · intro x hx y hy hxy
+    rw [mem_coe, mem_filter, mem_Ico] at hx hy
+    by_contra h_ne
+    have hmod : x % K = y % K := hx.2.trans hy.2.symm
+    -- If x ≠ y, then K | |x - y| (same residue), so quotients (· - a)/K differ
+    have hdvd_ne : ∀ {u v : ℕ}, a ≤ u → u < v → K ∣ (v - u) →
+        (u - a) / K ≠ (v - a) / K := by
+      intro u v hu hlt hdvd h_eq
+      have h1 : v - a = (u - a) + (v - u) := by omega
+      have : (u - a) / K < (v - a) / K := by
+        rw [h1]
+        calc (u - a) / K < (u - a) / K + 1 := Nat.lt_succ_self _
+          _ ≤ ((u - a) + K) / K := by rw [Nat.add_div_right _ hK]
+          _ ≤ ((u - a) + (v - u)) / K :=
+              Nat.div_le_div_right (by exact Nat.add_le_add_left (Nat.le_of_dvd (by omega) hdvd) _)
+      omega
+    rcases Nat.lt_or_gt_of_ne h_ne with hlt | hlt
+    · exact absurd hxy (hdvd_ne hx.1.1 hlt
+        (Nat.dvd_of_mod_eq_zero (Nat.sub_mod_eq_zero_of_mod_eq hmod.symm)))
+    · exact absurd hxy.symm (hdvd_ne hy.1.1 hlt
+        (Nat.dvd_of_mod_eq_zero (Nat.sub_mod_eq_zero_of_mod_eq hmod)))
 
-lemma residue_count_interval {R : Finset ℕ} (hR : ∀ r ∈ R, r < p^D) (a b : ℕ) (h_ba : a ≤ b) :
-    ((Ico a b).filter (fun m => m % p^D ∈ R)).card ≤ R.card * ((b - a) / p^D + 1) := sorry
+lemma residue_count_interval (hp : p.Prime)
+    {R : Finset ℕ} (hR : ∀ r ∈ R, r < p^D) (a b : ℕ) (h_ba : a ≤ b) :
+    ((Ico a b).filter (fun m => m % p^D ∈ R)).card ≤ R.card * ((b - a) / p^D + 1) :=
+  _root_.residue_count_interval hp.pos hR a b h_ba
 
 lemma bad_residue_sets (hp : p.Prime) (hD : D ≥ 16 * (log p (k + 1)) + 16) :
     (∀ m, padicValNat p ((m + k).choose k) > D/6 → 
