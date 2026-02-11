@@ -699,3 +699,26 @@ Added helper lemmas in Cascade section (primed versions of private lemmas
 from ResidueCounting): cascade_digit_neq', no_carry_beyond',
 not_pred_at_takeWhile_length', digit_zero_of_lt_pow."
 ```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-vtv --status "Completed. Sorry closed and build passes."
+```
+```json
+{
+  "status": "completed",
+  "summary": "Closed sorry in valuation_le_cascade. lake build succeeds.",
+  "details": "Proved padicValNat p ((m + k).choose k) ≤ (log p k + 1) + cascade_length k D m.\n\nProof approach has two cases:\n\n1. **Cascade terminates within D digits** (L < D - (s+1)): Used Kummer's theorem (factorization_choose') to express v_p as the count of carry positions in Ico 1 b. Then showed all carry positions lie in Ico 1 (s+2+L) using cascade_digit_neq' (digit at position s+1+L ≠ p-1) and no_carry_beyond' (descending induction via carry_propagate). Total carries ≤ s+1+L.\n\n2. **Cascade fills remaining digits** (L ≥ D - (s+1)): Used factorization_choose_le_log to get v_p ≤ log_p(m+k), then showed log_p(m+k) ≤ (s+1)+L by sub-cases:\n   - If s+1 ≤ D: k < p^D, so m+k < 2p^D ≤ p^(D+1), giving log_p(m+k) ≤ D ≤ (s+1)+L.\n   - If s+1 > D: k ≥ p^s ≥ p^D > m, so m+k ≤ 2k < p^(s+2), giving log_p(m+k) ≤ s+1.\n\nAdded helper lemmas (primed copies of private lemmas from ResidueCounting section): not_pred_at_takeWhile_length', cascade_digit_neq', no_carry_beyond', digit_zero_of_lt_pow.\n\nNo new sorry holes introduced."
+}
+```
+
+## Final Result
+
+```json
+{
+  "status": "completed",
+  "summary": "Closed sorry in valuation_le_cascade. lake build succeeds.",
+  "details": "Proved padicValNat p ((m + k).choose k) ≤ (log p k + 1) + cascade_length k D m.\n\nProof approach has two cases:\n\n1. **Cascade terminates within D digits** (L < D - (s+1)): Used Kummer's theorem (factorization_choose') to express v_p as the count of carry positions in Ico 1 b. Then showed all carry positions lie in Ico 1 (s+2+L) using cascade_digit_neq' (digit at position s+1+L ≠ p-1) and no_carry_beyond' (descending induction via carry_propagate). Total carries ≤ s+1+L.\n\n2. **Cascade fills remaining digits** (L ≥ D - (s+1)): Used factorization_choose_le_log to get v_p ≤ log_p(m+k), then showed log_p(m+k) ≤ (s+1)+L by sub-cases:\n   - If s+1 ≤ D: k < p^D, so m+k < 2p^D ≤ p^(D+1), giving log_p(m+k) ≤ D ≤ (s+1)+L.\n   - If s+1 > D: k ≥ p^s ≥ p^D > m, so m+k ≤ 2k < p^(s+2), giving log_p(m+k) ≤ s+1.\n\nAdded helper lemmas (primed copies of private lemmas from ResidueCounting section): not_pred_at_takeWhile_length', cascade_digit_neq', no_carry_beyond', digit_zero_of_lt_pow.\n\nNo new sorry holes introduced."
+}
+```
+
+End Time: 2026-02-11T06:13:40.145Z
