@@ -2133,3 +2133,38 @@ Proof strategy:
 Added digitConstraintEquiv helper and import Mathlib.Data.Set.Card.
 Added 'include hp in' since proof requires toDigitSpace_bijective."
 ```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-bu3 --status "Completed: sorry closed, lake build succeeds, committed"
+```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm finish erdos728b-bu3
+```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm close erdos728b-bu3 2>/dev/null || tm complete erdos728b-bu3 2>/dev/null || tm done erdos728b-bu3 2>/dev/null || echo "Trying resolve..." && tm resolve erdos728b-bu3 2>/dev/null || true
+```
+Task completed successfully.
+
+```json
+{
+  "status": "completed",
+  "summary": "Closed sorry in count_digits_fixed. lake build succeeds.",
+  "details": "Proved that the count of m ∈ {0,...,p^D-1} with T specified base-p digits fixed at injectively-chosen positions equals p^(D-T).\n\nApproach:\n1. Bijection range(p^D) ↔ Fin(p^D) via card_bij\n2. Bijection Fin(p^D) ↔ DigitSpace D p via toDigitSpace_bijective\n3. Constructed digitConstraintEquiv: an Equiv between {f : DigitSpace D p // ∀ k, f(indices k) = values k} and ({i : Fin D // i ∉ range indices} → Fin p)\n4. Cardinality via Fintype.card_fun + Fintype.card_subtype_compl + Set.card_range_of_injective\n\nChanges:\n- Added import Mathlib.Data.Set.Card\n- Added private noncomputable def digitConstraintEquiv (helper Equiv)\n- Added 'include hp in' before count_digits_fixed (proof needs toDigitSpace_bijective which requires hp : p.Prime)\n- Replaced sorry with 3-step proof\n- No new sorry holes introduced"
+}
+```
+
+## Final Result
+
+Task completed successfully.
+
+```json
+{
+  "status": "completed",
+  "summary": "Closed sorry in count_digits_fixed. lake build succeeds.",
+  "details": "Proved that the count of m ∈ {0,...,p^D-1} with T specified base-p digits fixed at injectively-chosen positions equals p^(D-T).\n\nApproach:\n1. Bijection range(p^D) ↔ Fin(p^D) via card_bij\n2. Bijection Fin(p^D) ↔ DigitSpace D p via toDigitSpace_bijective\n3. Constructed digitConstraintEquiv: an Equiv between {f : DigitSpace D p // ∀ k, f(indices k) = values k} and ({i : Fin D // i ∉ range indices} → Fin p)\n4. Cardinality via Fintype.card_fun + Fintype.card_subtype_compl + Set.card_range_of_injective\n\nChanges:\n- Added import Mathlib.Data.Set.Card\n- Added private noncomputable def digitConstraintEquiv (helper Equiv)\n- Added 'include hp in' before count_digits_fixed (proof needs toDigitSpace_bijective which requires hp : p.Prime)\n- Replaced sorry with 3-step proof\n- No new sorry holes introduced"
+}
+```
+
+End Time: 2026-02-11T06:03:56.100Z

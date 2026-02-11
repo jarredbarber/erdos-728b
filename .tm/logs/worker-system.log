@@ -18826,3 +18826,31 @@ Proof strategy:
 
 Added digitConstraintEquiv helper and import Mathlib.Data.Set.Card.
 Added 'include hp in' since proof requires toDigitSpace_bijective."
+[2026-02-11T06:03:42.629Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-bu3 --status "Completed: sorry closed, lake build succeeds, committed"
+[2026-02-11T06:03:44.602Z] 
+$ cd /home/jarred/code/erdos-728b && tm finish erdos728b-bu3
+[2026-02-11T06:03:47.312Z] 
+$ cd /home/jarred/code/erdos-728b && tm close erdos728b-bu3 2>/dev/null || tm complete erdos728b-bu3 2>/dev/null || tm done erdos728b-bu3 2>/dev/null || echo "Trying resolve..." && tm resolve erdos728b-bu3 2>/dev/null || true
+[2026-02-11T06:03:56.100Z] 
+
+📝 Agent response complete.
+
+[2026-02-11T06:03:56.100Z] 📄 Log saved to .tm/logs/worker-erdos728b-bu3.md
+[2026-02-11T06:03:56.101Z] 
+📊 Task erdos728b-bu3 completed:
+[2026-02-11T06:03:56.101Z]    Summary: Closed sorry in count_digits_fixed. lake build succeeds.
+[2026-02-11T06:03:56.101Z]    Details: Proved that the count of m ∈ {0,...,p^D-1} with T specified base-p digits fixed at injectively-chosen positions equals p^(D-T).
+
+Approach:
+1. Bijection range(p^D) ↔ Fin(p^D) via card_bij
+2. Bijection Fin(p^D) ↔ DigitSpace D p via toDigitSpace_bijective
+3. Constructed digitConstraintEquiv: an Equiv between {f : DigitSpace D p // ∀ k, f(indices k) = values k} and ({i : Fin D // i ∉ range indices} → Fin p)
+4. Cardinality via Fintype.card_fun + Fintype.card_subtype_compl + Set.card_range_of_injective
+
+Changes:
+- Added import Mathlib.Data.Set.Card
+- Added private noncomputable def digitConstraintEquiv (helper Equiv)
+- Added 'include hp in' before count_digits_fixed (proof needs toDigitSpace_bijective which requires hp : p.Prime)
+- Replaced sorry with 3-step proof
+- No new sorry holes introduced
