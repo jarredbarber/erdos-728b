@@ -397,11 +397,219 @@ lemma residue_count_interval (hp : p.Prime)
     ((Ico a b).filter (fun m => m % p^D ∈ R)).card ≤ R.card * ((b - a) / p^D + 1) :=
   _root_.residue_count_interval hp.pos hR a b h_ba
 
+/-- digit p (m % p^D) i = digit p m i for i < D.
+    The i-th digit depends only on (m / p^i) % p, and reducing m mod p^D
+    doesn't affect quotients at positions below D. -/
+private lemma digit_mod_pow_eq (p m D i : ℕ) (hp : p > 0) (hi : i < D) :
+    digit p (m % p ^ D) i = digit p m i := by
+  unfold digit
+  have hD_split : p ^ D = p ^ i * p ^ (D - i) := by
+    rw [← pow_add]; congr 1; omega
+  rw [hD_split, Nat.mod_mul_right_div_self]
+  apply Nat.mod_mod_of_dvd
+  exact dvd_pow_self p (by omega : D - i ≠ 0)
+
+/-- Helper: extensionality for List.takeWhile when the predicate agrees on all elements. -/
+private lemma takeWhile_congr' {l : List ℕ} {p q : ℕ → Bool}
+    (h : ∀ x, x ∈ l → p x = q x) : l.takeWhile p = l.takeWhile q := by
+  induction l with
+  | nil => simp
+  | cons a t ih =>
+    simp only [List.takeWhile_cons]
+    rw [h a List.mem_cons_self]
+    split
+    · congr 1; exact ih (fun x hx => h x (List.mem_cons_of_mem _ hx))
+    · rfl
+
+/-- cascade_length depends only on digits at positions s+1..D-1, hence only on m mod p^D. -/
+private lemma cascade_length_mod_eq (k D m : ℕ) (hp : p > 0) :
+    cascade_length (p := p) k D (m % p ^ D) = cascade_length (p := p) k D m := by
+  unfold cascade_length
+  simp only
+  congr 1
+  apply takeWhile_congr'
+  intro i hi
+  rw [List.mem_range] at hi
+  simp only [decide_eq_decide]
+  rw [digit_mod_pow_eq p m D (log p k + 1 + i) hp (by omega)]
+
+/-- count_high_digits depends only on digits at positions 0..D-1, hence only on m mod p^D. -/
+private lemma count_high_digits_mod_eq (p m D : ℕ) (hp : p > 0) :
+    count_high_digits p (m % p ^ D) D = count_high_digits p m D := by
+  unfold count_high_digits high_digits_finset is_high_digit
+  congr 1
+  ext i
+  simp only [mem_filter, mem_range]
+  constructor
+  · intro ⟨hi, hd⟩; exact ⟨hi, by rw [digit_mod_pow_eq p m D i hp hi] at hd; exact hd⟩
+  · intro ⟨hi, hd⟩; exact ⟨hi, by rw [digit_mod_pow_eq p m D i hp hi]; exact hd⟩
+
+/-- If `takeWhile` has length `L < l.length`, then `l[L]` does NOT satisfy the predicate. -/
+private lemma not_pred_at_takeWhile_length {α : Type*} {p : α → Bool} :
+    ∀ (l : List α) (h : (l.takeWhile p).length < l.length),
+    p l[(l.takeWhile p).length] = false := by
+  intro l; induction l with
+  | nil => intro h; simp at h
+  | cons a t ih =>
+    intro h; by_cases ha : p a = true
+    · have htw_len : (List.takeWhile p (a :: t)).length =
+          (List.takeWhile p t).length + 1 := by simp [ha]
+      have h' : (List.takeWhile p t).length < t.length := by
+        simp [List.length_cons] at h; omega
+      have h_idx : (a :: t)[(List.takeWhile p (a :: t)).length] =
+          t[(List.takeWhile p t).length] := by
+        simp only [htw_len, List.getElem_cons_succ]
+      simp only [h_idx]; exact ih h'
+    · have htw_len : (List.takeWhile p (a :: t)).length = 0 := by
+        simp [Bool.eq_false_iff.mpr ha]
+      have h_idx : (a :: t)[(List.takeWhile p (a :: t)).length] = a := by
+        simp only [htw_len, List.getElem_cons_zero]
+      simp only [h_idx]; exact Bool.eq_false_iff.mpr ha
+
+/-- If `cascade_length = L < D - (s+1)`, the digit at position `s+1+L` is NOT `p-1`.
+    This is because `takeWhile` stopped at position `L` in the range. -/
+private lemma cascade_digit_neq (k D m : ℕ)
+    (hL_lt : cascade_length (p := p) k D m < D - (log p k + 1)) :
+    digit p m (log p k + 1 + cascade_length (p := p) k D m) ≠ p - 1 := by
+  unfold cascade_length; simp only
+  set s := log p k; set limit := D - (s + 1)
+  set pred := fun i => decide (digit p m (s + 1 + i) = p - 1)
+  set tw := (List.range limit).takeWhile pred
+  have h_tw_lt : tw.length < (List.range limit).length := by
+    simp [List.length_range]; exact hL_lt
+  have h_not := not_pred_at_takeWhile_length (List.range limit) h_tw_lt
+  have h_range_eq : (List.range limit)[tw.length] = tw.length := by
+    simp [List.getElem_range]
+  rw [h_range_eq] at h_not
+  simp only [pred, decide_eq_false_iff_not] at h_not; exact h_not
+
+/-- No carry exists at any position beyond the cascade boundary.
+    If `digit p m j ≠ p-1` and `j ≥ s+1`, then `carry_cond` is false at all
+    positions `> j`, by descending induction using `carry_propagate`. -/
+private lemma no_carry_beyond (hp : p.Prime) (k m j : ℕ)
+    (hk : k ≥ 1) (hj : j ≥ log p k + 1) (h_digit : digit p m j ≠ p - 1)
+    (i : ℕ) (hi : i > j) (h_carry : carry_cond p k m i) : False := by
+  obtain ⟨d, rfl⟩ : ∃ d, i = j + 1 + d := ⟨i - (j + 1), by omega⟩
+  clear hi; induction d with
+  | zero =>
+    have : j + 1 > log p k + 1 := by omega
+    obtain ⟨h_dig, _⟩ := carry_propagate k hp m (j + 1) this h_carry hk
+    simp at h_dig; exact h_digit h_dig
+  | succ d ih =>
+    have h_pos : j + 1 + (d + 1) > log p k + 1 := by omega
+    obtain ⟨_, h_carry_prev⟩ :=
+      carry_propagate k hp m (j + 1 + (d + 1)) h_pos h_carry hk
+    have h_sub : j + 1 + (d + 1) - 1 = j + 1 + d := by omega
+    rw [h_sub] at h_carry_prev; exact ih h_carry_prev
+
+/-- For arbitrary m, v_p(C(m+k,k)) > D/6 implies the cascade within D digits
+    is at least D/6 - log p k.
+    Proof (contrapositive): if cascade_length L < D/6 - s, then the cascade
+    terminates within D (since D/6 - s < D - s - 1 for D ≥ 16). The digit at
+    position s+1+L ≠ p-1, so no carry propagates beyond s+1+L. By Kummer's
+    theorem (factorization_choose'), v_p = #{carry positions} ⊆ Ico 1 (s+2+L),
+    giving v_p ≤ s+1+L ≤ D/6. -/
+private lemma valuation_gt_implies_cascade (hp : p.Prime) (k D m : ℕ)
+    (hk : k ≥ 1) (hD : D ≥ 16 * (log p (k + 1)) + 16) :
+    padicValNat p ((m + k).choose k) > D / 6 →
+    cascade_length (p := p) k D m ≥ D / 6 - log p k := by
+  intro hv; by_contra h_lt; push_neg at h_lt
+  set s := log p k; set L := cascade_length (p := p) k D m
+  -- L < D - (s+1): from L < D/6 - s and D ≥ 16
+  have hD_ge16 : D ≥ 16 := by omega
+  have hL_lt_limit : L < D - (s + 1) := by
+    have : D / 6 ≤ D - 1 := by omega
+    omega
+  -- digit at s+1+L ≠ p-1 (cascade boundary)
+  have h_digit := cascade_digit_neq k D m hL_lt_limit
+  -- Express v_p using factorization_choose'
+  set b := max (D + 1) (log p (m + k) + 1) with hb_def
+  have hb : log p (m + k) < b := by show _ < max _ _; omega
+  rw [← Nat.factorization_def _ hp,
+    Nat.factorization_choose' hp hb] at hv
+  -- All carry positions are ≤ s+1+L (no carry beyond the cascade)
+  set boundary := s + 1 + L
+  have h_subset :
+      (Ico 1 b).filter (fun i => p ^ i ≤ k % p ^ i + m % p ^ i) ⊆
+        Ico 1 (boundary + 1) := by
+    intro i hi; rw [mem_filter, mem_Ico] at hi; rw [mem_Ico]
+    refine ⟨hi.1.1, ?_⟩
+    by_contra h_not; push_neg at h_not
+    exact no_carry_beyond hp k m (s + 1 + L) hk
+      (by omega) h_digit i (by omega) hi.2
+  have h_card_bound :
+      ((Ico 1 b).filter
+        (fun i => p ^ i ≤ k % p ^ i + m % p ^ i)).card ≤
+        boundary := by
+    calc ((Ico 1 b).filter _).card
+        ≤ (Ico 1 (boundary + 1)).card := card_le_card h_subset
+      _ = boundary := by simp [Nat.card_Ico]
+  -- boundary = s + 1 + L ≤ D/6 (from L < D/6 - s)
+  have h_boundary_le : boundary ≤ D / 6 := by omega
+  omega
+
+/-- For arbitrary m, count_high_digits p m D ≤ v_p(C(2m,m)).
+    Each high digit at position i < D forces a carry at position i+1 in m+m
+    (by high_digit_forces_carry). These carries are at distinct positions 1..D,
+    each contributing 1 to v_p via Kummer's theorem. -/
+private lemma count_high_le_valuation (hp : p.Prime) (m D : ℕ) :
+    count_high_digits p m D ≤ padicValNat p ((2 * m).choose m) := by
+  classical
+  by_cases hm : m = 0
+  · subst hm
+    unfold count_high_digits high_digits_finset is_high_digit digit
+    simp only [Nat.zero_div, Nat.zero_mod]
+    rw [Finset.filter_false_of_mem]
+    · simp
+    · intro i _; simp only [not_le]; have := hp.two_le; omega
+  have hm_pos : m ≥ 1 := Nat.pos_of_ne_zero hm
+  let b := max (D + 1) (log p (2 * m) + 1)
+  have hb : log p (2 * m) < b := by
+    show log p (2 * m) < max (D + 1) (log p (2 * m) + 1); omega
+  have hb_gt_D : D < b := by
+    show D < max (D + 1) (log p (2 * m) + 1); omega
+  have hle : m ≤ 2 * m := Nat.le_mul_of_pos_left m (by omega)
+  have h2m_sub : 2 * m - m = m := by omega
+  rw [← Nat.factorization_def _ hp, Nat.factorization_choose hp hle hb, h2m_sub]
+  apply card_le_card_of_injOn (fun j => j + 1)
+  · intro j hj
+    rw [mem_coe] at hj
+    rw [high_digits_finset, mem_filter, mem_range] at hj
+    rw [mem_coe, mem_filter, mem_Ico]
+    refine ⟨⟨Nat.succ_le_succ (Nat.zero_le j),
+      Nat.lt_of_lt_of_le (Nat.succ_lt_succ hj.1) (by omega)⟩,
+      high_digit_forces_carry p m j hj.2⟩
+  · intro x hx y hy hxy
+    rw [mem_coe] at hx hy
+    exact Nat.succ_injective hxy
+
 lemma bad_residue_sets (hp : p.Prime) (hD : D ≥ 16 * (log p (k + 1)) + 16) :
     (∀ m, padicValNat p ((m + k).choose k) > D/6 → 
       m % p^D ∈ (range (p^D)).filter (fun r => cascade_length (p:=p) k D r ≥ D/6 - log p k)) ∧
     (∀ m, padicValNat p ((2 * m).choose m) < D/6 → 
-      m % p^D ∈ (range (p^D)).filter (fun r => count_high_digits p r D < D/6)) := sorry
+      m % p^D ∈ (range (p^D)).filter (fun r => count_high_digits p r D < D/6)) := by
+  have hp_pos : p > 0 := Nat.Prime.pos hp
+  have hpD_pos : p ^ D > 0 := Nat.pos_of_ne_zero (by positivity)
+  constructor
+  · -- Conjunct 1: high valuation on C(m+k,k) → m % p^D has large cascade
+    intro m hv
+    rw [mem_filter]
+    constructor
+    · exact mem_range.mpr (Nat.mod_lt m hpD_pos)
+    · rw [cascade_length_mod_eq k D m hp_pos]
+      have hk : k ≥ 1 := by
+        by_contra hk_lt
+        push_neg at hk_lt
+        interval_cases k
+        simp at hv
+      exact valuation_gt_implies_cascade hp k D m hk hD hv
+  · -- Conjunct 2: low valuation on C(2m,m) → m % p^D has few high digits
+    intro m hv
+    rw [mem_filter]
+    constructor
+    · exact mem_range.mpr (Nat.mod_lt m hpD_pos)
+    · rw [count_high_digits_mod_eq p m D hp_pos]
+      exact Nat.lt_of_le_of_lt (count_high_le_valuation hp m D) hv
 
 lemma count_bad_interval (m0 : ℕ) (hm0 : m0 ≥ p^D) (hD : D ≥ 16 * (log p (k + 1)) + 16)
     (hp : p.Prime) (hp_ge_3 : p ≥ 3) (hk : k ≥ 1) :

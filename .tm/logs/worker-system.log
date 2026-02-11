@@ -14858,3 +14858,2118 @@ $ cd /home/jarred/code/erdos-728b && tm update erdos728b-at0 --state closed --st
 📊 Task erdos728b-at0 completed:
 [2026-02-11T05:17:43.556Z]    Summary: Closed sorry in h_T_val (Lemma3Counting.lean:329). lake build succeeds.
 [2026-02-11T05:17:43.556Z]    Details: Proved `2 * s + 3 ≤ T_val` where `s := Nat.log p k` and `T_val := D / 6`, given `hD : D ≥ 12 * (Nat.log p k + 1) + 6`. This is pure Nat arithmetic: D ≥ 12s + 18 implies D/6 ≥ 2s + 3. Solved by `omega`. No new sorry holes introduced.
+[2026-02-11T05:17:43.561Z] ✅ Closed task erdos728b-at0
+
+[2026-02-11T05:17:43.629Z] 🔄 Checking git status...
+[2026-02-11T05:17:43.643Z] 📝 Committing changes...
+[2026-02-11T05:17:43.691Z] 🚀 Pushing to remote...
+[2026-02-11T05:17:45.446Z] 
+================================================================================
+[2026-02-11T05:17:45.446Z] 📌 Processing task: erdos728b-hga - Close sorry: bad_residue_sets (L3C:143)
+[2026-02-11T05:17:45.446Z]    Role: formalize | Priority: 1 
+[2026-02-11T05:17:45.446Z] ================================================================================
+
+[2026-02-11T05:17:45.451Z] ✓ Claimed task erdos728b-hga
+
+[2026-02-11T05:17:45.451Z] 🤖 Using agent: formalize with models: google-antigravity/claude-opus-4-6-thinking, google-antigravity/gemini-3-pro-high:high
+
+[2026-02-11T05:17:45.451Z] 💭 Starting pi agent session with model: google-antigravity/claude-opus-4-6-thinking...
+[2026-02-11T05:17:45.486Z] 📸 Capturing file state before agent execution...
+[2026-02-11T05:17:45.499Z] ✓ Captured state: 161 tracked, 1 untracked files
+
+[2026-02-11T05:17:49.234Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-hga --status "Reading source files and understanding the sorry target"
+[2026-02-11T05:17:51.009Z] 
+🛠️  Executing tool: read...
+[2026-02-11T05:17:54.522Z] 
+$ cd /home/jarred/code/erdos-728b && ls proofs/
+[2026-02-11T05:17:56.414Z] 
+🛠️  Executing tool: read...
+[2026-02-11T05:18:00.381Z] 
+🛠️  Executing tool: read...
+[2026-02-11T05:18:02.393Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "bad_residue_sets" Erdos/Lemma3Counting.lean
+[2026-02-11T05:18:04.223Z] 
+🛠️  Executing tool: read...
+[2026-02-11T05:18:08.717Z] 
+$ cd /home/jarred/code/erdos-728b && cat Erdos/Digits.lean
+[2026-02-11T05:18:10.878Z] 
+$ cd /home/jarred/code/erdos-728b && cat Erdos/Lemma3Common.lean
+[2026-02-11T05:18:12.560Z] 
+$ cd /home/jarred/code/erdos-728b && cat Erdos/Lemma3Residue.lean
+[2026-02-11T05:18:21.739Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "cascade_length\|count_high_digits\|digit " Erdos/Lemma3Counting.lean | head -20
+[2026-02-11T05:18:27.978Z] 
+$ cd /home/jarred/code/erdos-728b && grep -rn "digit.*mod\|mod.*digit" Erdos/ --include="*.lean" | head -20
+[2026-02-11T05:18:32.814Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-hga --status "Understanding the proof structure - need digit_mod_eq lemma and the two conjuncts"
+[2026-02-11T05:18:39.032Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_bad_residue.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+-- Check if digit is invariant under mod p^D for i < D
+example (p m D i : ℕ) (hp : p > 0) (hi : i < D) : digit p (m % p ^ D) i = digit p m i := by
+  unfold digit
+  rw [Nat.mod_div_eq_of_pow_le (Nat.pow_le_pow_right hp hi)]
+  sorry
+EOF
+lake env lean /tmp/test_bad_residue.lean 2>&1 | head -30
+[2026-02-11T05:18:45.415Z] [overseer] 📝 Cleared poke messages
+[2026-02-11T05:18:45.416Z] [overseer] 💓 Heartbeat #19 complete: No intervention needed. The Tier 0 formalization continues, with erdos728b-hga in progress and multiple unblocked leaf tasks in the backlog. Sorry count is 13.
+[2026-02-11T05:18:50.938Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_bad_residue.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+-- The key identity: (m % p^D) / p^i = (m / p^i) % p^(D-i) for i ≤ D
+example (p m D i : ℕ) (hp : p > 0) (hi : i ≤ D) : m % p ^ D / p ^ i = m / p ^ i % p ^ (D - i) := by
+  exact?
+EOF
+lake env lean /tmp/test_bad_residue.lean 2>&1 | tail -15
+[2026-02-11T05:19:19.117Z] 
+$ cd /home/jarred/code/erdos-728b && grep -r "mod_div\|div_mod" .lake/packages/mathlib/Mathlib/Data/Nat/ --include="*.lean" -l | head -10
+[2026-02-11T05:19:21.858Z] 
+$ cd /home/jarred/code/erdos-728b && grep -rn "mod_pow.*div\|div.*mod_pow\|mod_div_eq" .lake/packages/mathlib/Mathlib/ --include="*.lean" | head -20
+[2026-02-11T05:19:30.568Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_bad_residue.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+-- Try: digit p (m % p^D) i = digit p m i for i < D
+-- digit p m i = (m / p^i) % p
+-- We need: (m % p^D) / p^i % p = m / p^i % p
+-- Key: m % p^D = m % (p^i * p^(D-i)), and we can use Nat.mod_def or similar
+
+-- Try using Nat.mod_mod_of_dvd
+example (p m D i : ℕ) (hp : p > 0) (hi : i < D) : m % p ^ D / p ^ i % p = m / p ^ i % p := by
+  have hpi_pos : p ^ i > 0 := Nat.pos_of_ne_zero (by positivity)
+  -- rewrite p^D as p^i * p^(D-i)
+  have hD_split : p ^ D = p ^ i * p ^ (D - i) := by
+    rw [← pow_add]; congr 1; omega
+  rw [hD_split]
+  rw [Nat.mod_mul_right_div_self]
+  -- Now need: m / p ^ i % (p ^ (D - i)) % p = m / p ^ i % p
+  apply Nat.mod_mod_of_dvd
+  exact dvd_pow_self p (by omega : D - i ≠ 0) |>.symm |> fun h => sorry
+EOF
+lake env lean /tmp/test_bad_residue.lean 2>&1 | tail -15
+[2026-02-11T05:19:42.344Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_bad_residue.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+-- digit p (m % p^D) i = digit p m i for i < D
+lemma digit_mod_pow_eq (p m D i : ℕ) (hp : p > 0) (hi : i < D) : 
+    digit p (m % p ^ D) i = digit p m i := by
+  unfold digit
+  have hpi_pos : p ^ i > 0 := Nat.pos_of_ne_zero (by positivity)
+  have hD_split : p ^ D = p ^ i * p ^ (D - i) := by
+    rw [← pow_add]; congr 1; omega
+  rw [hD_split, Nat.mod_mul_right_div_self]
+  apply Nat.mod_mod_of_dvd
+  exact dvd_pow_self p (by omega : D - i ≠ 0)
+EOF
+lake env lean /tmp/test_bad_residue.lean 2>&1 | tail -15
+[2026-02-11T05:20:09.454Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "sorry" Erdos/Lemma3Counting.lean
+[2026-02-11T05:20:23.927Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_bad_residue2.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+-- Check valuation_le_cascade signature
+#check @valuation_le_cascade
+EOF
+lake env lean /tmp/test_bad_residue2.lean 2>&1
+[2026-02-11T05:21:29.487Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "valuation\|v_p\|padicValNat.*cascade\|cascade.*padicVal" Erdos/Lemma3Counting.lean | head -20
+[2026-02-11T05:21:45.418Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T05:21:45.421Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T05:21:48.979Z] 
+🛠️  Executing tool: read...
+[2026-02-11T05:22:00.762Z] [overseer] 📝 Cleared poke messages
+[2026-02-11T05:22:00.762Z] [overseer] 💓 Heartbeat #20 complete: No intervention needed. Task erdos728b-hga is active and making progress on Tier 0 formalization.
+[2026-02-11T05:22:34.589Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-hga --status "Building helper lemmas: digit_mod_pow_eq, cascade_length_mod, count_high_digits_mod"
+[2026-02-11T05:22:47.521Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_helpers.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+-- Helper 1: digit p (m % p^D) i = digit p m i for i < D
+lemma digit_mod_pow_eq (p m D i : ℕ) (hp : p > 0) (hi : i < D) : 
+    digit p (m % p ^ D) i = digit p m i := by
+  unfold digit
+  have hD_split : p ^ D = p ^ i * p ^ (D - i) := by
+    rw [← pow_add]; congr 1; omega
+  rw [hD_split, Nat.mod_mul_right_div_self]
+  apply Nat.mod_mod_of_dvd
+  exact dvd_pow_self p (by omega : D - i ≠ 0)
+
+-- Helper 2: cascade_length only depends on m mod p^D
+lemma cascade_length_mod_eq {p : ℕ} (k D m : ℕ) (hp : p > 0) (hD : D ≥ log p k + 1) :
+    cascade_length (p := p) k D (m % p ^ D) = cascade_length (p := p) k D m := by
+  unfold cascade_length
+  congr 1
+  apply List.takeWhile_ext
+  intro i hi
+  -- i is in List.range (D - (log p k + 1)), so i < D - (log p k + 1)
+  rw [List.mem_range] at hi
+  have hi_lt_D : log p k + 1 + i < D := by omega
+  rw [digit_mod_pow_eq p m D (log p k + 1 + i) hp hi_lt_D]
+
+-- Helper 3: count_high_digits only depends on m mod p^D
+lemma count_high_digits_mod_eq (p m D : ℕ) (hp : p > 0) :
+    count_high_digits p (m % p ^ D) D = count_high_digits p m D := by
+  unfold count_high_digits high_digits_finset is_high_digit
+  congr 1
+  ext i
+  simp only [mem_filter, mem_range]
+  constructor
+  · intro ⟨hi, hd⟩; exact ⟨hi, by rw [digit_mod_pow_eq p m D i hp hi] at hd; exact hd⟩
+  · intro ⟨hi, hd⟩; exact ⟨hi, by rw [digit_mod_pow_eq p m D i hp hi]; exact hd⟩
+EOF
+lake env lean /tmp/test_helpers.lean 2>&1
+[2026-02-11T05:22:57.338Z] 
+$ cd /home/jarred/code/erdos-728b && grep -rn "takeWhile" .lake/packages/mathlib/Mathlib/Data/List/ --include="*.lean" | grep -i "ext\|congr" | head -10
+[2026-02-11T05:23:01.405Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_tw.lean << 'EOF'
+import Mathlib.Data.List.Basic
+
+#check @List.takeWhile_eq_takeWhile_iff
+#check @List.takeWhile
+-- Search for something about takeWhile extensionality
+example (l : List ℕ) (p q : ℕ → Bool) (h : ∀ x, x ∈ l → p x = q x) :
+    l.takeWhile p = l.takeWhile q := by
+  exact?
+EOF
+lake env lean /tmp/test_tw.lean 2>&1 | tail -10
+[2026-02-11T05:23:10.320Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_tw.lean << 'EOF'
+import Mathlib.Data.List.Basic
+
+-- Try to prove takeWhile extensionality by induction
+example (l : List ℕ) (p q : ℕ → Bool) (h : ∀ x, x ∈ l → p x = q x) :
+    l.takeWhile p = l.takeWhile q := by
+  induction l with
+  | nil => simp
+  | cons a t ih =>
+    simp only [List.takeWhile_cons]
+    rw [h a (List.mem_cons_self a t)]
+    split
+    · congr 1; exact ih (fun x hx => h x (List.mem_cons_of_mem a hx))
+    · rfl
+EOF
+lake env lean /tmp/test_tw.lean 2>&1
+[2026-02-11T05:23:16.675Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_tw.lean << 'EOF'
+import Mathlib.Data.List.Basic
+
+example (l : List ℕ) (p q : ℕ → Bool) (h : ∀ x, x ∈ l → p x = q x) :
+    l.takeWhile p = l.takeWhile q := by
+  induction l with
+  | nil => simp
+  | cons a t ih =>
+    simp only [List.takeWhile_cons]
+    rw [h a (List.mem_cons_self _ _)]
+    split
+    · congr 1; exact ih (fun x hx => h x (List.mem_cons_of_mem _ hx))
+    · rfl
+EOF
+lake env lean /tmp/test_tw.lean 2>&1
+[2026-02-11T05:23:21.849Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_tw.lean << 'EOF'
+import Mathlib.Data.List.Basic
+
+#check @List.mem_cons_self
+#print List.mem_cons_self
+EOF
+lake env lean /tmp/test_tw.lean 2>&1
+[2026-02-11T05:23:27.710Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_tw.lean << 'EOF'
+import Mathlib.Data.List.Basic
+
+example (l : List ℕ) (p q : ℕ → Bool) (h : ∀ x, x ∈ l → p x = q x) :
+    l.takeWhile p = l.takeWhile q := by
+  induction l with
+  | nil => simp
+  | cons a t ih =>
+    simp only [List.takeWhile_cons]
+    rw [h a List.mem_cons_self]
+    split
+    · congr 1; exact ih (fun x hx => h x (List.mem_cons_of_mem _ hx))
+    · rfl
+EOF
+lake env lean /tmp/test_tw.lean 2>&1
+[2026-02-11T05:23:44.610Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_helpers2.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+-- Helper 1: digit p (m % p^D) i = digit p m i for i < D
+lemma digit_mod_pow_eq' (p m D i : ℕ) (hp : p > 0) (hi : i < D) : 
+    digit p (m % p ^ D) i = digit p m i := by
+  unfold digit
+  have hD_split : p ^ D = p ^ i * p ^ (D - i) := by
+    rw [← pow_add]; congr 1; omega
+  rw [hD_split, Nat.mod_mul_right_div_self]
+  apply Nat.mod_mod_of_dvd
+  exact dvd_pow_self p (by omega : D - i ≠ 0)
+
+-- Helper: takeWhile ext for decidable props
+private lemma takeWhile_congr {l : List ℕ} {p q : ℕ → Bool} 
+    (h : ∀ x, x ∈ l → p x = q x) : l.takeWhile p = l.takeWhile q := by
+  induction l with
+  | nil => simp
+  | cons a t ih =>
+    simp only [List.takeWhile_cons]
+    rw [h a List.mem_cons_self]
+    split
+    · congr 1; exact ih (fun x hx => h x (List.mem_cons_of_mem _ hx))
+    · rfl
+
+-- Helper 2: cascade_length only depends on m mod p^D
+lemma cascade_length_mod_eq' {p : ℕ} (k D m : ℕ) (hp : p > 0) :
+    cascade_length (p := p) k D (m % p ^ D) = cascade_length (p := p) k D m := by
+  unfold cascade_length
+  simp only
+  congr 1
+  apply takeWhile_congr
+  intro i hi
+  rw [List.mem_range] at hi
+  -- i < D - (log p k + 1), so log p k + 1 + i < D
+  have hi_lt_D : log p k + 1 + i < D := by omega
+  simp only [decide_eq_decide]
+  rw [digit_mod_pow_eq' p m D (log p k + 1 + i) hp hi_lt_D]
+EOF
+lake env lean /tmp/test_helpers2.lean 2>&1
+[2026-02-11T05:24:56.503Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_full.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+set_option linter.unusedVariables false
+
+-- Helper: digit p (m % p^D) i = digit p m i for i < D
+private lemma digit_mod_pow_eq (p m D i : ℕ) (hp : p > 0) (hi : i < D) : 
+    digit p (m % p ^ D) i = digit p m i := by
+  unfold digit
+  have hD_split : p ^ D = p ^ i * p ^ (D - i) := by
+    rw [← pow_add]; congr 1; omega
+  rw [hD_split, Nat.mod_mul_right_div_self]
+  apply Nat.mod_mod_of_dvd
+  exact dvd_pow_self p (by omega : D - i ≠ 0)
+
+-- Helper: takeWhile extensionality
+private lemma takeWhile_congr' {l : List ℕ} {p q : ℕ → Bool} 
+    (h : ∀ x, x ∈ l → p x = q x) : l.takeWhile p = l.takeWhile q := by
+  induction l with
+  | nil => simp
+  | cons a t ih =>
+    simp only [List.takeWhile_cons]
+    rw [h a List.mem_cons_self]
+    split
+    · congr 1; exact ih (fun x hx => h x (List.mem_cons_of_mem _ hx))
+    · rfl
+
+-- cascade_length only depends on m mod p^D
+private lemma cascade_length_mod_eq {p : ℕ} (k D m : ℕ) (hp : p > 0) :
+    cascade_length (p := p) k D (m % p ^ D) = cascade_length (p := p) k D m := by
+  unfold cascade_length
+  simp only
+  congr 1
+  apply takeWhile_congr'
+  intro i hi
+  rw [List.mem_range] at hi
+  simp only [decide_eq_decide]
+  rw [digit_mod_pow_eq p m D (log p k + 1 + i) hp (by omega)]
+
+-- count_high_digits only depends on m mod p^D
+private lemma count_high_digits_mod_eq (p m D : ℕ) (hp : p > 0) :
+    count_high_digits p (m % p ^ D) D = count_high_digits p m D := by
+  unfold count_high_digits high_digits_finset is_high_digit
+  congr 1
+  ext i
+  simp only [mem_filter, mem_range]
+  constructor
+  · intro ⟨hi, hd⟩; exact ⟨hi, by rw [digit_mod_pow_eq p m D i hp hi] at hd; exact hd⟩
+  · intro ⟨hi, hd⟩; exact ⟨hi, by rw [digit_mod_pow_eq p m D i hp hi]; exact hd⟩
+
+/-- STUB: For arbitrary m, v_p(C(m+k,k)) > D/6 implies the cascade within D digits
+    is at least D/6 - log p k. This follows from carry_propagate (contrapositive):
+    if cascade < D/6 - s, no carry reaches position s+1+cascade+1, so total
+    carries ≤ (s+1) + cascade < D/6 + 1, contradicting v_p > D/6.
+    Needs: formalization of Kummer's theorem carry count for arbitrary m. -/
+private lemma valuation_gt_implies_cascade {p : ℕ} (hp : p.Prime) (k D m : ℕ)
+    (hk : k ≥ 1) (hD : D ≥ 16 * (log p (k + 1)) + 16) :
+    padicValNat p ((m + k).choose k) > D / 6 →
+    cascade_length (p := p) k D m ≥ D / 6 - log p k := by
+  sorry
+
+/-- STUB: For arbitrary m, count_high_digits p m D ≤ v_p(C(2m,m)).
+    Each high digit at position i < D forces a carry at position i in m+m,
+    contributing 1 to v_p. The current formalization (valuation_ge_high_digits)
+    requires log p (2m) < D+1, but the result holds without this condition since
+    carries at positions 0..D-1 always contribute to the total valuation. -/
+private lemma count_high_le_valuation {p : ℕ} (hp : p.Prime) (m D : ℕ) :
+    count_high_digits p m D ≤ padicValNat p ((2 * m).choose m) := by
+  sorry
+
+EOF
+lake env lean /tmp/test_full.lean 2>&1
+[2026-02-11T05:25:00.765Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T05:25:00.770Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T05:25:15.558Z] 
+$ cd /home/jarred/code/erdos-728b && cat >> /tmp/test_full.lean << 'EOF'
+
+-- Now prove bad_residue_sets using the helpers
+example {p : ℕ} {D k : ℕ} (hp : p.Prime) (hD : D ≥ 16 * (log p (k + 1)) + 16) :
+    (∀ m, padicValNat p ((m + k).choose k) > D/6 → 
+      m % p^D ∈ (range (p^D)).filter (fun r => cascade_length (p:=p) k D r ≥ D/6 - log p k)) ∧
+    (∀ m, padicValNat p ((2 * m).choose m) < D/6 → 
+      m % p^D ∈ (range (p^D)).filter (fun r => count_high_digits p r D < D/6)) := by
+  have hp_pos : p > 0 := Nat.Prime.pos hp
+  have hpD_pos : p ^ D > 0 := Nat.pos_of_ne_zero (by positivity)
+  constructor
+  · -- Conjunct 1: high valuation → cascade residue
+    intro m hv
+    rw [mem_filter]
+    constructor
+    · exact mem_range.mpr (Nat.mod_lt m hpD_pos)
+    · -- cascade_length of (m % p^D) ≥ D/6 - log p k
+      rw [cascade_length_mod_eq k D m hp_pos]
+      have hk : k ≥ 1 := by
+        by_contra hk_lt
+        push_neg at hk_lt
+        interval_cases k
+        simp at hv
+      exact valuation_gt_implies_cascade hp k D m hk hD hv
+  · -- Conjunct 2: low valuation → few high digits residue
+    intro m hv
+    rw [mem_filter]
+    constructor
+    · exact mem_range.mpr (Nat.mod_lt m hpD_pos)
+    · -- count_high_digits of (m % p^D) < D/6
+      rw [count_high_digits_mod_eq p m D hp_pos]
+      exact Nat.lt_of_le_of_lt (count_high_le_valuation hp m D) hv
+EOF
+lake env lean /tmp/test_full.lean 2>&1
+[2026-02-11T05:25:26.139Z] 
+$ cd /home/jarred/code/erdos-728b && cat >> /tmp/test_full.lean << 'EOF2'
+
+-- Verify the example compiled
+#check @Nat.mod_lt
+EOF2
+lake env lean /tmp/test_full.lean 2>&1
+[2026-02-11T05:25:46.334Z] [overseer] 📝 Cleared poke messages
+[2026-02-11T05:25:46.336Z] [overseer] 💓 Heartbeat #21 complete: No intervention needed. Task erdos728b-hga is making steady progress, having already proven the invariance of cascade length and high digit count under mod p^D. Tier 0 leaf tasks remain unblocked.
+[2026-02-11T05:26:01.169Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_full2.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+set_option linter.unusedVariables false
+
+private lemma digit_mod_pow_eq (p m D i : ℕ) (hp : p > 0) (hi : i < D) : 
+    digit p (m % p ^ D) i = digit p m i := by
+  unfold digit
+  have hD_split : p ^ D = p ^ i * p ^ (D - i) := by
+    rw [← pow_add]; congr 1; omega
+  rw [hD_split, Nat.mod_mul_right_div_self]
+  apply Nat.mod_mod_of_dvd
+  exact dvd_pow_self p (by omega : D - i ≠ 0)
+
+private lemma takeWhile_congr' {l : List ℕ} {p q : ℕ → Bool} 
+    (h : ∀ x, x ∈ l → p x = q x) : l.takeWhile p = l.takeWhile q := by
+  induction l with
+  | nil => simp
+  | cons a t ih =>
+    simp only [List.takeWhile_cons]
+    rw [h a List.mem_cons_self]
+    split
+    · congr 1; exact ih (fun x hx => h x (List.mem_cons_of_mem _ hx))
+    · rfl
+
+private lemma cascade_length_mod_eq {p : ℕ} (k D m : ℕ) (hp : p > 0) :
+    cascade_length (p := p) k D (m % p ^ D) = cascade_length (p := p) k D m := by
+  unfold cascade_length
+  simp only
+  congr 1
+  apply takeWhile_congr'
+  intro i hi
+  rw [List.mem_range] at hi
+  simp only [decide_eq_decide]
+  rw [digit_mod_pow_eq p m D (log p k + 1 + i) hp (by omega)]
+
+private lemma count_high_digits_mod_eq (p m D : ℕ) (hp : p > 0) :
+    count_high_digits p (m % p ^ D) D = count_high_digits p m D := by
+  unfold count_high_digits high_digits_finset is_high_digit
+  congr 1
+  ext i
+  simp only [mem_filter, mem_range]
+  constructor
+  · intro ⟨hi, hd⟩; exact ⟨hi, by rw [digit_mod_pow_eq p m D i hp hi] at hd; exact hd⟩
+  · intro ⟨hi, hd⟩; exact ⟨hi, by rw [digit_mod_pow_eq p m D i hp hi]; exact hd⟩
+
+/-- STUCK: For arbitrary m, v_p(C(m+k,k)) > D/6 implies the cascade within D digits
+    is at least D/6 - log p k. This follows from carry_propagate (contrapositive):
+    if cascade < D/6 - s, no carry reaches position s+1+cascade+1, so total
+    carries ≤ (s+1) + cascade < D/6 + 1, contradicting v_p > D/6.
+    Needs: formalization of Kummer's carry count as a sum over all positions,
+    then induction using carry_propagate to show carries beyond cascade are 0. -/
+private lemma valuation_gt_implies_cascade {p : ℕ} (hp : p.Prime) (k D m : ℕ)
+    (hk : k ≥ 1) (hD : D ≥ 16 * (log p (k + 1)) + 16) :
+    padicValNat p ((m + k).choose k) > D / 6 →
+    cascade_length (p := p) k D m ≥ D / 6 - log p k := by
+  sorry
+
+/-- STUCK: For arbitrary m, count_high_digits p m D ≤ v_p(C(2m,m)).
+    Each high digit at position i < D forces a carry at position i in m+m (Lemma B1),
+    contributing 1 to v_p. The existing valuation_ge_high_digits requires
+    log p (2m) < D+1. This general version needs Kummer's carry formulation
+    without the log bound restriction, or a direct argument about carries. -/
+private lemma count_high_le_valuation {p : ℕ} (hp : p.Prime) (m D : ℕ) :
+    count_high_digits p m D ≤ padicValNat p ((2 * m).choose m) := by
+  sorry
+
+lemma bad_residue_sets' {p : ℕ} (D k : ℕ) (hp : p.Prime) (hD : D ≥ 16 * (log p (k + 1)) + 16) :
+    (∀ m, padicValNat p ((m + k).choose k) > D/6 → 
+      m % p^D ∈ (range (p^D)).filter (fun r => cascade_length (p:=p) k D r ≥ D/6 - log p k)) ∧
+    (∀ m, padicValNat p ((2 * m).choose m) < D/6 → 
+      m % p^D ∈ (range (p^D)).filter (fun r => count_high_digits p r D < D/6)) := by
+  have hp_pos : p > 0 := Nat.Prime.pos hp
+  have hpD_pos : p ^ D > 0 := Nat.pos_of_ne_zero (by positivity)
+  constructor
+  · intro m hv
+    rw [mem_filter]
+    constructor
+    · exact mem_range.mpr (Nat.mod_lt m hpD_pos)
+    · rw [cascade_length_mod_eq k D m hp_pos]
+      have hk : k ≥ 1 := by
+        by_contra hk_lt
+        push_neg at hk_lt
+        interval_cases k
+        simp at hv
+      exact valuation_gt_implies_cascade hp k D m hk hD hv
+  · intro m hv
+    rw [mem_filter]
+    constructor
+    · exact mem_range.mpr (Nat.mod_lt m hpD_pos)
+    · rw [count_high_digits_mod_eq p m D hp_pos]
+      exact Nat.lt_of_le_of_lt (count_high_le_valuation hp m D) hv
+EOF
+lake env lean /tmp/test_full2.lean 2>&1
+[2026-02-11T05:26:13.737Z] 
+$ cd /home/jarred/code/erdos-728b && echo '#check @bad_residue_sets'"'" >> /tmp/test_full2.lean && lake env lean /tmp/test_full2.lean 2>&1 | tail -5
+[2026-02-11T05:26:47.623Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_high.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+-- For arbitrary m, count_high_digits p m D ≤ v_p(C(2m,m))
+-- The existing valuation_ge_high_digits requires log p (2m) < D+1
+-- Let's try: if m = 0, both sides are 0. If m > 0, we need to handle it.
+-- Actually, if log p (2m) ≥ D + 1, then 2m ≥ p^(D+1).
+-- But count_high_digits only counts D digits, so it's ≤ D.
+-- And v_p(C(2m,m)) ≥ count of carries at ALL positions ≥ D digits with high values.
+-- We can prove this by extending valuation_ge_high_digits or by a direct argument.
+
+-- Actually, let me check: maybe we can always ensure log p (2m) < D + 1 
+-- by reducing to m mod p^D?
+-- No, that would change the binomial coefficient.
+
+-- Key insight: Nat.factorization_choose hp requires log p (2m) < D+1.
+-- But high_digit_forces_carry works for any position i regardless of m's size.
+-- The factorization_choose formula sums carries at positions 1..log_p(2m).
+-- For i+1 ≤ D (i.e., i < D), the carry at position i+1 is determined by m mod p^(i+1).
+-- Each high digit at position i creates a carry that contributes to the sum.
+
+-- The connection: v_p(C(2m,m)) = sum over j≥1 of floor((2m mod p^j + 2m mod p^j - 2m mod p^j) / p^j)
+-- No, Kummer: v_p(C(2m,m)) = # carries in m + m in base p.
+
+-- Let me try a different approach: bound factorization directly
+-- Actually, for the case where m is large, v_p(C(2m,m)) is even larger.
+-- The key is that v_p(C(2m,m)) ≥ number of carries at positions 0..D-1.
+-- Each high digit forces a carry (by high_digit_forces_carry).
+-- So v_p(C(2m,m)) ≥ count of high digits at positions 0..D-1 = count_high_digits p m D.
+
+-- The issue is connecting "carries at positions 0..D-1" to v_p.
+-- v_p(C(2m,m)) = (sum of carries at positions 0..D-1) + (carries at positions ≥ D) ≥ carries at 0..D-1.
+
+-- Can we express v_p as a sum? Yes: 
+-- v_p(C(a+b,a)) = sum_{i≥1} floor((a%p^i + b%p^i) / p^i) - floor(a%p^i / p^i) - floor(b%p^i / p^i)
+-- For C(2m,m): a=b=m, so each term is floor((2*(m%p^i))/p^i) - 2*floor((m%p^i)/p^i)
+-- But this is complicated.
+
+-- Alternative: Use the Legendre formula directly.
+-- v_p(n!) = sum_{i≥1} floor(n/p^i)
+-- v_p(C(2m,m)) = v_p((2m)!) - 2*v_p(m!) = sum_{i≥1} (floor(2m/p^i) - 2*floor(m/p^i))
+
+-- Each term floor(2m/p^i) - 2*floor(m/p^i) ∈ {0, 1}.
+-- It equals 1 iff 2*(m mod p^i) ≥ p^i, i.e., the carry condition at position i.
+
+-- So v_p(C(2m,m)) = sum_{i≥1} 1_{carry at position i}
+-- And count_high_digits p m D = #{j ∈ 0..D-1 : digit j is high}
+-- By high_digit_forces_carry: if digit j is high, then 2*(m%p^(j+1)) ≥ p^(j+1), i.e., carry at j+1.
+-- So {j : digit j is high} ⊆ {j : carry at j+1 - 1}, meaning count_high_digits ≤ #{i ∈ 1..D : carry at i} ≤ v_p(C(2m,m)).
+
+-- This is essentially what lower_bound_valuation_by_high_digits does, but that uses 
+-- Nat.factorization_choose which requires a log bound.
+
+-- Let me check if Nat.factorization_choose works without the log bound or if we can use 
+-- the Legendre formula directly.
+
+#check @Nat.factorization_choose
+EOF
+lake env lean /tmp/test_count_high.lean 2>&1 | grep "factorization_choose"
+[2026-02-11T05:26:57.734Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_fc.lean << 'EOF'
+import Mathlib.Data.Nat.Choose.Factorization
+
+#print Nat.factorization_choose
+EOF
+lake env lean /tmp/test_fc.lean 2>&1 | head -20
+[2026-02-11T05:27:26.887Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_high2.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+set_option linter.unusedVariables false
+
+-- For arbitrary m, count_high_digits p m D ≤ v_p(C(2m,m))
+lemma count_high_le_valuation' {p : ℕ} (hp : p.Prime) (m D : ℕ) :
+    count_high_digits p m D ≤ padicValNat p ((2 * m).choose m) := by
+  -- Handle m = 0 case
+  by_cases hm : m = 0
+  · simp [hm, count_high_digits, high_digits_finset, is_high_digit, digit]
+  have hm_pos : m ≥ 1 := Nat.pos_of_ne_zero hm
+  -- Use factorization_choose with b = max(D+1, log p (2m) + 1)
+  let b := max (D + 1) (log p (2 * m) + 1)
+  have hb : log p (2 * m) < b := by omega
+  have hle : m ≤ 2 * m := Nat.le_mul_of_pos_left m (by omega)
+  rw [Nat.factorization_def _ hp]
+  rw [Nat.factorization_choose hp hle hb]
+  -- Now: count_high_digits p m D ≤ card of {i ∈ Ico 1 b : p^i ≤ m%p^i + (2m-m)%p^i}
+  -- Simplify: 2m - m = m
+  have h2m_sub : 2 * m - m = m := by omega
+  rw [h2m_sub]
+  -- count_high_digits = card of {j ∈ range D : is_high_digit p m j}
+  -- We inject via j ↦ j + 1: {j ∈ range D : high digit j} → {i ∈ Ico 1 b : carry at i}
+  apply card_le_card_of_injOn (fun j => j + 1)
+  · -- maps high digit positions into carry positions
+    intro j hj
+    simp only [mem_coe, high_digits_finset, mem_filter, mem_range] at hj
+    simp only [mem_coe, mem_filter, mem_Ico]
+    constructor
+    · constructor
+      · omega
+      · omega  -- j + 1 ≤ D + 1 ≤ b
+    · -- carry condition at j+1: p^(j+1) ≤ m % p^(j+1) + m % p^(j+1)
+      exact high_digit_forces_carry p m j hj.2
+  · -- injectivity
+    intros x _ y _ hxy
+    omega
+EOF
+lake env lean /tmp/test_count_high2.lean 2>&1
+[2026-02-11T05:27:45.152Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_high3.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+set_option linter.unusedVariables false
+
+-- m=0 case separately
+private lemma count_high_zero (p D : ℕ) (hp : p > 0) : count_high_digits p 0 D = 0 := by
+  unfold count_high_digits high_digits_finset is_high_digit digit
+  simp [Nat.zero_div, Nat.zero_mod]
+  intro i _
+  omega
+
+-- For arbitrary m, count_high_digits p m D ≤ v_p(C(2m,m))
+lemma count_high_le_valuation' {p : ℕ} (hp : p.Prime) (m D : ℕ) :
+    count_high_digits p m D ≤ padicValNat p ((2 * m).choose m) := by
+  by_cases hm : m = 0
+  · rw [hm, count_high_zero p D hp.pos]; exact Nat.zero_le _
+  have hm_pos : m ≥ 1 := Nat.pos_of_ne_zero hm
+  let b := max (D + 1) (log p (2 * m) + 1)
+  have hb : log p (2 * m) < b := by omega
+  have hle : m ≤ 2 * m := Nat.le_mul_of_pos_left m (by omega)
+  have h2m_sub : 2 * m - m = m := by omega
+  -- Rewrite padicValNat using factorization
+  rw [← Nat.factorization_def _ hp, Nat.factorization_choose hp hle hb, h2m_sub]
+  -- Now need: count_high_digits ≤ #{i ∈ Ico 1 b : p^i ≤ m%p^i + m%p^i}
+  apply card_le_card_of_injOn (fun j => j + 1)
+  · intro j hj
+    simp only [mem_coe, high_digits_finset, mem_filter, mem_range] at hj
+    simp only [mem_coe, mem_filter, mem_Ico]
+    exact ⟨⟨by omega, by omega⟩, high_digit_forces_carry p m j hj.2⟩
+  · intros x _ y _ hxy; omega
+EOF
+lake env lean /tmp/test_count_high3.lean 2>&1
+[2026-02-11T05:27:57.817Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_high4.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+set_option linter.unusedVariables false
+
+-- Check what the simp produces for m=0
+example (p D : ℕ) (hp : p > 0) : count_high_digits p 0 D = 0 := by
+  unfold count_high_digits high_digits_finset is_high_digit digit
+  simp [Nat.zero_div, Nat.zero_mod]
+  -- The goal after simp should be: filter on range D where (p+1)/2 ≤ 0 is empty
+  sorry
+EOF
+lake env lean /tmp/test_count_high4.lean 2>&1 | tail -10
+[2026-02-11T05:28:09.244Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_high4.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+set_option linter.unusedVariables false
+
+example (p D : ℕ) (hp : p > 0) : count_high_digits p 0 D = 0 := by
+  unfold count_high_digits high_digits_finset is_high_digit digit
+  simp only [Nat.zero_div, Nat.zero_mod]
+  -- What does the goal look like?
+  rw [Finset.filter_false_of_mem]
+  · exact Finset.card_empty
+  · intro i _
+    omega
+EOF
+lake env lean /tmp/test_count_high4.lean 2>&1
+[2026-02-11T05:28:27.914Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_high5.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+set_option linter.unusedVariables false
+
+lemma count_high_le_valuation' {p : ℕ} (hp : p.Prime) (m D : ℕ) :
+    count_high_digits p m D ≤ padicValNat p ((2 * m).choose m) := by
+  by_cases hm : m = 0
+  · subst hm
+    unfold count_high_digits high_digits_finset is_high_digit digit
+    simp only [Nat.zero_div, Nat.zero_mod]
+    rw [Finset.filter_false_of_mem]
+    · exact Nat.zero_le _
+    · intro i _; omega
+  have hm_pos : m ≥ 1 := Nat.pos_of_ne_zero hm
+  let b := max (D + 1) (log p (2 * m) + 1)
+  have hb : log p (2 * m) < b := by simp [b]; omega
+  have hle : m ≤ 2 * m := Nat.le_mul_of_pos_left m (by omega)
+  have h2m_sub : 2 * m - m = m := by omega
+  rw [← Nat.factorization_def _ hp, Nat.factorization_choose hp hle hb, h2m_sub]
+  apply card_le_card_of_injOn (fun j => j + 1)
+  · intro j hj
+    simp only [mem_coe, high_digits_finset, mem_filter, mem_range] at hj
+    simp only [mem_coe, mem_filter, mem_Ico]
+    constructor
+    · constructor
+      · omega
+      · simp [b]; omega  -- j + 1 ≤ D < D + 1 ≤ b
+    · exact high_digit_forces_carry p m j hj.2
+  · intros x _ y _ hxy; omega
+EOF
+lake env lean /tmp/test_count_high5.lean 2>&1
+[2026-02-11T05:28:42.863Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_high6.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+set_option linter.unusedVariables false
+
+-- m=0: check what the goal looks like
+example (p D : ℕ) (hp : Nat.Prime p) : count_high_digits p 0 D = 0 := by
+  unfold count_high_digits high_digits_finset is_high_digit digit
+  simp only [Nat.zero_div, Nat.zero_mod]
+  -- goal should be card of filter ≤ something
+  convert Finset.card_empty
+  rw [Finset.eq_empty_iff_forall_not_mem]
+  intro i
+  simp only [mem_filter, mem_range, not_and]
+  intro _
+  have := Nat.Prime.two_le hp
+  omega
+EOF
+lake env lean /tmp/test_count_high6.lean 2>&1
+[2026-02-11T05:28:46.341Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T05:28:46.345Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T05:28:54.131Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_high6.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+set_option linter.unusedVariables false
+
+example (p D : ℕ) (hp : Nat.Prime p) : count_high_digits p 0 D = 0 := by
+  unfold count_high_digits high_digits_finset is_high_digit digit
+  simp only [Nat.zero_div, Nat.zero_mod]
+  rw [Finset.filter_false_of_mem]
+  · simp
+  · intro i _
+    have := Nat.Prime.two_le hp
+    simp only [not_le]
+    omega
+EOF
+lake env lean /tmp/test_count_high6.lean 2>&1
+[2026-02-11T05:29:16.176Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_inj.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+-- The injection needs j + 1 < b where j < D and b = max (D + 1) (log p (2 * m) + 1)
+example (j D : ℕ) (hj : j < D) (b : ℕ) (hb : b = max (D + 1) (log 2 (2 * 3) + 1)) :
+    j + 1 < b := by
+  omega
+
+-- The omega issue was about y, not about j+1 < b. Let me re-read the error.
+-- The error said j+1 < b was fine but the overall Ico membership wasn't.
+-- Actually the error mentions variables e, f (y, x from injectivity). 
+-- The injectivity proof x _ y _ hxy seems OK with omega on x+1 = y+1 → x = y.
+-- Wait, maybe the issue was in the "maps into" part, not injectivity.
+
+-- Let me re-check. The error was:
+-- omega could not prove the goal:
+--  g ≥ 0, f ≥ 0, e ≥ 0, e - f ≥ 1, d ≥ 0, c ≥ 1, a ≥ 0, a - g ≥ 0
+-- This looks like the injectivity proof, where x and y from coe need to satisfy x+1 = y+1 → x = y.
+-- But omega should handle that... The constraint says e - f ≥ 1 which means y - x ≥ 1 (y ≠ x).
+-- And d = (fun j => j+1) y = y + 1. But there's no constraint forcing x+1 = y+1.
+-- Hmm, maybe the issue is that hxy isn't properly being used.
+
+-- Actually wait, `intros x _ y _ hxy; omega` should work for injectivity on ℕ.
+-- Let me check: the issue might be that card_le_card_of_injOn wants InjOn on coe...
+EOF
+lake env lean /tmp/test_inj.lean 2>&1
+[2026-02-11T05:29:17.284Z] [overseer] 📝 Cleared poke messages
+[2026-02-11T05:29:17.285Z] [overseer] 💓 Heartbeat #22 complete: No intervention needed. Task erdos728b-hga is active and Tier 0 leaf tasks remain unblocked in the queue.
+[2026-02-11T05:29:34.521Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_high7.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+set_option linter.unusedVariables false
+
+lemma count_high_le_valuation' {p : ℕ} (hp : p.Prime) (m D : ℕ) :
+    count_high_digits p m D ≤ padicValNat p ((2 * m).choose m) := by
+  by_cases hm : m = 0
+  · subst hm
+    unfold count_high_digits high_digits_finset is_high_digit digit
+    simp only [Nat.zero_div, Nat.zero_mod]
+    rw [Finset.filter_false_of_mem]
+    · simp
+    · intro i _; simp only [not_le]; have := hp.two_le; omega
+  have hm_pos : m ≥ 1 := Nat.pos_of_ne_zero hm
+  let b := max (D + 1) (log p (2 * m) + 1)
+  have hb : log p (2 * m) < b := by simp [b]; omega
+  have hb_gt_D : D < b := by simp [b]; omega
+  have hle : m ≤ 2 * m := Nat.le_mul_of_pos_left m (by omega)
+  have h2m_sub : 2 * m - m = m := by omega
+  rw [← Nat.factorization_def _ hp, Nat.factorization_choose hp hle hb, h2m_sub]
+  apply card_le_card_of_injOn (fun j => j + 1)
+  · intro j hj
+    rw [mem_coe] at hj
+    simp only [high_digits_finset, mem_filter, mem_range] at hj
+    rw [mem_coe, mem_filter, mem_Ico]
+    exact ⟨⟨by omega, by omega⟩, high_digit_forces_carry p m j hj.2⟩
+  · intro x hx y hy hxy
+    rw [mem_coe] at hx hy
+    omega
+EOF
+lake env lean /tmp/test_count_high7.lean 2>&1
+[2026-02-11T05:29:50.933Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_high8.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+set_option linter.unusedVariables false
+
+-- Check what rw does to factorization_def and factorization_choose
+example {p : ℕ} (hp : p.Prime) (m D : ℕ) (hm : m ≥ 1) :
+    count_high_digits p m D ≤ padicValNat p ((2 * m).choose m) := by
+  let b := max (D + 1) (log p (2 * m) + 1)
+  have hb : log p (2 * m) < b := by simp [b]; omega
+  have hle : m ≤ 2 * m := Nat.le_mul_of_pos_left m (by omega)
+  have h2m_sub : 2 * m - m = m := by omega
+  -- Let's see what happens step by step
+  have key : padicValNat p ((2 * m).choose m) = 
+      ((Ico 1 b).filter (fun i => p ^ i ≤ m % p ^ i + m % p ^ i)).card := by
+    rw [← Nat.factorization_def _ hp, Nat.factorization_choose hp hle hb, h2m_sub]
+  rw [key]
+  sorry
+EOF
+lake env lean /tmp/test_count_high8.lean 2>&1
+[2026-02-11T05:30:04.692Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_high9.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+-- Check factorization_def
+#check @Nat.factorization_def
+-- factorization_def : ∀ {n : ℕ} (p : ℕ), Nat.Prime p → (Nat.factorization n) p = padicValNat p n
+-- So padicValNat p n = (Nat.factorization n) p
+-- And ← factorization_def replaces padicValNat with factorization
+
+example {p : ℕ} (hp : p.Prime) (m : ℕ) (hm : m ≥ 1) :
+    padicValNat p ((2 * m).choose m) = 
+    ((2 * m).choose m).factorization p := by
+  rw [← Nat.factorization_def _ hp]
+EOF
+lake env lean /tmp/test_count_high9.lean 2>&1
+[2026-02-11T05:30:17.490Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_high10.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+set_option linter.unusedVariables false
+
+example {p : ℕ} (hp : p.Prime) (m D : ℕ) (hm : m ≥ 1) :
+    count_high_digits p m D ≤ padicValNat p ((2 * m).choose m) := by
+  let b := max (D + 1) (log p (2 * m) + 1)
+  have hb : log p (2 * m) < b := by simp [b]; omega
+  have hle : m ≤ 2 * m := Nat.le_mul_of_pos_left m (by omega)
+  have h2m_sub : 2 * m - m = m := by omega
+  -- Rewrite padicValNat to factorization
+  rw [← Nat.factorization_def _ hp]
+  -- Now goal: count_high_digits ≤ ((2*m).choose m).factorization p
+  rw [Nat.factorization_choose hp hle hb]
+  -- Now goal: count_high_digits ≤ card of filter
+  rw [h2m_sub]
+  -- Now: count_high_digits p m D ≤ #{i ∈ Ico 1 b : p^i ≤ m%p^i + m%p^i}
+  sorry
+EOF
+lake env lean /tmp/test_count_high10.lean 2>&1
+[2026-02-11T05:30:29.142Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_high11.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+set_option linter.unusedVariables false
+
+example {p : ℕ} (hp : p.Prime) (m D : ℕ) (hm : m ≥ 1) :
+    count_high_digits p m D ≤ padicValNat p ((2 * m).choose m) := by
+  let b := max (D + 1) (log p (2 * m) + 1)
+  have hb : log p (2 * m) < b := by
+    show log p (2 * m) < max (D + 1) (log p (2 * m) + 1)
+    omega
+  sorry
+EOF
+lake env lean /tmp/test_count_high11.lean 2>&1
+[2026-02-11T05:30:45.605Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_high12.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+set_option linter.unusedVariables false
+
+example {p : ℕ} (hp : p.Prime) (m D : ℕ) (hm : m ≥ 1) :
+    count_high_digits p m D ≤ padicValNat p ((2 * m).choose m) := by
+  let b := max (D + 1) (log p (2 * m) + 1)
+  have hb : log p (2 * m) < b := by
+    show log p (2 * m) < max (D + 1) (log p (2 * m) + 1); omega
+  have hle : m ≤ 2 * m := Nat.le_mul_of_pos_left m (by omega)
+  have h2m_sub : 2 * m - m = m := by omega
+  have hb_gt_D : D + 1 ≤ b := by show D + 1 ≤ max (D + 1) (log p (2 * m) + 1); omega
+  rw [← Nat.factorization_def _ hp, Nat.factorization_choose hp hle hb, h2m_sub]
+  apply card_le_card_of_injOn (fun j => j + 1)
+  · intro j hj
+    rw [mem_coe] at hj
+    rw [high_digits_finset, mem_filter, mem_range] at hj
+    rw [mem_coe, mem_filter, mem_Ico]
+    refine ⟨⟨?_, ?_⟩, ?_⟩
+    · exact Nat.succ_le_succ (Nat.zero_le j)
+    · exact Nat.lt_of_lt_of_le (Nat.succ_lt_succ hj.1) hb_gt_D
+    · exact high_digit_forces_carry p m j hj.2
+  · intro x hx y hy hxy
+    rw [mem_coe] at hx hy
+    exact Nat.succ_injective hxy
+EOF
+lake env lean /tmp/test_count_high12.lean 2>&1
+[2026-02-11T05:30:57.704Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_high13.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+set_option linter.unusedVariables false
+
+-- Check is_high_digit decidability
+#check @instDecidableIsHighDigit -- doesn't exist?
+
+-- is_high_digit p m i = digit p m i ≥ (p + 1) / 2, which is decidable
+instance (p m i : ℕ) : Decidable (is_high_digit p m i) :=
+  inferInstanceAs (Decidable ((p + 1) / 2 ≤ digit p m i))
+EOF
+lake env lean /tmp/test_count_high13.lean 2>&1
+[2026-02-11T05:31:07.412Z] 
+$ cd /home/jarred/code/erdos-728b && grep "Decidable\|decidable\|instance" Erdos/Digits.lean
+[2026-02-11T05:31:10.271Z] 
+$ cd /home/jarred/code/erdos-728b && grep "noncomputable" Erdos/Digits.lean
+[2026-02-11T05:31:20.917Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_high14.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728 Classical
+
+set_option linter.unusedVariables false
+
+example {p : ℕ} (hp : p.Prime) (m D : ℕ) (hm : m ≥ 1) :
+    count_high_digits p m D ≤ padicValNat p ((2 * m).choose m) := by
+  let b := max (D + 1) (log p (2 * m) + 1)
+  have hb : log p (2 * m) < b := by
+    show log p (2 * m) < max (D + 1) (log p (2 * m) + 1); omega
+  have hle : m ≤ 2 * m := Nat.le_mul_of_pos_left m (by omega)
+  have h2m_sub : 2 * m - m = m := by omega
+  have hb_gt_D : D + 1 ≤ b := by show D + 1 ≤ max (D + 1) (log p (2 * m) + 1); omega
+  rw [← Nat.factorization_def _ hp, Nat.factorization_choose hp hle hb, h2m_sub]
+  apply card_le_card_of_injOn (fun j => j + 1)
+  · intro j hj
+    rw [mem_coe] at hj
+    rw [high_digits_finset, mem_filter, mem_range] at hj
+    rw [mem_coe, mem_filter, mem_Ico]
+    refine ⟨⟨?_, ?_⟩, ?_⟩
+    · exact Nat.succ_le_succ (Nat.zero_le j)
+    · exact Nat.lt_of_lt_of_le (Nat.succ_lt_succ hj.1) hb_gt_D
+    · exact high_digit_forces_carry p m j hj.2
+  · intro x hx y hy hxy
+    rw [mem_coe] at hx hy
+    exact Nat.succ_injective hxy
+EOF
+lake env lean /tmp/test_count_high14.lean 2>&1
+[2026-02-11T05:31:36.198Z] 
+$ cd /home/jarred/code/erdos-728b && grep -rn "Kummer\|kummer\|factorization_choose" Erdos/ --include="*.lean" | head -10
+[2026-02-11T05:31:40.224Z] 
+$ cd /home/jarred/code/erdos-728b && read -r -d '' _ <<'EOF'
+Let me check Nat.factorization_choose' signature
+EOF
+cat > /tmp/test_fc2.lean << 'EOF'
+import Mathlib.Data.Nat.Choose.Factorization
+#check @Nat.factorization_choose'
+#print Nat.factorization_choose'
+EOF
+lake env lean /tmp/test_fc2.lean 2>&1 | head -15
+[2026-02-11T05:32:17.288Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T05:32:17.291Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T05:32:42.141Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_cascade.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+set_option linter.unusedVariables false
+set_option maxHeartbeats 400000
+
+-- First, let me prove a key helper: if carry_cond at position j+1 (with j > s),
+-- then digit p m j = p-1.
+-- This is already proved in carry_propagate, but let me extract the part I need.
+
+-- Main lemma: v_p(C(m+k,k)) ≤ (s+1) + cascade_length k D m for arbitrary m
+-- when D is large enough.
+-- The key observation: carries beyond position s + 1 + cascade_length must be 0.
+
+-- Step 1: If cascade_length = L < D - s - 1, then ¬carry_cond at position s+L+2.
+-- Step 2: By carry_propagate, ¬carry_cond at all positions > s+L+1.
+-- Step 3: Total carries ≤ (s+1) + L.
+
+-- Step 1 helper: cascade dies → no carry beyond
+-- If digit p m (s+1+L) ≠ p-1, then ¬carry_cond p k m (s+1+L+1+1)
+-- Actually, carry_propagate says: carry_cond at i AND i > s+1 → digit at i-1 = p-1.
+-- Contrapositive: digit at i-1 ≠ p-1 → ¬carry_cond at i (when i > s+1).
+
+-- But carry_propagate requires k ≥ 1. Let me check.
+
+-- Let me try a cleaner approach: bound total carries directly.
+
+-- For each carry position i in Ico 1 b with i > s+1, carry_propagate gives
+-- digit at i-1 = p-1 and carry at i-1. So by induction down from i to s+2,
+-- digits s+1, s+2, ..., i-2 are all p-1.
+
+-- The maximum carry position beyond s+1 is at most s+1+L+1 (one past the cascade).
+-- Wait: the cascade length L means digits s+1, ..., s+L are p-1, and digit s+1+L ≠ p-1
+-- (or L = D - s - 1). A carry at position s+1+L+1 would require digit s+L = p-1 via
+-- carry_propagate. But digit s+L ≠ p-1 (when L < D-s-1), contradiction.
+
+-- Actually wait, carry_propagate says carry at position i > s+1 implies:
+-- 1) digit at i-1 = p-1
+-- 2) carry at i-1
+-- It does NOT directly say ¬carry at i if digit ≠ p-1. It says the contrapositive.
+
+-- Let me check carry_propagate more carefully:
+-- carry_propagate (hp) (m i) (hi : i > log p k + 1) (h_carry : carry_cond p k m i) (hk : k ≥ 1) :
+--     digit p m (i - 1) = p - 1 ∧ carry_cond p k m (i - 1)
+
+-- So contrapositive: for i > s+1, if digit at i-1 ≠ p-1 OR ¬carry at i-1, then ¬carry at i.
+
+-- I'll prove: for i ≥ s+L+2 (where L = cascade_length, and L < D-s-1), ¬carry_cond at i.
+-- By strong induction: 
+--   Base: at position s+L+2 > s+1. If carry at s+L+2, then digit at s+L+1 = p-1.
+--         But s+L+1 = s+1+L, and digit at s+1+L ≠ p-1 (cascade ended there). Contradiction.
+--   Step: at position i > s+L+2 > s+1. If carry at i, then carry at i-1 (by carry_propagate).
+--         By IH, ¬carry at i-1. Contradiction.
+
+-- Actually the induction is DOWN from i, not up. Let me use carry_propagate directly:
+-- carry at i > s+1 → carry at i-1 (and digit at i-1 = p-1).
+-- carry at i-1 > s+1 → carry at i-2 (and digit at i-2 = p-1).
+-- ...continuing down...
+-- carry at s+L+2 → digit at s+L+1 = p-1. But cascade ended at s+L, so digit at s+1+L ≠ p-1.
+-- Contradiction.
+
+-- So: for ANY i > s+L+1 (with i > s+1), carry at i is impossible when L < D-s-1.
+
+-- But this requires showing that the cascade ending means digit at s+1+L ≠ p-1.
+-- cascade_length k D m is defined as:
+--   (List.range (D-(s+1))).takeWhile (fun j => digit p m (s+1+j) = p-1) |>.length
+-- So if L = cascade_length < D-s-1, then:
+--   the (L+1)-th element of the range was NOT taken, meaning digit at s+1+L ≠ p-1.
+-- Wait: takeWhile stops at the first element NOT satisfying the predicate.
+-- So length L means: digits at s+1, s+2, ..., s+L are p-1, and digit at s+1+L is NOT p-1
+-- (assuming L < D-s-1, so s+1+L is in range).
+
+-- Actually: List.range (D-(s+1)) = [0, 1, ..., D-s-2].
+-- takeWhile (fun j => digit at s+1+j = p-1) takes j=0,1,...,L-1 (all satisfying),
+-- and j=L does NOT satisfy. So:
+-- digit at s+1+0 = p-1, ..., digit at s+1+(L-1) = p-1, digit at s+1+L ≠ p-1.
+-- i.e., digit at s+1, s+2, ..., s+L are p-1, and digit at s+1+L is NOT p-1.
+
+-- Perfect. So if L = cascade_length < D-s-1, then digit at s+1+L ≠ p-1.
+
+-- Now I can proceed.
+
+-- Let me check: does List.takeWhile have a lemma about elements after the prefix?
+-- Something like: if takeWhile has length L and L < list.length, then the L-th element
+-- doesn't satisfy the predicate.
+
+#check @List.not_of_length_takeWhile_lt
+EOF
+lake env lean /tmp/test_cascade.lean 2>&1 | tail -5
+[2026-02-11T05:32:52.840Z] 
+$ cd /home/jarred/code/erdos-728b && grep -rn "takeWhile" .lake/packages/mathlib/Mathlib/ --include="*.lean" -l | head -5
+[2026-02-11T05:32:55.429Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "takeWhile.*length\|length.*takeWhile\|get.*takeWhile\|takeWhile.*get\|takeWhile.*not\|not.*takeWhile" .lake/packages/mathlib/Mathlib/Data/List/TakeWhile.lean | head -20
+[2026-02-11T05:32:58.109Z] 
+$ cd /home/jarred/code/erdos-728b && grep -rn "takeWhile" ~/.elan/toolchains/leanprover-lean4-v4.27.0/lib/lean4/library/ --include="*.lean" | grep -i "length\|get\|not" | head -20
+[2026-02-11T05:33:00.229Z] 
+$ cd /home/jarred/code/erdos-728b && find ~/.elan/toolchains/leanprover-lean4-v4.27.0/ -name "*.olean" -path "*/List*" | head -5
+[2026-02-11T05:33:03.716Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_tw2.lean << 'EOF'
+import Mathlib
+
+-- Search for lemmas about takeWhile and not-predicate at the boundary
+#check List.takeWhile_length_lt_iff
+#check List.getElem_takeWhile
+#check List.length_takeWhile_lt
+EOF
+lake env lean /tmp/test_tw2.lean 2>&1 | head -10
+[2026-02-11T05:33:13.985Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_tw3.lean << 'EOF'
+import Mathlib.Data.List.TakeWhile
+
+-- Search for relevant lemmas
+example : True := by
+  #check @List.takeWhile_append_of_pos
+  trivial
+EOF
+lake env lean /tmp/test_tw3.lean 2>&1 | head -5
+[2026-02-11T05:33:15.702Z] [overseer] 📝 Cleared poke messages
+[2026-02-11T05:33:15.703Z] [overseer] 💓 Heartbeat #23 complete: No intervention needed. The system is progressing through the Tier 0 leaf lemmas. Sorry count is 13.
+[2026-02-11T05:33:19.197Z] 
+$ cd /home/jarred/code/erdos-728b && grep "theorem\|lemma" .lake/packages/mathlib/Mathlib/Data/List/TakeWhile.lean | head -20
+[2026-02-11T05:33:26.485Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_tw4.lean << 'EOF'
+import Mathlib.Data.List.TakeWhile
+
+-- If takeWhile has length L < list length, the L-th element doesn't satisfy p
+lemma not_of_takeWhile_length {α : Type*} {p : α → Bool} {l : List α}
+    (h : l.takeWhile p |>.length < l.length) :
+    ¬(p (l.get ⟨l.takeWhile p |>.length, h⟩) = true) := by
+  induction l with
+  | nil => simp at h
+  | cons a t ih =>
+    simp only [List.takeWhile_cons] at h ⊢
+    split at h ⊢
+    case isTrue hp =>
+      simp only [List.length_cons, Nat.succ_lt_succ_iff] at h
+      simp only [List.length_cons, List.get_cons_succ]
+      exact ih h
+    case isFalse hn =>
+      simp only [List.length_nil] at h ⊢
+      simp only [List.get_cons_zero]
+      exact hn
+EOF
+lake env lean /tmp/test_tw4.lean 2>&1
+[2026-02-11T05:33:33.387Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_tw4.lean << 'EOF'
+import Mathlib.Data.List.TakeWhile
+
+-- If takeWhile has length L < list length, the L-th element doesn't satisfy p
+lemma not_of_takeWhile_length {α : Type*} {p : α → Bool} {l : List α}
+    (h : (l.takeWhile p).length < l.length) :
+    p (l.get ⟨(l.takeWhile p).length, h⟩) = false := by
+  induction l with
+  | nil => simp at h
+  | cons a t ih =>
+    simp only [List.takeWhile_cons] at h ⊢
+    split at h ⊢
+    case isTrue hp =>
+      simp only [List.length_cons, Nat.succ_lt_succ_iff] at h
+      simp only [List.length_cons, List.get_cons_succ]
+      exact ih h
+    case isFalse hn =>
+      simp only [List.length_nil] at h ⊢
+      simp only [List.get_cons_zero]
+      exact Bool.eq_false_iff.mpr hn
+EOF
+lake env lean /tmp/test_tw4.lean 2>&1
+[2026-02-11T05:33:39.888Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_tw4.lean << 'EOF'
+import Mathlib.Data.List.TakeWhile
+
+lemma not_of_takeWhile_length {α : Type*} {p : α → Bool} {l : List α}
+    (h : (l.takeWhile p).length < l.length) :
+    p (l.get ⟨(l.takeWhile p).length, h⟩) = false := by
+  induction l with
+  | nil => simp at h
+  | cons a t ih =>
+    simp only [List.takeWhile_cons]
+    split
+    case isTrue hp =>
+      simp only [List.length_cons, Nat.succ_lt_succ_iff] at h
+      simp only [List.length_cons, List.get_cons_succ]
+      exact ih h
+    case isFalse hn =>
+      simp only [List.length_nil, List.get_cons_zero]
+      exact Bool.eq_false_iff.mpr hn
+EOF
+lake env lean /tmp/test_tw4.lean 2>&1
+[2026-02-11T05:33:49.370Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_tw4.lean << 'EOF'
+import Mathlib.Data.List.TakeWhile
+
+-- More direct approach
+lemma not_of_takeWhile_length {α : Type*} {p : α → Bool} :
+    ∀ {l : List α} (h : (l.takeWhile p).length < l.length),
+    p (l.get ⟨(l.takeWhile p).length, h⟩) = false := by
+  intro l
+  induction l with
+  | nil => intro h; simp at h
+  | cons a t ih =>
+    intro h
+    by_cases ha : p a = true
+    · -- p a = true, so takeWhile (a::t) p = a :: takeWhile t p
+      simp only [List.takeWhile_cons, ha, ite_true, List.length_cons, Nat.succ_lt_succ_iff] at h ⊢
+      exact ih h
+    · -- p a = false, so takeWhile = [], length = 0
+      simp only [List.takeWhile_cons, Bool.eq_false_iff.mpr (by simpa using ha), ite_false,
+        List.length_nil, List.get_cons_zero] at h ⊢
+      simpa using ha
+EOF
+lake env lean /tmp/test_tw4.lean 2>&1
+[2026-02-11T05:34:09.150Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-hga --status "Writing the proof into Lemma3Counting.lean - closing count_high_le_valuation fully, leaving cascade helper sorry'd"
+[2026-02-11T05:34:12.454Z] 
+🛠️  Executing tool: read...
+[2026-02-11T05:34:56.116Z] 
+🛠️  Executing tool: edit...
+[2026-02-11T05:34:59.381Z] 
+$ cd /home/jarred/code/erdos-728b && lake build 2>&1 | tail -30
+[2026-02-11T05:35:25.223Z] 
+$ cd /home/jarred/code/erdos-728b && lake build 2>&1 | grep "error:"
+[2026-02-11T05:35:50.102Z] 
+$ cd /home/jarred/code/erdos-728b && lake build 2>&1 | grep -A5 "487:"
+[2026-02-11T05:36:15.706Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T05:36:15.709Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T05:36:15.932Z] 
+$ cd /home/jarred/code/erdos-728b && grep "Classical" Erdos/Lemma3Counting.lean
+[2026-02-11T05:36:19.310Z] 
+🛠️  Executing tool: read...
+[2026-02-11T05:36:35.036Z] [overseer] 📝 Cleared poke messages
+[2026-02-11T05:36:35.037Z] [overseer] 💓 Heartbeat #24 complete: No intervention needed. Task hga is making steady progress. Sorry count is 13.
+[2026-02-11T05:36:39.745Z] 
+🛠️  Executing tool: edit...
+[2026-02-11T05:36:42.956Z] 
+$ cd /home/jarred/code/erdos-728b && lake build 2>&1 | tail -20
+[2026-02-11T05:37:28.621Z] 
+$ cd /home/jarred/code/erdos-728b && lake build 2>&1 | grep "sorry"
+[2026-02-11T05:37:37.850Z] 
+$ cd /home/jarred/code/erdos-728b && sed -n '454p;455p;456p;457p' Erdos/Lemma3Counting.lean
+[2026-02-11T05:37:40.397Z] 
+$ cd /home/jarred/code/erdos-728b && sed -n '525p' Erdos/Lemma3Counting.lean
+[2026-02-11T05:37:46.437Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-hga --status "bad_residue_sets proved modulo 1 helper sorry (valuation_gt_implies_cascade). Attempting to close it."
+[2026-02-11T05:38:09.198Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_vtc.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+set_option linter.unusedVariables false
+set_option maxHeartbeats 800000
+
+-- Key helper: if cascade_length = L < D - s - 1, then digit at s+1+L ≠ p-1
+-- (the cascade dies because the predicate is false at position L in the takeWhile)
+private lemma cascade_digit_neq {p : ℕ} (k D m : ℕ)
+    (L : ℕ) (hL_eq : cascade_length (p := p) k D m = L)
+    (hL_lt : L < D - (log p k + 1)) :
+    digit p m (log p k + 1 + L) ≠ p - 1 := by
+  -- cascade_length = length of takeWhile on List.range (D - (s+1))
+  -- If L < D - (s+1), the takeWhile stopped because the L-th element didn't satisfy the pred
+  unfold cascade_length at hL_eq
+  simp only at hL_eq
+  -- The list is List.range (D - (log p k + 1))
+  -- takeWhile stopped at index L, so (decide (digit p m (log p k + 1 + L) = p - 1)) = false
+  have hL_in_range : L < (List.range (D - (log p k + 1))).length := by
+    simp [List.length_range]; exact hL_lt
+  -- We need that the L-th element of the original list doesn't satisfy the predicate.
+  -- The original list is List.range (D - (s+1)), so element L is just L.
+  -- The predicate is (fun i => decide (digit p m (s + 1 + i) = p - 1))
+  -- takeWhile has length L < list.length, so the element at index L in the list
+  -- does NOT satisfy the predicate.
+  have h_range_get : (List.range (D - (log p k + 1)))[L]'hL_in_range = L := by
+    simp [List.getElem_range]
+  -- By List.takeWhile properties: if takeWhile has length L < list.length,
+  -- then the L-th element doesn't satisfy the predicate.
+  -- Let me prove this directly by contradiction.
+  intro h_eq
+  -- If digit at s+1+L = p-1, then the predicate IS satisfied at index L,
+  -- so takeWhile should have taken at least L+1 elements.
+  have h_pred_true : (decide (digit p m (log p k + 1 + L) = p - 1)) = true := by
+    exact decide_eq_true h_eq
+  -- This means takeWhile should be at least L+1 elements
+  -- because all elements 0..L satisfy the predicate.
+  -- Elements 0..L-1 satisfy (from hL_eq, they were taken).
+  -- Element L satisfies (from h_pred_true).
+  -- So takeWhile length ≥ L + 1.
+  -- But hL_eq says it's exactly L. Contradiction.
+  -- We need: if all elements 0..L satisfy the predicate, then takeWhile ≥ L+1.
+  -- Let's use List.takeWhile_cons and induction.
+  sorry
+EOF
+lake env lean /tmp/test_vtc.lean 2>&1 | tail -5
+[2026-02-11T05:38:29.070Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_tw_stop.lean << 'EOF'
+import Mathlib.Data.List.TakeWhile
+
+-- If takeWhile stops at position L (length = L and L < list.length),
+-- the L-th element doesn't satisfy the predicate.
+-- Proved by induction: takeWhile on (a::t) with p a = true has length 1 + takeWhile t,
+-- and with p a = false has length 0.
+
+-- Cleaner: the element right after takeWhile in the original list is NOT in takeWhile,
+-- hence doesn't satisfy the predicate.
+
+-- Actually, a clean approach: show that takeWhile doesn't contain the L-th element,
+-- then show that if the L-th element satisfies p, it would be in takeWhile.
+
+-- Let me try: l.takeWhile p ++ l.dropWhile p = l, and 
+-- (l.dropWhile p).head satisfies ¬p (for non-empty dropWhile).
+
+-- dropWhile_get_zero_not
+-- List.dropWhile_get_zero_not : ¬p (l.dropWhile p)[0]
+
+-- And takeWhile ++ dropWhile = l
+-- So l[takeWhile.length] = dropWhile[0]
+
+-- This is exactly what we need!
+
+#check @List.dropWhile_get_zero_not
+#check @List.takeWhile_append_dropWhile
+EOF
+lake env lean /tmp/test_tw_stop.lean 2>&1
+[2026-02-11T05:38:41.399Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_tw_stop2.lean << 'EOF'
+import Mathlib.Data.List.TakeWhile
+
+-- Key lemma: if takeWhile has length L < list.length, the L-th element doesn't satisfy p
+lemma not_pred_at_takeWhile_length {α : Type*} {p : α → Bool} {l : List α}
+    (h : (l.takeWhile p).length < l.length) :
+    ¬(p (l[l.takeWhile p |>.length]'h) = true) := by
+  -- dropWhile is nonempty since takeWhile.length < l.length
+  have h_drop_pos : 0 < (l.dropWhile p).length := by
+    have := List.takeWhile_append_dropWhile (p := p) (l := l)
+    have h1 : (l.takeWhile p).length + (l.dropWhile p).length = l.length := by
+      rw [← List.length_append]; congr 1; exact List.takeWhile_append_dropWhile
+    omega
+  have h_drop := List.dropWhile_get_zero_not p l h_drop_pos
+  -- l[takeWhile.length] = dropWhile[0]
+  have h_eq : l[l.takeWhile p |>.length]'h = (l.dropWhile p).get ⟨0, h_drop_pos⟩ := by
+    have := List.takeWhile_append_dropWhile (p := p) (l := l)
+    rw [← this]
+    simp [List.getElem_append_right (by omega)]
+  rw [h_eq]
+  exact h_drop
+EOF
+lake env lean /tmp/test_tw_stop2.lean 2>&1
+[2026-02-11T05:38:53.026Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_tw_stop3.lean << 'EOF'
+import Mathlib.Data.List.TakeWhile
+
+-- Key: if takeWhile length = L < list length, then l[L] doesn't satisfy p
+-- Use: l = takeWhile ++ dropWhile, and dropWhile.head doesn't satisfy p
+lemma not_pred_at_takeWhile_length {α : Type*} {p : α → Bool} {l : List α}
+    (h : (l.takeWhile p).length < l.length) :
+    ¬(p (l[l.takeWhile p |>.length]'h) = true) := by
+  have h_drop_pos : 0 < (l.dropWhile p).length := by
+    have h1 : (l.takeWhile p).length + (l.dropWhile p).length = l.length := by
+      rw [← List.length_append]; congr 1; exact List.takeWhile_append_dropWhile
+    omega
+  -- l[takeWhile.length] = (takeWhile ++ dropWhile)[takeWhile.length] = dropWhile[0]
+  have key : l[l.takeWhile p |>.length]'h =
+      (l.dropWhile p)[0]'h_drop_pos := by
+    conv_lhs => rw [← List.takeWhile_append_dropWhile (p := p) (l := l)]
+    rw [List.getElem_append_right (by omega : ¬ _ < _)]
+    simp
+  rw [key]
+  exact List.dropWhile_get_zero_not p l h_drop_pos
+EOF
+lake env lean /tmp/test_tw_stop3.lean 2>&1
+[2026-02-11T05:39:02.394Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_tw_stop4.lean << 'EOF'
+import Mathlib.Data.List.TakeWhile
+
+#check @List.getElem_append
+-- Maybe I should just do this by induction
+lemma not_pred_at_takeWhile_length {α : Type*} {p : α → Bool} :
+    ∀ (l : List α) (h : (l.takeWhile p).length < l.length),
+    p l[(l.takeWhile p).length] = false := by
+  intro l
+  induction l with
+  | nil => intro h; simp at h
+  | cons a t ih =>
+    intro h
+    simp only [List.takeWhile_cons]
+    split
+    case isTrue ha =>
+      simp only [List.length_cons, Nat.succ_lt_succ_iff] at h
+      simp only [List.length_cons, List.getElem_cons_succ]
+      exact ih t h
+    case isFalse hn =>
+      simp only [List.length_nil, List.getElem_cons_zero]
+      exact Bool.eq_false_iff.mpr hn
+EOF
+lake env lean /tmp/test_tw_stop4.lean 2>&1
+[2026-02-11T05:39:09.690Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_tw_stop5.lean << 'EOF'
+import Mathlib.Data.List.TakeWhile
+
+lemma not_pred_at_takeWhile_length {α : Type*} {p : α → Bool} :
+    ∀ (l : List α) (h : (l.takeWhile p).length < l.length),
+    p l[(l.takeWhile p).length] = false := by
+  intro l
+  induction l with
+  | nil => intro h; simp at h
+  | cons a t ih =>
+    intro h
+    simp only [List.takeWhile_cons]
+    split
+    case isTrue ha =>
+      simp only [List.length_cons] at h
+      have h' : (t.takeWhile p).length < t.length := by omega
+      simp only [List.length_cons, List.getElem_cons_succ]
+      exact ih h'
+    case isFalse hn =>
+      simp only [List.length_nil, List.getElem_cons_zero]
+      exact Bool.eq_false_iff.mpr hn
+EOF
+lake env lean /tmp/test_tw_stop5.lean 2>&1
+[2026-02-11T05:39:19.361Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_tw_stop6.lean << 'EOF'
+import Mathlib.Data.List.TakeWhile
+
+lemma not_pred_at_takeWhile_length {α : Type*} {p : α → Bool} :
+    ∀ (l : List α) (h : (l.takeWhile p).length < l.length),
+    p l[(l.takeWhile p).length] = false := by
+  intro l
+  induction l with
+  | nil => intro h; simp at h
+  | cons a t ih =>
+    intro h
+    by_cases ha : p a = true
+    · -- p a = true: takeWhile (a::t) = a :: takeWhile t
+      have htw : (a :: t).takeWhile p = a :: t.takeWhile p := by
+        simp [List.takeWhile_cons, ha]
+      rw [htw] at h ⊢
+      simp only [List.length_cons, List.getElem_cons_succ] at h ⊢
+      exact ih h
+    · -- p a = false: takeWhile (a::t) = []
+      have htw : (a :: t).takeWhile p = [] := by
+        simp [List.takeWhile_cons, Bool.eq_false_iff.mpr ha]
+      rw [htw]
+      simp only [List.length_nil, List.getElem_cons_zero]
+      exact Bool.eq_false_iff.mpr ha
+EOF
+lake env lean /tmp/test_tw_stop6.lean 2>&1
+[2026-02-11T05:39:34.955Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_tw_stop7.lean << 'EOF'
+import Mathlib.Data.List.TakeWhile
+
+-- More direct approach: avoid rewriting the dependent term
+-- Use show to reformulate with a concrete index
+lemma not_pred_at_takeWhile_length {α : Type*} {p : α → Bool} :
+    ∀ (l : List α) (h : (l.takeWhile p).length < l.length),
+    p l[(l.takeWhile p).length] = false := by
+  intro l
+  induction l with
+  | nil => intro h; simp at h
+  | cons a t ih =>
+    intro h
+    by_cases ha : p a = true
+    · -- takeWhile (a::t) = a :: takeWhile t, so length = 1 + takeWhile t length
+      have htw_len : (List.takeWhile p (a :: t)).length = (List.takeWhile p t).length + 1 := by
+        simp [List.takeWhile_cons, ha]
+      have h' : (List.takeWhile p t).length < t.length := by
+        simp [List.length_cons] at h; rw [htw_len] at h; omega
+      -- goal: p (a::t)[takeWhile (a::t).length]
+      -- = p (a::t)[takeWhile t .length + 1]
+      -- = p t[takeWhile t .length]
+      show p (a :: t)[(List.takeWhile p (a :: t)).length] = false
+      rw [htw_len]
+      -- Now goal: p (a :: t)[takeWhile t .length + 1] = false
+      -- (a :: t)[n+1] = t[n]
+      simp only [List.getElem_cons_succ]
+      exact ih h'
+    · -- takeWhile (a::t) = [], length = 0
+      show p (a :: t)[(List.takeWhile p (a :: t)).length] = false
+      have htw_len : (List.takeWhile p (a :: t)).length = 0 := by
+        simp [List.takeWhile_cons, Bool.eq_false_iff.mpr ha]
+      rw [htw_len]
+      simp only [List.getElem_cons_zero]
+      exact Bool.eq_false_iff.mpr ha
+EOF
+lake env lean /tmp/test_tw_stop7.lean 2>&1
+[2026-02-11T05:39:35.040Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T05:39:35.043Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T05:39:51.816Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_tw_stop8.lean << 'EOF'
+import Mathlib.Data.List.TakeWhile
+
+-- Try using have to create an equality with explicit casting
+lemma not_pred_at_takeWhile_length {α : Type*} {p : α → Bool} :
+    ∀ (l : List α) (h : (l.takeWhile p).length < l.length),
+    p l[(l.takeWhile p).length] = false := by
+  intro l
+  induction l with
+  | nil => intro h; simp at h
+  | cons a t ih =>
+    intro h
+    by_cases ha : p a = true
+    · -- takeWhile (a::t) p = a :: takeWhile t p
+      have htw : List.takeWhile p (a :: t) = a :: List.takeWhile p t := by
+        simp [ha]
+      have htw_len : (List.takeWhile p (a :: t)).length = (List.takeWhile p t).length + 1 := by
+        rw [htw]; simp
+      have h' : (List.takeWhile p t).length < t.length := by
+        have : (a :: t).length = t.length + 1 := List.length_cons a t
+        omega
+      -- The goal is p (a :: t)[L] = false where L = takeWhile(a::t).length
+      -- Since L = takeWhile(t).length + 1, (a::t)[L] = t[takeWhile(t).length]
+      have h_idx : (a :: t)[(List.takeWhile p (a :: t)).length] =
+          t[(List.takeWhile p t).length] := by
+        -- Need to show these are the same element
+        -- (a :: t)[n+1] = t[n], and takeWhile(a::t).length = takeWhile(t).length + 1
+        -- Use List.getElem_cons_succ
+        have : (List.takeWhile p (a :: t)).length = (List.takeWhile p t).length + 1 := htw_len
+        simp only [this, List.getElem_cons_succ]
+      simp only [h_idx]
+      exact ih h'
+    · have htw : List.takeWhile p (a :: t) = [] := by
+        simp [Bool.eq_false_iff.mpr ha]
+      have htw_len : (List.takeWhile p (a :: t)).length = 0 := by
+        rw [htw]; simp
+      have h_idx : (a :: t)[(List.takeWhile p (a :: t)).length] = a := by
+        simp only [htw_len, List.getElem_cons_zero]
+      simp only [h_idx]
+      exact Bool.eq_false_iff.mpr ha
+EOF
+lake env lean /tmp/test_tw_stop8.lean 2>&1
+[2026-02-11T05:40:00.069Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_tw_stop8b.lean << 'EOF'
+import Mathlib.Data.List.TakeWhile
+
+lemma not_pred_at_takeWhile_length {α : Type*} {p : α → Bool} :
+    ∀ (l : List α) (h : (l.takeWhile p).length < l.length),
+    p l[(l.takeWhile p).length] = false := by
+  intro l
+  induction l with
+  | nil => intro h; simp at h
+  | cons a t ih =>
+    intro h
+    by_cases ha : p a = true
+    · have htw_len : (List.takeWhile p (a :: t)).length =
+          (List.takeWhile p t).length + 1 := by simp [ha]
+      have h' : (List.takeWhile p t).length < t.length := by
+        simp [List.length_cons] at h; omega
+      have h_idx : (a :: t)[(List.takeWhile p (a :: t)).length] =
+          t[(List.takeWhile p t).length] := by
+        simp only [htw_len, List.getElem_cons_succ]
+      simp only [h_idx]; exact ih h'
+    · have htw_len : (List.takeWhile p (a :: t)).length = 0 := by
+        simp [Bool.eq_false_iff.mpr ha]
+      have h_idx : (a :: t)[(List.takeWhile p (a :: t)).length] = a := by
+        simp only [htw_len, List.getElem_cons_zero]
+      simp only [h_idx]; exact Bool.eq_false_iff.mpr ha
+EOF
+lake env lean /tmp/test_tw_stop8b.lean 2>&1
+[2026-02-11T05:40:17.795Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_cascade2.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+set_option linter.unusedVariables false
+set_option maxHeartbeats 800000
+
+private lemma not_pred_at_takeWhile_length' {α : Type*} {p : α → Bool} :
+    ∀ (l : List α) (h : (l.takeWhile p).length < l.length),
+    p l[(l.takeWhile p).length] = false := by
+  intro l
+  induction l with
+  | nil => intro h; simp at h
+  | cons a t ih =>
+    intro h
+    by_cases ha : p a = true
+    · have htw_len : (List.takeWhile p (a :: t)).length =
+          (List.takeWhile p t).length + 1 := by simp [ha]
+      have h' : (List.takeWhile p t).length < t.length := by
+        simp [List.length_cons] at h; omega
+      have h_idx : (a :: t)[(List.takeWhile p (a :: t)).length] =
+          t[(List.takeWhile p t).length] := by
+        simp only [htw_len, List.getElem_cons_succ]
+      simp only [h_idx]; exact ih h'
+    · have htw_len : (List.takeWhile p (a :: t)).length = 0 := by
+        simp [Bool.eq_false_iff.mpr ha]
+      have h_idx : (a :: t)[(List.takeWhile p (a :: t)).length] = a := by
+        simp only [htw_len, List.getElem_cons_zero]
+      simp only [h_idx]; exact Bool.eq_false_iff.mpr ha
+
+-- If cascade_length = L < D - s - 1, then digit at s+1+L ≠ p-1
+private lemma cascade_digit_neq' {p : ℕ} (k D m : ℕ) (hp : p.Prime)
+    (hL_lt : cascade_length (p := p) k D m < D - (log p k + 1)) :
+    digit p m (log p k + 1 + cascade_length (p := p) k D m) ≠ p - 1 := by
+  unfold cascade_length
+  simp only
+  set s := log p k
+  set limit := D - (s + 1)
+  set pred := fun i => decide (digit p m (s + 1 + i) = p - 1)
+  set tw := (List.range limit).takeWhile pred
+  -- tw.length < limit = (List.range limit).length
+  have h_tw_lt : tw.length < (List.range limit).length := by
+    simp [List.length_range]; exact hL_lt
+  -- The element at index tw.length in List.range limit doesn't satisfy pred
+  have h_not := not_pred_at_takeWhile_length' (List.range limit) h_tw_lt
+  -- (List.range limit)[tw.length] = tw.length
+  have h_range_eq : (List.range limit)[tw.length] = tw.length := by
+    simp [List.getElem_range]
+  rw [h_range_eq] at h_not
+  -- h_not : pred tw.length = false
+  -- pred tw.length = decide (digit p m (s + 1 + tw.length) = p - 1)
+  simp only [pred, decide_eq_false_iff_not] at h_not
+  exact h_not
+EOF
+lake env lean /tmp/test_cascade2.lean 2>&1
+[2026-02-11T05:40:37.178Z] [overseer] 📝 Cleared poke messages
+[2026-02-11T05:40:37.178Z] [overseer] 💓 Heartbeat #25 complete: No intervention needed. Task hga is active and making progress on proving the invariance of cascade length and high digit count under modulo. Metric trends are positive with 6 tasks closed in the last hour.
+[2026-02-11T05:40:39.766Z] 
+$ cd /home/jarred/code/erdos-728b && cat >> /tmp/test_cascade2.lean << 'EOF'
+
+-- No carry beyond the cascade: if digit at position j ≠ p-1 and j ≥ s+1,
+-- then ¬carry_cond at j+1, hence ¬carry_cond at all higher positions.
+-- Uses carry_propagate (contrapositive).
+private lemma no_carry_beyond' {p : ℕ} (hp : p.Prime) (k m j : ℕ)
+    (hk : k ≥ 1) (hj : j ≥ log p k + 1) (h_digit : digit p m j ≠ p - 1) :
+    ∀ i, i ≥ j + 1 → ¬carry_cond p k m i := by
+  intro i hi
+  -- By strong induction on i - (j + 1)
+  induction i with
+  | zero => omega
+  | succ n ih_nat =>
+    intro h_carry
+    -- n + 1 > s + 1 since n + 1 ≥ j + 1 ≥ s + 2
+    have hn_gt : n + 1 > log p k + 1 := by omega
+    have ⟨h_digit_n, h_carry_n⟩ := carry_propagate hp k m (n + 1) hn_gt h_carry hk
+    -- n ≥ j: if n = j, then digit at j = p-1, contradicting h_digit
+    -- if n > j, then by IH, ¬carry_cond at n
+    by_cases hn_eq : n = j
+    · rw [hn_eq] at h_digit_n; exact h_digit h_digit_n
+    · have hn_ge : n ≥ j + 1 := by omega
+      -- Need: ¬carry_cond at n
+      -- If n = 0, then j + 1 ≤ 0, impossible since j ≥ s + 1 ≥ 0
+      -- Otherwise, ih_nat gives us the result for smaller values... 
+      -- Wait, ih_nat is the induction hypothesis for n, but it's Nat.rec not strong induction.
+      -- Let me restructure.
+      sorry
+EOF
+lake env lean /tmp/test_cascade2.lean 2>&1 | tail -5
+[2026-02-11T05:40:51.215Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_carry.lean << 'EOF'
+import Erdos.Lemma3Counting
+open Erdos728
+#check @carry_propagate
+-- carry_propagate : Nat.Prime p → ∀ (m i : ℕ), i > log p k + 1 → carry_cond p k m i → k ≥ 1 → ...
+EOF
+lake env lean /tmp/test_carry.lean 2>&1
+[2026-02-11T05:41:09.390Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_no_carry.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+set_option linter.unusedVariables false
+
+-- No carry at positions beyond the cascade boundary
+-- If digit at position j ≠ p-1 and j ≥ s+1, then ¬carry_cond at all positions > j
+private lemma no_carry_beyond {p : ℕ} (hp : p.Prime) (k m j : ℕ)
+    (hk : k ≥ 1) (hj : j ≥ log p k + 1) (h_digit : digit p m j ≠ p - 1) :
+    ∀ i, i > j → ¬carry_cond p k m i := by
+  intro i hi h_carry
+  -- Strong induction: decrease i down to j+1
+  -- At i = j+1 > s+1: carry_propagate gives digit at j = p-1, contradiction
+  -- At i > j+1 > s+1: carry_propagate gives carry at i-1 > j, by IH ¬carry at i-1, contradiction
+  -- But we need strong induction on (i - j - 1) to go down.
+  have : i - (j + 1) < i := by omega
+  -- Use well-founded induction on i
+  revert h_carry
+  induction i using Nat.strong_rec_on with
+  | _ i ih =>
+    intro h_carry
+    have hi_gt_s : i > log p k + 1 := by omega
+    have ⟨h_dig_prev, h_carry_prev⟩ := carry_propagate k hp m i hi_gt_s h_carry hk
+    by_cases h_eq : i - 1 = j
+    · rw [h_eq] at h_dig_prev; exact h_digit h_dig_prev
+    · have h_prev_gt : i - 1 > j := by omega
+      have h_prev_lt : i - 1 < i := by omega
+      exact ih (i - 1) h_prev_lt h_prev_gt h_carry_prev
+EOF
+lake env lean /tmp/test_no_carry.lean 2>&1
+[2026-02-11T05:41:26.288Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_no_carry2.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+set_option linter.unusedVariables false
+
+private lemma no_carry_beyond {p : ℕ} (hp : p.Prime) (k m j : ℕ)
+    (hk : k ≥ 1) (hj : j ≥ log p k + 1) (h_digit : digit p m j ≠ p - 1)
+    (i : ℕ) (hi : i > j) (h_carry : carry_cond p k m i) : False := by
+  -- Descend from i to j+1 using carry_propagate
+  -- Each step: carry at position n > s+1 → digit at n-1 = p-1 AND carry at n-1
+  -- When we reach j+1: digit at j = p-1, contradiction
+  -- When n-1 > j+1: continue descending
+  -- Use Nat.strongRecOn on (i - j - 1)
+  have key : ∀ n, n > j → n ≤ i → carry_cond p k m n → False := by
+    intro n hn_gt hn_le h_c
+    -- Induction on n - (j+1): this decreases at each step
+    induction n, (show n - (j + 1) < i from by omega) using WellFoundedRelation.wf.induction with
+    | ind n ih =>
+      have hn_gt_s : n > log p k + 1 := by omega
+      obtain ⟨h_dig_prev, h_carry_prev⟩ := carry_propagate k hp m n hn_gt_s h_c hk
+      by_cases h_eq : n - 1 = j
+      · rw [h_eq] at h_dig_prev; exact h_digit h_dig_prev
+      · have h_prev_gt : n - 1 > j := by omega
+        exact ih (n - 1) (by omega) h_prev_gt (by omega) h_carry_prev
+  exact key i hi (le_refl i) h_carry
+EOF
+lake env lean /tmp/test_no_carry2.lean 2>&1
+[2026-02-11T05:41:41.768Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_no_carry3.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+set_option linter.unusedVariables false
+
+private lemma no_carry_beyond {p : ℕ} (hp : p.Prime) (k m j : ℕ)
+    (hk : k ≥ 1) (hj : j ≥ log p k + 1) (h_digit : digit p m j ≠ p - 1)
+    (i : ℕ) (hi : i > j) (h_carry : carry_cond p k m i) : False := by
+  -- Descend from i to j+1 using carry_propagate, using well-founded recursion on (i - j)
+  obtain ⟨d, rfl⟩ : ∃ d, i = j + 1 + d := ⟨i - (j + 1), by omega⟩
+  clear hi
+  induction d with
+  | zero =>
+    -- i = j + 1
+    have : j + 1 > log p k + 1 := by omega
+    obtain ⟨h_dig, _⟩ := carry_propagate k hp m (j + 1) this h_carry hk
+    simp at h_dig
+    exact h_digit h_dig
+  | succ d ih =>
+    -- i = j + 1 + (d + 1) = j + 2 + d
+    have h_pos : j + 1 + (d + 1) > log p k + 1 := by omega
+    obtain ⟨h_dig, h_carry_prev⟩ := carry_propagate k hp m (j + 1 + (d + 1)) h_pos h_carry hk
+    -- carry at (j + 1 + (d+1)) - 1 = j + 1 + d
+    have h_sub : j + 1 + (d + 1) - 1 = j + 1 + d := by omega
+    rw [h_sub] at h_carry_prev
+    exact ih h_carry_prev
+EOF
+lake env lean /tmp/test_no_carry3.lean 2>&1
+[2026-02-11T05:42:29.474Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_vtc_full.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+set_option linter.unusedVariables false
+set_option maxHeartbeats 800000
+
+-- 1. takeWhile boundary lemma
+private lemma not_pred_at_takeWhile_length' {α : Type*} {p : α → Bool} :
+    ∀ (l : List α) (h : (l.takeWhile p).length < l.length),
+    p l[(l.takeWhile p).length] = false := by
+  intro l
+  induction l with
+  | nil => intro h; simp at h
+  | cons a t ih =>
+    intro h
+    by_cases ha : p a = true
+    · have htw_len : (List.takeWhile p (a :: t)).length =
+          (List.takeWhile p t).length + 1 := by simp [ha]
+      have h' : (List.takeWhile p t).length < t.length := by
+        simp [List.length_cons] at h; omega
+      have h_idx : (a :: t)[(List.takeWhile p (a :: t)).length] =
+          t[(List.takeWhile p t).length] := by
+        simp only [htw_len, List.getElem_cons_succ]
+      simp only [h_idx]; exact ih h'
+    · have htw_len : (List.takeWhile p (a :: t)).length = 0 := by
+        simp [Bool.eq_false_iff.mpr ha]
+      have h_idx : (a :: t)[(List.takeWhile p (a :: t)).length] = a := by
+        simp only [htw_len, List.getElem_cons_zero]
+      simp only [h_idx]; exact Bool.eq_false_iff.mpr ha
+
+-- 2. If cascade_length < D - s - 1, digit at s+1+L ≠ p-1
+private lemma cascade_digit_neq' {p : ℕ} (k D m : ℕ)
+    (hL_lt : cascade_length (p := p) k D m < D - (log p k + 1)) :
+    digit p m (log p k + 1 + cascade_length (p := p) k D m) ≠ p - 1 := by
+  unfold cascade_length
+  simp only
+  set s := log p k
+  set limit := D - (s + 1)
+  set pred := fun i => decide (digit p m (s + 1 + i) = p - 1)
+  set tw := (List.range limit).takeWhile pred
+  have h_tw_lt : tw.length < (List.range limit).length := by
+    simp [List.length_range]; exact hL_lt
+  have h_not := not_pred_at_takeWhile_length' (List.range limit) h_tw_lt
+  have h_range_eq : (List.range limit)[tw.length] = tw.length := by
+    simp [List.getElem_range]
+  rw [h_range_eq] at h_not
+  simp only [pred, decide_eq_false_iff_not] at h_not
+  exact h_not
+
+-- 3. No carry beyond the cascade boundary
+private lemma no_carry_beyond' {p : ℕ} (hp : p.Prime) (k m j : ℕ)
+    (hk : k ≥ 1) (hj : j ≥ log p k + 1) (h_digit : digit p m j ≠ p - 1)
+    (i : ℕ) (hi : i > j) (h_carry : carry_cond p k m i) : False := by
+  obtain ⟨d, rfl⟩ : ∃ d, i = j + 1 + d := ⟨i - (j + 1), by omega⟩
+  clear hi
+  induction d with
+  | zero =>
+    have : j + 1 > log p k + 1 := by omega
+    obtain ⟨h_dig, _⟩ := carry_propagate k hp m (j + 1) this h_carry hk
+    simp at h_dig; exact h_digit h_dig
+  | succ d ih =>
+    have h_pos : j + 1 + (d + 1) > log p k + 1 := by omega
+    obtain ⟨_, h_carry_prev⟩ := carry_propagate k hp m (j + 1 + (d + 1)) h_pos h_carry hk
+    have h_sub : j + 1 + (d + 1) - 1 = j + 1 + d := by omega
+    rw [h_sub] at h_carry_prev
+    exact ih h_carry_prev
+
+-- 4. Main: v_p(C(m+k,k)) > D/6 → cascade_length ≥ D/6 - s
+-- Contrapositive: cascade_length < D/6 - s → v_p ≤ D/6
+-- Proof: if cascade < D/6 - s, then by (2) digit ≠ p-1 at the boundary,
+-- by (3) no carries beyond that boundary, so total carries ≤ boundary position.
+-- Total carries ≤ s + 1 + cascade_length ≤ D/6.
+private lemma valuation_gt_implies_cascade' {p : ℕ} (hp : p.Prime) (k D m : ℕ)
+    (hk : k ≥ 1) (hD : D ≥ 16 * (log p (k + 1)) + 16) :
+    padicValNat p ((m + k).choose k) > D / 6 →
+    cascade_length (p := p) k D m ≥ D / 6 - log p k := by
+  -- Contrapositive
+  intro hv
+  by_contra h_lt
+  push_neg at h_lt
+  set s := log p k
+  set L := cascade_length (p := p) k D m
+  -- Verify L < D - (s+1) so the cascade terminates within D
+  have hD_ge : D ≥ 12 * (s + 1) + 6 := by
+    have : s ≤ log p (k + 1) := Nat.log_mono_right (by omega)
+    omega
+  have hL_lt_limit : L < D - (s + 1) := by
+    have : D / 6 ≥ 2 * (s + 1) := by omega
+    omega
+  -- digit at s+1+L ≠ p-1 (cascade boundary)
+  have h_digit := cascade_digit_neq' k D m hL_lt_limit
+  -- No carry at positions > s+1+L
+  -- Express v_p using factorization_choose'
+  set b := max (D + 1) (log p (m + k) + 1)
+  have hb : log p (m + k) < b := by
+    show log p (m + k) < max (D + 1) (log p (m + k) + 1); omega
+  rw [← Nat.factorization_def _ hp, Nat.factorization_choose' hp hb] at hv
+  -- hv : card of {i ∈ Ico 1 b : carry_cond p k m i} > D/6
+  -- All carry positions must be ≤ s+1+L
+  -- Carries at positions > s+1+L are impossible (by no_carry_beyond')
+  -- s+1+L is the boundary position
+  set boundary := s + 1 + L
+  have h_boundary_ge : boundary ≥ s + 1 := by omega
+  -- Show all carries are in Ico 1 (boundary + 1)
+  have h_subset : (Ico 1 b).filter (fun i => p ^ i ≤ k % p ^ i + m % p ^ i) ⊆
+      Ico 1 (boundary + 1) := by
+    intro i hi
+    rw [mem_filter, mem_Ico] at hi
+    rw [mem_Ico]
+    constructor
+    · exact hi.1.1
+    · by_contra h_not
+      push_neg at h_not
+      have h_i_gt : i > boundary := by omega
+      exact no_carry_beyond' hp k m (s + 1 + L) hk (by omega) h_digit i h_i_gt hi.2
+  -- card of carry set ≤ card of Ico 1 (boundary + 1) = boundary
+  have h_card_bound : ((Ico 1 b).filter
+      (fun i => p ^ i ≤ k % p ^ i + m % p ^ i)).card ≤ boundary := by
+    calc ((Ico 1 b).filter (fun i => p ^ i ≤ k % p ^ i + m % p ^ i)).card
+        ≤ (Ico 1 (boundary + 1)).card := card_le_card h_subset
+      _ = boundary := by simp [Nat.card_Ico]
+  -- boundary = s + 1 + L < s + 1 + (D/6 - s) = D/6 + 1
+  -- So boundary ≤ D/6
+  have h_boundary_le : boundary ≤ D / 6 := by
+    show s + 1 + L ≤ D / 6; omega
+  -- Contradiction: card > D/6 but card ≤ D/6
+  omega
+EOF
+lake env lean /tmp/test_vtc_full.lean 2>&1
+[2026-02-11T05:42:48.405Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_arith.lean << 'EOF'
+import Mathlib.Data.Nat.Basic
+
+-- Debug the arithmetic
+example (D s L : ℕ) (hD : D ≥ 12 * (s + 1) + 6) (hL : L < D / 6 - s) :
+    L < D - (s + 1) := by
+  have : D / 6 ≥ 2 * (s + 1) := by omega
+  have : D / 6 - s ≤ D - (s + 1) := by omega
+  omega
+EOF
+lake env lean /tmp/test_arith.lean 2>&1
+[2026-02-11T05:42:58.803Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_arith2.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat
+
+-- Check if s ≤ log p (k+1)
+-- s = log p k. We know log p k ≤ log p (k+1) for k ≥ 1 and p ≥ 2.
+example (p k : ℕ) (hp : p ≥ 2) (hk : k ≥ 1) : log p k ≤ log p (k + 1) :=
+  Nat.log_mono_right (by omega)
+
+-- Now check: D ≥ 16*(log p (k+1)) + 16 → D ≥ 12*(log p k + 1) + 6
+example (D p k : ℕ) (hp : p ≥ 2) (hk : k ≥ 1) 
+    (hD : D ≥ 16 * (log p (k + 1)) + 16) : D ≥ 12 * (log p k + 1) + 6 := by
+  have : log p k ≤ log p (k + 1) := Nat.log_mono_right (by omega)
+  omega
+EOF
+lake env lean /tmp/test_arith2.lean 2>&1
+[2026-02-11T05:43:36.667Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_arith3.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat
+
+-- When k ≥ 1 and p ≥ 2: log p (k+1) ≥ 1 since k+1 ≥ 2 ≥ p^1... no, that's only for p=2.
+-- Actually log p n ≥ 1 iff n ≥ p.
+-- k ≥ 1 → k+1 ≥ 2. But log p 2 = 0 when p ≥ 3.
+-- So log p (k+1) can be 0 when k = 1 and p = 3.
+
+-- OK so the bound doesn't follow trivially. Let me check: when s = log p k = 0 and k ≥ 1:
+-- D ≥ 16 * log p (k+1) + 16. If log p (k+1) = 0, D ≥ 16.
+-- We need D ≥ 12*(0+1) + 6 = 18. But D ≥ 16 doesn't guarantee D ≥ 18.
+
+-- Hmm, but with s = 0, D/6 - s = D/6. And cascade_length < D - 1 is what we need.
+-- D/6 < D - 1 for D ≥ 2. So even with D ≥ 16, D/6 ≤ 2 < 15 ≤ D - 1.
+
+-- Actually, the specific arithmetic bound I need is:
+-- L < D/6 - s → L < D - (s+1)
+-- This requires D/6 - s ≤ D - (s+1), i.e., D/6 ≤ D - 1.
+-- For D ≥ 2 (certainly D ≥ 16 satisfies this).
+-- D/6 ≤ D - 1: when D ≥ 1, D/6 ≤ D ≤ D, and D - 1 ≥ 0.
+-- More precisely: D/6 ≤ D - 1 iff D ≤ 6*(D-1) = 6D - 6 iff 6 ≤ 5D iff D ≥ 2.
+
+example (D s L : ℕ) (hD : D ≥ 16) (hL : L < D / 6 - s) :
+    L < D - (s + 1) := by
+  have h1 : D / 6 ≤ D - 1 := by omega
+  omega
+EOF
+lake env lean /tmp/test_arith3.lean 2>&1
+[2026-02-11T05:43:37.181Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T05:43:37.185Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T05:43:53.502Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_arith4.lean << 'EOF'
+import Mathlib.Data.Nat.Basic
+
+-- s + 1 + L ≤ D / 6 when L < D / 6 - s
+-- In ℕ: L ≤ D/6 - s - 1 (from h_lt: L + 1 ≤ D/6 - s, i.e. L ≤ D/6 - s - 1)
+-- s + 1 + L ≤ s + 1 + (D/6 - s - 1) = D/6
+-- This only works if D/6 ≥ s + 1, i.e., D/6 > s, i.e., D/6 - s ≥ 1, which is true since L ≥ 0 < D/6 - s.
+
+example (s L D6 : ℕ) (hL : L < D6 - s) : s + 1 + L ≤ D6 := by omega
+EOF
+lake env lean /tmp/test_arith4.lean 2>&1
+[2026-02-11T05:44:08.766Z] [overseer] 📝 Cleared poke messages
+[2026-02-11T05:44:08.767Z] [overseer] 💓 Heartbeat #26 complete: No intervention needed. Task hga is making steady progress on bad_residue_sets formalization. Backlog is healthy and multi-tier.
+[2026-02-11T05:44:31.562Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_vtc_full2.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat Finset Erdos728
+
+set_option linter.unusedVariables false
+set_option maxHeartbeats 800000
+
+private lemma not_pred_at_takeWhile_length' {α : Type*} {p : α → Bool} :
+    ∀ (l : List α) (h : (l.takeWhile p).length < l.length),
+    p l[(l.takeWhile p).length] = false := by
+  intro l; induction l with
+  | nil => intro h; simp at h
+  | cons a t ih =>
+    intro h; by_cases ha : p a = true
+    · have htw_len : (List.takeWhile p (a :: t)).length =
+          (List.takeWhile p t).length + 1 := by simp [ha]
+      have h' : (List.takeWhile p t).length < t.length := by
+        simp [List.length_cons] at h; omega
+      have h_idx : (a :: t)[(List.takeWhile p (a :: t)).length] =
+          t[(List.takeWhile p t).length] := by
+        simp only [htw_len, List.getElem_cons_succ]
+      simp only [h_idx]; exact ih h'
+    · have htw_len : (List.takeWhile p (a :: t)).length = 0 := by
+        simp [Bool.eq_false_iff.mpr ha]
+      have h_idx : (a :: t)[(List.takeWhile p (a :: t)).length] = a := by
+        simp only [htw_len, List.getElem_cons_zero]
+      simp only [h_idx]; exact Bool.eq_false_iff.mpr ha
+
+private lemma cascade_digit_neq' {p : ℕ} (k D m : ℕ)
+    (hL_lt : cascade_length (p := p) k D m < D - (log p k + 1)) :
+    digit p m (log p k + 1 + cascade_length (p := p) k D m) ≠ p - 1 := by
+  unfold cascade_length; simp only
+  set s := log p k; set limit := D - (s + 1)
+  set pred := fun i => decide (digit p m (s + 1 + i) = p - 1)
+  set tw := (List.range limit).takeWhile pred
+  have h_tw_lt : tw.length < (List.range limit).length := by
+    simp [List.length_range]; exact hL_lt
+  have h_not := not_pred_at_takeWhile_length' (List.range limit) h_tw_lt
+  have h_range_eq : (List.range limit)[tw.length] = tw.length := by
+    simp [List.getElem_range]
+  rw [h_range_eq] at h_not
+  simp only [pred, decide_eq_false_iff_not] at h_not; exact h_not
+
+private lemma no_carry_beyond' {p : ℕ} (hp : p.Prime) (k m j : ℕ)
+    (hk : k ≥ 1) (hj : j ≥ log p k + 1) (h_digit : digit p m j ≠ p - 1)
+    (i : ℕ) (hi : i > j) (h_carry : carry_cond p k m i) : False := by
+  obtain ⟨d, rfl⟩ : ∃ d, i = j + 1 + d := ⟨i - (j + 1), by omega⟩
+  clear hi; induction d with
+  | zero =>
+    have : j + 1 > log p k + 1 := by omega
+    obtain ⟨h_dig, _⟩ := carry_propagate k hp m (j + 1) this h_carry hk
+    simp at h_dig; exact h_digit h_dig
+  | succ d ih =>
+    have h_pos : j + 1 + (d + 1) > log p k + 1 := by omega
+    obtain ⟨_, h_carry_prev⟩ := carry_propagate k hp m (j + 1 + (d + 1)) h_pos h_carry hk
+    have h_sub : j + 1 + (d + 1) - 1 = j + 1 + d := by omega
+    rw [h_sub] at h_carry_prev; exact ih h_carry_prev
+
+private lemma valuation_gt_implies_cascade' {p : ℕ} (hp : p.Prime) (k D m : ℕ)
+    (hk : k ≥ 1) (hD : D ≥ 16 * (log p (k + 1)) + 16) :
+    padicValNat p ((m + k).choose k) > D / 6 →
+    cascade_length (p := p) k D m ≥ D / 6 - log p k := by
+  intro hv; by_contra h_lt; push_neg at h_lt
+  set s := log p k; set L := cascade_length (p := p) k D m
+  -- L < D - (s+1): from L < D/6 - s and D ≥ 16
+  have hD_ge16 : D ≥ 16 := by omega
+  have hL_lt_limit : L < D - (s + 1) := by
+    have : D / 6 ≤ D - 1 := by omega; omega
+  -- digit at s+1+L ≠ p-1 (cascade boundary)
+  have h_digit := cascade_digit_neq' k D m hL_lt_limit
+  -- Express v_p using factorization_choose'
+  set b := max (D + 1) (log p (m + k) + 1) with hb_def
+  have hb : log p (m + k) < b := by show _ < max _ _; omega
+  rw [← Nat.factorization_def _ hp, Nat.factorization_choose' hp hb] at hv
+  -- All carry positions ≤ s+1+L
+  set boundary := s + 1 + L
+  have h_subset : (Ico 1 b).filter (fun i => p ^ i ≤ k % p ^ i + m % p ^ i) ⊆
+      Ico 1 (boundary + 1) := by
+    intro i hi; rw [mem_filter, mem_Ico] at hi; rw [mem_Ico]
+    refine ⟨hi.1.1, ?_⟩
+    by_contra h_not; push_neg at h_not
+    exact no_carry_beyond' hp k m (s + 1 + L) hk (by omega) h_digit i (by omega) hi.2
+  have h_card_bound : ((Ico 1 b).filter
+      (fun i => p ^ i ≤ k % p ^ i + m % p ^ i)).card ≤ boundary := by
+    calc ((Ico 1 b).filter _).card
+        ≤ (Ico 1 (boundary + 1)).card := card_le_card h_subset
+      _ = boundary := by simp [Nat.card_Ico]
+  -- boundary = s + 1 + L ≤ D/6
+  have h_boundary_le : boundary ≤ D / 6 := by omega
+  omega
+EOF
+lake env lean /tmp/test_vtc_full2.lean 2>&1
+[2026-02-11T05:44:44.405Z] 
+🛠️  Executing tool: edit...
+[2026-02-11T05:44:47.095Z] 
+$ cd /home/jarred/code/erdos-728b && lake env lean /tmp/test_vtc_full2.lean 2>&1
+[2026-02-11T05:44:59.994Z] 
+🛠️  Executing tool: read...
+[2026-02-11T05:45:02.110Z] 
+🛠️  Executing tool: read...
+[2026-02-11T05:45:45.286Z] 
+🛠️  Executing tool: edit...
+[2026-02-11T05:45:48.788Z] 
+$ cd /home/jarred/code/erdos-728b && lake build 2>&1 | tail -15
+[2026-02-11T05:46:36.330Z] 
+$ cd /home/jarred/code/erdos-728b && lake build 2>&1 | grep "sorry"
+[2026-02-11T05:46:44.892Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "bad_residue_sets\|sorry" Erdos/Lemma3Counting.lean | grep -E "sorry|bad_residue"
+[2026-02-11T05:46:49.449Z] 
+$ cd /home/jarred/code/erdos-728b && sed -n '614p;615p;616p;617p;618p;619p' Erdos/Lemma3Counting.lean
+[2026-02-11T05:46:52.263Z] 
+$ cd /home/jarred/code/erdos-728b && grep -c "sorry" Erdos/Lemma3Counting.lean
+[2026-02-11T05:46:54.325Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "sorry" Erdos/Lemma3Counting.lean
+[2026-02-11T05:46:59.262Z] 
+$ cd /home/jarred/code/erdos-728b && grep -c "^\s*sorry$\|:= sorry$\| sorry$" Erdos/Lemma3Counting.lean
+[2026-02-11T05:47:08.771Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T05:47:08.773Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T05:47:09.163Z] 
+$ cd /home/jarred/code/erdos-728b && git add -A && git commit -m "Close sorry: bad_residue_sets
+
+Prove that both 'bad' conditions (high valuation on C(m+k,k) and low
+valuation on C(2m,m)) depend only on m mod p^D.
+
+Key lemmas proved:
+- digit_mod_pow_eq: digit p (m % p^D) i = digit p m i for i < D
+- cascade_length_mod_eq: cascade_length is invariant under mod p^D
+- count_high_digits_mod_eq: count_high_digits is invariant under mod p^D
+- valuation_gt_implies_cascade: v_p(C(m+k,k)) > D/6 implies large cascade
+  (via contrapositive using carry_propagate and factorization_choose')
+- count_high_le_valuation: count_high_digits ≤ v_p(C(2m,m)) for arbitrary m
+  (extends valuation_ge_high_digits to remove the log bound restriction)
+- no_carry_beyond: no carry exists past the cascade boundary
+  (descending induction using carry_propagate)
+
+No new sorrys introduced. lake build succeeds."

@@ -8,6 +8,8 @@
 - [2026-02-11 04:51] erdos728b-tor CLOSED. Proved toDigitSpace_bijective.
 - [2026-02-11 05:00] erdos728b-zs3 CLOSED. Proved carry_propagate.
 - [2026-02-11 05:01] erdos728b-co5 CLOSED. Proved valuation_ge_high_digits.
-- [2026-02-11 05:05] Sorry count: 15 total.
-- [2026-02-11 05:10] erdos728b-9pu (count_few_high_digits) is nearing completion; proof compiles in test file.
-- [2026-02-11 05:10] Tier 0 unblocked: bu3, vtv, at0, hga, 2zs.
+- [2026-02-11 05:15] erdos728b-9pu CLOSED. Proved count_few_high_digits using Chernoff.
+- [2026-02-11 05:17] erdos728b-at0 CLOSED. Proved h_T_val arithmetic.
+- [2026-02-11 05:25] Sorry count: 13 total.
+- [2026-02-11 05:25] erdos728b-hga (bad_residue_sets) is nearing completion; proved invariance of cascade/high digits under mod.
+- [2026-02-11 05:25] Tier 0 status: hga (in_progress), bu3, vtv, 2zs unblocked. Tier 1 g8b unblocked.
