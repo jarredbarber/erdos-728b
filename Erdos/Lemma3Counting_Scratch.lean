@@ -1,136 +1,150 @@
-import Erdos.Lemma3Counting
-import Mathlib.Tactic
-
-open Nat Real
-
-namespace Erdos728
-
-variable {p : ℕ} (hp : p.Prime) (D k : ℕ)
-
-lemma hT_proof (hD : D ≥ 16 * (log p (k + 1)) + 16) :
-    D/6 - log p k ≤ D - (log p k + 1) := by
-  let s := log p k
-  have hs : s ≤ log p (k+1) := Nat.log_mono_right (le_succ k)
-  have h_s_bound : 16 * (s + 1) ≤ D := by
-    calc 16 * (s + 1) ≤ 16 * (log p (k+1) + 1) := by gcongr
-          _ ≤ D := hD
-
-  -- Proof D/6 + 1 ≤ D
-  have hD_ge_2 : D ≥ 2 := le_trans (by norm_num) h_s_bound
-  have h_div : D/6 + 1 ≤ D := by
-    apply le_trans (add_le_add_right (Nat.div_le_self D 6) 1)
-    -- D/6 + 1 <= D
-    -- D >= 2.
-    -- If D=2, 0+1 <= 2.
-    -- If D=6, 1+1 <= 6.
-    -- generally x/6 + 1 <= x for x >= 2.
-    -- 5x/6 >= 1.
-    -- 5x >= 6. x >= 2 is sufficient.
-    rw [Nat.add_le_iff_le_sub hD_ge_2]
-    apply Nat.div_le_sub_of_mul_le_mul
-    -- 1 * 6 <= (D-1)*6 ? No.
-    -- x/y <= z iff x <= z*y + (y-1)
-    -- We want D/6 <= D-1.
-    -- D <= (D-1)*6 + 5 = 6D - 6 + 5 = 6D - 1.
-    -- 1 <= 5D. True for D>=1.
-    have : 1 ≤ 5 * D := by
-      apply le_trans (by norm_num) (Nat.mul_le_mul_left 5 (le_trans (by norm_num) hD_ge_2))
+lemma threshold_subpolynomial (C_log : ℝ) :
+    ∃ N : ℕ, ∀ m₀ : ℕ, N ≤ m₀ → ∀ k : ℕ, 1 ≤ k →
+      (k : ℝ) ≤ C_log * Real.log (2 * m₀) →
+      union_bound_threshold k ≤ m₀ := by
+  -- Handle C_log <= 0
+  by_cases hC : C_log ≤ 0
+  · use 2
+    intro m₀ hm₀ k hk h_bound
+    exfalso
+    have h_log : Real.log (2 * m₀) > 0 := Real.log_pos (by norm_cast; linarith)
+    have h_neg : C_log * Real.log (2 * m₀) ≤ 0 := mul_nonneg_of_nonpos_of_nonneg hC (le_of_lt h_log)
+    have : (k : ℝ) ≤ 0 := le_trans h_bound h_neg
     linarith
+  push_neg at hC
 
-  apply Nat.sub_le_sub_right
-  exact h_div
+  -- Step 1: Bound log(T(k)) <= 1000 * (log(2k))^2
+  have h_log_Tk (k : ℕ) (hk : k ≥ 1) : 
+    Real.log (union_bound_threshold k) ≤ 
+    1000 * (Real.log (2 * k))^2 := by
+      apply le_trans (union_bound_threshold_log_bound k hk)
+      
+      let L := Real.log (2 * k)
+      have hL : L ≥ Real.log 2 := by
+        rw [Real.log_le_log_iff (by norm_num) (by norm_cast; linarith)]; linarith
+      
+      -- Expand log(16k)
+      rw [show Real.log (16 * k) = Real.log 8 + L by
+          rw [show 16 * k = 8 * (2 * k) by ring, Real.log_mul (by norm_num) (by norm_cast; linarith)]]
+      
+      calc (72 * ((Real.log 8 + L) / Real.log 2 + 1) + 72) * L
+         = (72 * (3 + L / Real.log 2 + 1) + 72) * L := by
+             rw [show Real.log 8 = 3 * Real.log 2 by rw [show 8=(2:ℝ)^3 by norm_num, Real.log_pow]]
+             field_simp
+             ring_nf
+       _ = 360 * L + (72 / Real.log 2) * L^2 := by field_simp; ring
+       _ ≤ (360 / Real.log 2) * L^2 + (72 / Real.log 2) * L^2 := by
+           apply add_le_add_right
+           rw [mul_div_assoc]
+           apply mul_le_mul_of_nonneg_left
+           · rw [le_div_iff₀ (Real.log_pos (by norm_num))]
+             exact hL
+           · norm_num
+       _ = (432 / Real.log 2) * L^2 := by ring
+       _ ≤ 1000 * L^2 := by
+           apply mul_le_mul_of_nonneg_right _ (sq_nonneg _)
+           rw [div_le_iff₀ (Real.log_pos (by norm_num))]
+           rw [Real.le_log_iff_exp_le (by norm_num)]
+           have : (432 : ℝ) / 1000 ≤ 1/2 := by norm_num
+           apply le_trans (Real.exp_monotone this)
+           rw [Real.exp_le_iff_le_log (by norm_num)]
+           rw [le_div_iff₀ (by norm_num : (2:ℝ) > 0)]
+           rw [mul_comm, ← Real.log_pow, show (2:ℝ)^2 = 4 by norm_num]
+           rw [Real.le_log_iff_exp_le (by norm_num)]
+           exact Real.exp_one_lt_d9.le.trans (by norm_num)
 
-lemma hR1_proof (hp : p.Prime) (hp_ge_3 : p ≥ 3) (D k : ℕ)
-    (hD : D ≥ 16 * (log p (k + 1)) + 16)
-    (T : ℕ) (hT : T = D/6 - log p k) :
-    p^(D - T) ≤ p^D / 2^(D/36) := by
-  let s := log p k
-  rw [hT]
+  -- Step 2: Use k <= C_log * log(2m0)
+  -- Let x = log(2m0)
+  let C_quad := 2000 * (Real.log (2 * C_log))^2
+  let C_quad_x := 2000
   
-  have hs : s ≤ log p (k+1) := Nat.log_mono_right (le_succ k)
-  have h_s_bound : 16 * (s + 1) ≤ D := by
-    calc 16 * (s + 1) ≤ 16 * (log p (k+1) + 1) := by gcongr
-          _ ≤ D := hD
-
-  have h_s_small : s ≤ D/6 := by
-    calc s < s + 1 := lt_succ_self s
-         _ ≤ (16 * (s + 1)) / 16 := by rw [Nat.mul_div_cancel _ (by norm_num)]
-         _ ≤ D / 16 := Nat.div_le_div_right h_s_bound
-         _ ≤ D / 6 := Nat.div_le_div_left (by linarith) (by norm_num)
-
-  have h_exp : D - (D/6 - s) = D - D/6 + s := by
-    rw [Nat.sub_sub_assoc h_s_small (Nat.div_le_self D 6)]
-    rw [Nat.sub_add_comm (Nat.div_le_self D 6)]
+  -- Apply log_growth_lemma for C_quad_x
+  obtain ⟨N1, hN1⟩ := log_growth_lemma C_quad_x
   
-  rw [h_exp]
+  -- Need C_quad + log 2 <= x/2 for large x
+  let N2_val := 2 * (C_quad + Real.log 2)
+  let N2 := Nat.ceil N2_val
+  let N := max (max N1 N2) 3
   
-  -- We need p^(D - D/6 + s) ≤ p^D / 2^(D/36)
-  -- iff p^(D - D/6 + s) * 2^(D/36) ≤ p^D
-  -- iff 2^(D/36) ≤ p^(D - (D - D/6 + s))  (using division property)
-  -- exponent of p: D - (D - D/6 + s) = D/6 - s.
-  -- So we need 2^(D/36) ≤ p^(D/6 - s).
+  -- We need to ensure log(2m0) >= N.
+  -- log(2m0) >= N implies 2m0 >= exp(N).
+  let N_final := Nat.ceil (Real.exp N)
   
-  apply Nat.le_div_iff_mul_le (pow_pos (by norm_num) _) |>.mpr
-  rw [← pow_add]
+  use N_final
+  intro m₀ hm₀ k hk h_bound
   
-  have h_pow_ineq : 2^(D/36) ≤ p^(D/6 - s) := by
-    -- 2^(D/36) <= 3^(D/36) <= p^(D/36) <= p^(D/6 - s) if D/36 <= D/6 - s
-    -- But D/36 <= D/6 - s is equivalent to s <= D/6 - D/36 = 5D/36.
-    -- We have s <= D/16.
-    -- D/16 <= 5D/36? 36 <= 80. Yes.
-    -- So D/36 <= D/6 - s holds.
-    
-    have h_bases : 2 ≤ p := le_trans (by norm_num) hp_ge_3
-    apply le_trans (Nat.pow_le_pow_left h_bases (D/36))
-    apply Nat.pow_le_pow_right (Nat.Prime.pos hp)
-    
-    -- Show D/36 ≤ D/6 - s
-    -- s ≤ D/6 - D/36 = 5D/36
-    apply le_sub_of_add_le
-    rw [add_comm]
-    
-    calc s ≤ D/16 := by
-            apply Nat.le_div_of_mul_le (by norm_num)
-            apply le_trans h_s_bound (le_refl D)
-            -- 16s <= 16(s+1) <= D.
-            -- s <= D/16.
-         _ ≤ 5 * D / 36 := by
-            -- D/16 <= 5D/36 <=> 36D <= 80D. True.
-            apply Nat.div_le_div_of_mul_le_mul (by norm_num)
-            linarith
-         _ ≤ D/6 - D/36 := by
-            -- 5D/36 <= D/6 - D/36 ?
-            -- 6D/36 <= D/6 ?
-            -- D/6 <= D/6. Yes.
-            -- Need to be careful with integer division truncation.
-            -- s <= 5D/36.
-            -- We need s + D/36 <= D/6.
-            -- s <= D/16.
-            -- D/16 + D/36 = (9D + 4D)/144 = 13D/144.
-            -- D/6 = 24D/144.
-            -- 13D/144 <= 24D/144. True.
-            -- Formal proof:
-            apply Nat.le_of_mul_le_mul_right (b := 144) (by norm_num)
-            rw [Nat.add_mul, Nat.mul_sub_left_distrib]
-            -- 144(s) + 144(D/36) <= 144(D/6)
-            -- 144s + 4 * (36 * (D/36)) <= 24 * (6 * (D/6))
-            -- Using div_mul_le and mul_div_le
-            sorry 
-            -- I'll refine this in the actual code.
-            
-    -- Since this scratch proof is getting complicated with Nat division,
-    -- I'll assume the math is sound and implement it properly in the file.
-    sorry
+  have hm₀_pos : m₀ > 0 := lt_of_lt_of_le (by norm_num) hm₀
+  let x := Real.log (2 * m₀)
+  have hx_pos : x > 0 := Real.log_pos (by norm_cast; linarith)
+  
+  have hx_ge_N : x ≥ N := by
+    rw [Real.le_log_iff_exp_le (by norm_cast; linarith)]
+    calc Real.exp N ≤ N_final := Nat.le_ceil _
+       _ ≤ m₀ := hm₀
+       _ ≤ 2 * m₀ := by linarith
+  
+  rw [Real.le_log_iff_exp_le hm₀_pos]
+  
+  apply le_trans (h_log_Tk k hk)
+  
+  -- 1000 * (log 2k)^2 <= ...
+  have h_log_2k : Real.log (2 * k) ≤ Real.log (2 * C_log) + Real.log x := by
+    rw [← Real.log_mul (by norm_num) hx_pos] -- log((2C)*x)
+    rw [Real.log_le_log_iff (by norm_cast; linarith) (by norm_cast; positivity)]
+    calc (2 * k : ℝ) = 2 * k := rfl
+       _ ≤ 2 * (C_log * Real.log (2 * m₀)) := mul_le_mul_of_nonneg_left h_bound (by norm_num)
+       _ = (2 * C_log) * x := by ring
+  
+  have h_sq_le : (Real.log (2 * k))^2 ≤ 2 * (Real.log (2 * C_log))^2 + 2 * (Real.log x)^2 := by
+    calc (Real.log (2 * k))^2 
+       ≤ (Real.log (2 * C_log) + Real.log x)^2 := sq_le_sq' (by 
+           rw [abs_le]
+           constructor
+           · linarith [hx_pos, Real.log_pos (by norm_cast; linarith : 2*k > 1)] 
+             -- Actually just RHS >= 0 if log(2k) >= 0.
+             -- log(2k) >= log 2 > 0.
+             -- log(2C) + log x could be negative?
+             -- x >= N >= 3. log x > 1.
+             -- C_log could be small.
+             -- But (log(2k))^2 <= (A+B)^2 if A+B >= log(2k).
+             -- We have log(2k) <= A+B.
+             -- Since log(2k) >= 0, if A+B >= 0, then (log 2k)^2 <= (A+B)^2.
+             -- A+B >= log 2k >= 0. So yes.
+             exact h_log_2k
+           · exact h_log_2k
+         )
+       _ ≤ 2 * (Real.log (2 * C_log))^2 + 2 * (Real.log x)^2 := by
+           have : (Real.log (2 * C_log) + Real.log x)^2 + (Real.log (2 * C_log) - Real.log x)^2 = 
+                  2 * (Real.log (2 * C_log))^2 + 2 * (Real.log x)^2 := by ring
+           linarith [sq_nonneg (Real.log (2 * C_log) - Real.log x)]
 
-  calc p^(D - D/6 + s) * 2^(D/36) 
-    ≤ p^(D - D/6 + s) * p^(D/6 - s) := by
-       gcongr
-       exact h_pow_ineq
-    _ = p^(D - D/6 + s + (D/6 - s)) := by rw [← pow_add]
-    _ = p^D := by
-       congr
-       rw [Nat.add_assoc, Nat.sub_add_cancel]
-       · rw [Nat.sub_add_cancel (Nat.div_le_self D 6)]
-       · exact h_s_small
+  calc 1000 * (Real.log (2 * k))^2
+     ≤ 1000 * (2 * (Real.log (2 * C_log))^2 + 2 * (Real.log x)^2) := 
+         mul_le_mul_of_nonneg_left h_sq_le (by norm_num)
+   _ = 2000 * (Real.log (2 * C_log))^2 + 2000 * (Real.log x)^2 := by ring
+   _ = C_quad + C_quad_x * (Real.log x)^2 := rfl
+   _ ≤ C_quad + x / 2 := by
+       apply add_le_add_left
+       apply hN1
+       exact le_trans (le_max_left _ _) (le_trans (le_max_left _ _) hx_ge_N)
+   _ ≤ (x / 2 - Real.log 2) + x / 2 := by
+       apply add_le_add_right
+       -- C_quad <= x/2 - log 2
+       -- C_quad + log 2 <= x/2
+       -- 2 * (C_quad + log 2) <= x
+       -- N2_val <= x
+       calc C_quad ≤ x / 2 - Real.log 2 ↔ C_quad + Real.log 2 ≤ x / 2 := by linarith
+       rw [← mul_le_mul_left (by norm_num : (2:ℝ) > 0)]
+       simp [mul_sub, mul_div_cancel₀ _ (by norm_num : (2:ℝ) ≠ 0)]
+       rw [← mul_add]
+       calc 2 * (C_quad + Real.log 2) 
+           = N2_val := rfl
+         _ ≤ N2 := Nat.le_ceil _
+         _ ≤ N := le_trans (le_max_right _ _) (le_trans (le_max_left _ _) hx_ge_N)
+         _ ≤ x := hx_ge_N
+   _ = x - Real.log 2 := by ring
+   _ = Real.log (2 * m₀) - Real.log 2 := rfl
+   _ = Real.log m₀ := by
+       rw [Real.log_mul (by norm_num) (by norm_cast; linarith)]
+       ring
 
-end Erdos728
