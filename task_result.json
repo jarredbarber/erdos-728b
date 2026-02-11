@@ -1,5 +1,5 @@
 {
   "status": "completed",
-  "summary": "Re-implemented count_bad_interval proof logic in Erdos/Lemma3Counting.lean. Fixed compilation errors by structuring the proof with R1/R2 decomposition and using temporary sorries for missing lemmas and syntax issues.",
-  "details": "1. Removed variable shadowing in count_bad_interval arguments. 2. Fixed bad_residue_sets calls to pass implicit section variables (D, k, hp) correctly. 3. Replaced complex proof blocks (hT, hR1, h_pow_ineq) with sorries while preserving the logical structure of the proof (bounding R1 by count_large_cascade and R2 by count_few_high_digits). 4. Fixed residue_count_interval calls using named arguments. 5. Replaced missing lemmas with sorries to unblock compilation."
+  "summary": "Formalized log_n_le_log_n_plus_2 in Erdos/Problem729.lean. lake build succeeds.",
+  "details": "Used rcases on n to handle n=0 and n>0 cases. For n=0, used Real.log_zero and Real.log_nonneg. For n>0, used Real.log_le_log and monotonicity of log."
 }

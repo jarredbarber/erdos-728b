@@ -142,7 +142,12 @@ lemma nat_log_le_real_log {p n : ℕ} (hp : 1 < p) (hn : n ≠ 0) :
   exact Real.log_pos hp_real
 
 lemma log_n_le_log_n_plus_2 (n : ℕ) : Real.log n ≤ Real.log (n + 2) := by
-  sorry
+  rcases n.eq_zero_or_pos with rfl | hn
+  · rw [Nat.cast_zero, Real.log_zero, zero_add]
+    exact Real.log_nonneg (by norm_num)
+  · apply Real.log_le_log
+    · norm_cast
+    · norm_cast; linarith
 
 lemma sumDigits_bound_real {p : ℕ} (hp : 1 < p) (n : ℕ) :
     (sumDigits p n : ℝ) ≤ (p - 1) * (Real.log n / Real.log p + 1) := by
