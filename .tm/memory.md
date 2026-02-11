@@ -2,6 +2,6 @@
 
 - [2026-02-10 21:14] Pattern: Multiple formalization tasks failing with formatting/parsing issues.
 - [2026-02-11 01:20] Erdos/Lemma3.lean is SORRY-FREE.
-- [2026-02-11 04:10] Sorry count: 18. Literature count: 6 (4 verified ✅).
-- [2026-02-11 04:10] Created planner task aw0 to decompose 18 sorries in Lemma3Counting.lean.
-- [2026-02-11 04:10] erdos728b-hwa in progress (wiring main existence).
+- [2026-02-11 04:25] erdos728b-hwa CLOSED. Main theorem erdos_728 is sorry-free conditional on exists_m_small_primes_good_uniform.
+- [2026-02-11 04:30] Sorry count: 18. Task erdos728b-48g unblocked.
+- [2026-02-11 04:30] Planner task aw0 in progress mapping 18 sorry locations to verified NL proofs.
