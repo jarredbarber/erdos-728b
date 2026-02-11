@@ -14,8 +14,9 @@ This repo contains the answer: **yes.** 2,906 lines of Lean 4, **0 sorrys, 0 axi
 
 ### Setup
 
-- **Models:** Gemini 3 Pro (Google) and Claude Opus 4.6 (Anthropic), randomly assigned per task
+- **Models:** Claude Opus 4.6 (Anthropic), Gemini 3 Pro, and Gemini 3 Flash (Google), randomly assigned per task
 - **Workflow:** [timtam](https://github.com/jarredbarber/timtam) multi-agent system — explore agents discover NL proofs, verify agents review them, formalize agents write Lean. A planner decomposes problems into tasks. An overseer monitors progress.
+- **Formalization:** Standard LLMs writing Lean as text, iterating against the compiler. No MCTS, no tactic-level search, no Lean-specific training. Just general-purpose models and `lake build`.
 - **Lean:** 4.27.0 + Mathlib 4.27.0
 - **Effort:** 66 tasks, all closed
 
@@ -23,7 +24,7 @@ This repo contains the answer: **yes.** 2,906 lines of Lean 4, **0 sorrys, 0 axi
 
 **Erdős Problem 728:** For sufficiently small ε > 0 and any 0 < C < C', show there exist a, b, n ∈ ℕ with a, b > εn such that a!b! | n!(a+b-n)! and C log n < a+b-n < C' log n.
 
-This was previously resolved by GPT-5.2 + Aristotle ([arXiv:2601.07421](https://arxiv.org/abs/2601.07421)). Our agents had no access to that paper and found a different construction for the hardest step.
+Previously resolved by GPT-5.2 + Aristotle ([arXiv:2601.07421](https://arxiv.org/abs/2601.07421)), which used MCTS-based tactic search (Aristotle/Harmonic) for formalization. Our agents had no access to that paper, used no specialized search — just LLMs generating Lean code and fixing compiler errors — and found a different construction for the hardest step (Chernoff + union bound vs. carry-rich/spike-free counting).
 
 This is one of several Erdős problems attacked in this experiment. See the [full experiment writeup](https://gist.github.com/jarredbarber/10dff24643366d160e80e75766ae4df1) for results across all problems.
 
