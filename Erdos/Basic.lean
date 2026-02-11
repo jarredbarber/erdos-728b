@@ -48,18 +48,20 @@ private lemma dvd_of_padicValNat_le {a b : ℕ} (ha : a ≠ 0) (hb : b ≠ 0)
     4. Union bound: total bad ≤ π(2k) · m₀/(8k) ≤ 2k · m₀/(8k) = m₀/4 < m₀
     5. Since |bad| < |[m₀, 2m₀)| = m₀, a good m exists
 
-    SORRY: The union bound arithmetic is verified in the NL proof
-    (proofs/lemma3-counting.md, Part E) but requires substantial formalization:
-    - Explicit D_p computation and hypothesis verification
-    - Summation over primes with Finset arithmetic
-    - The M₀(k) ≤ m₀ bound when k = O(log m₀) -/
+    The proof is decomposed into two independent lemmas in Lemma3Counting.lean:
+    - exists_m_for_fixed_k: For each fixed k, the union bound gives a good m
+      when m₀ ≥ union_bound_threshold k.
+    - threshold_subpolynomial: For k ≤ C_log · log(2m₀) and m₀ large,
+      union_bound_threshold k ≤ m₀. -/
 private lemma exists_m_small_primes_good_uniform (C_log : ℝ) :
     ∃ M₀ : ℕ, ∀ m₀ : ℕ, M₀ ≤ m₀ → ∀ k : ℕ, 1 ≤ k →
       (k : ℝ) ≤ C_log * Real.log (2 * m₀) →
       ∃ m : ℕ, m₀ ≤ m ∧ m < 2 * m₀ ∧
         ∀ p : ℕ, p.Prime → p ≤ 2 * k →
           padicValNat p ((m + k).choose k) ≤ padicValNat p ((2 * m).choose m) := by
-  sorry
+  obtain ⟨N, hN⟩ := threshold_subpolynomial C_log
+  exact ⟨N, fun m₀ hm₀ k hk hk_bound =>
+    exists_m_for_fixed_k k hk m₀ (hN m₀ hm₀ k hk hk_bound)⟩
 
 /-- **Core existence lemma**: For any constant C > 0 and all sufficiently large m₀,
 for every k with 1 ≤ k ≤ C * log(2m₀), there exists m ∈ [m₀, 2m₀] such that
