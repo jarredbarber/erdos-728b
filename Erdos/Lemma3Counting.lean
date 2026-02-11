@@ -319,8 +319,55 @@ lemma valuation_le_cascade (hp : p.Prime) (m : ℕ) (hk : k ≥ 1) (hm : m < p ^
         Nat.lt_succ_iff.mp (Nat.log_lt_of_lt_pow (by omega) hmk_lt_pow)
       omega
 
+/-- If `cascade_length m ≥ T`, then digits at positions `s+1, ..., s+T` are all `p-1`. -/
+private lemma cascade_ge_implies_digits (m T : ℕ)
+    (hcasc : cascade_length (p := p) k D m ≥ T)
+    (j : ℕ) (hj : j < T) : digit p m (log p k + 1 + j) = p - 1 := by
+  unfold cascade_length at hcasc; simp only at hcasc
+  set s := log p k
+  set limit := D - (s + 1)
+  set pred := fun i => decide (digit p m (s + 1 + i) = p - 1)
+  have h_prefix : ((List.range limit).takeWhile pred) <+: (List.range limit) :=
+    List.takeWhile_prefix pred
+  have h_len : j < ((List.range limit).takeWhile pred).length := by omega
+  have h_getElem := h_prefix.getElem h_len
+  rw [List.getElem_range] at h_getElem
+  have h_pred := List.mem_takeWhile_imp (List.getElem_mem h_len)
+  rw [h_getElem] at h_pred
+  simp only [pred, decide_eq_true_eq] at h_pred
+  exact h_pred
+
 lemma count_large_cascade (hp : p.Prime) (T : ℕ) (hT : T ≤ D - (log p k + 1)) :
-    ((range (p^D)).filter (fun m => cascade_length (p:=p) k D m ≥ T)).card ≤ p ^ (D - T) := sorry
+    ((range (p^D)).filter (fun m => cascade_length (p:=p) k D m ≥ T)).card ≤ p ^ (D - T) := by
+  set s := log p k
+  by_cases hsD : s + 1 ≤ D
+  · -- Normal case: define T injective indices into digit positions s+1..s+T
+    have hT_bound : s + 1 + T ≤ D := by omega
+    let indices : Fin T → Fin D := fun j => ⟨s + 1 + j.val, by omega⟩
+    let values : Fin T → Fin p := fun _ => ⟨p - 1, Nat.sub_lt hp.pos (by omega)⟩
+    have h_inj : Function.Injective indices := by
+      intro a b h; ext; simp [indices] at h; omega
+    -- cascade_length ≥ T implies all T digit positions are fixed to p-1
+    have h_subset :
+        (range (p^D)).filter (fun m => cascade_length (p:=p) k D m ≥ T) ⊆
+        (range (p^D)).filter (fun m => ∀ j : Fin T,
+          digit p m (indices j) = (values j : ℕ)) := by
+      intro m hm
+      rw [mem_filter] at hm ⊢
+      exact ⟨hm.1, fun j => by
+        simp only [indices, values]
+        exact cascade_ge_implies_digits k D m T hm.2 j.val j.isLt⟩
+    -- Subset bound + count_digits_fixed gives p^(D-T)
+    calc ((range (p^D)).filter
+            (fun m => cascade_length (p:=p) k D m ≥ T)).card
+        ≤ ((range (p^D)).filter (fun m => ∀ j : Fin T,
+            digit p m (indices j) = (values j : ℕ))).card :=
+          card_le_card h_subset
+      _ = p ^ (D - T) := count_digits_fixed hp D indices values h_inj
+  · -- Degenerate case: s + 1 > D, so T = 0
+    push_neg at hsD
+    have hT0 : T = 0 := by omega
+    subst hT0; simp
 
 end Cascade
 
