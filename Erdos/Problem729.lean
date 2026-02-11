@@ -2,6 +2,7 @@ import Mathlib.NumberTheory.Padics.PadicVal.Basic
 import Mathlib.Data.Nat.Digits.Lemmas
 import Mathlib.Data.Nat.Log
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Tactic
 
 open Nat Real
 
@@ -33,19 +34,29 @@ lemma sumDigits_le_log (p n : ℕ) (hp : 1 < p) :
       exact Nat.digits_lt_base hp hd
     · rw [digits_len p n hp h, mul_comm]
 
+lemma delta_le_sumDigits {p : ℕ} (hp : p.Prime) (a b n : ℕ)
+    (h : padicValNat p a.factorial + padicValNat p b.factorial ≤ padicValNat p n.factorial) :
+    a + b - n ≤ sumDigits p a + sumDigits p b - sumDigits p n := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  have h_mul : (p - 1) * (padicValNat p a.factorial + padicValNat p b.factorial) ≤
+      (p - 1) * padicValNat p n.factorial :=
+    Nat.mul_le_mul_left (p - 1) h
+  rw [Nat.mul_add, sub_one_mul_padicValNat_factorial, sub_one_mul_padicValNat_factorial,
+    sub_one_mul_padicValNat_factorial] at h_mul
+  have h_Sa := digit_sum_le p a
+  have h_Sb := digit_sum_le p b
+  have h_Sn := digit_sum_le p n
+  rw [sumDigits, sumDigits, sumDigits]
+  omega
+
+lemma a_lt_two_n {P a b n : ℕ} (hP : 0 < P) (hnP : n > P)
+    (h : ∀ p, p.Prime → P < p → padicValNat p a.factorial + padicValNat p b.factorial ≤ padicValNat p n.factorial) :
+    a < 2 * n := by
+  sorry
+
 theorem erdos_729 (P : ℕ) (hP : 0 < P) :
     ∃ C > (0 : ℝ), ∀ a b n : ℕ,
       (∀ p, p.Prime → P < p →
         padicValNat p a.factorial + padicValNat p b.factorial ≤ padicValNat p n.factorial) →
       (a : ℝ) + b ≤ n + C * Real.log (n + 2) := by
-  sorry
-
-lemma delta_le_sumDigits {p : ℕ} (hp : p.Prime) (a b n : ℕ)
-    (h : padicValNat p a.factorial + padicValNat p b.factorial ≤ padicValNat p n.factorial) :
-    a + b - n ≤ (digits p a).sum + (digits p b).sum - (digits p n).sum := by
-  sorry
-
-lemma a_lt_two_n {P a b n : ℕ} (hP : 0 < P) (hnP : n > P)
-    (h : ∀ p, p.Prime → P < p → padicValNat p a.factorial + padicValNat p b.factorial ≤ padicValNat p n.factorial) :
-    a < 2 * n := by
   sorry

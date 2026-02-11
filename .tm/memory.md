@@ -14,7 +14,8 @@
 - [2026-02-11 06:03] erdos728b-bu3 CLOSED. Proved count_digits_fixed.
 - [2026-02-11 12:35] Erdos 728b is COMPLETE. All sorries in Erdos/Basic.lean and Erdos/Lemma3Counting.lean are closed.
 - [2026-02-11 12:40] Problem 729: Formalization started.
-- [2026-02-11 13:17] erdos728b-15q REOPENED. Previous attempt failed to persist changes and output JSON.
-- [2026-02-11 13:17] Skeletons for delta_le_sumDigits, sumDigits_le_log, and a_lt_two_n restored to Erdos/Problem729.lean.
+- [2026-02-11 13:40] erdos728b-51l CLOSED. Proved sumDigits_le_log.
+- [2026-02-11 13:40] erdos728b-15q CLOSED. Proved delta_le_sumDigits using Legendre's formula and Nat arithmetic (omega).
+- [2026-02-11 13:40] Backlog: 2 tasks remain for 729 (a_lt_two_n, main theorem).
 - [2026-02-11 12:50] Project 728b confirmed sorry-free.
 - [2026-02-11 12:35] Sorry count: 0 (excluding scratch file reproduce_lemma.lean).

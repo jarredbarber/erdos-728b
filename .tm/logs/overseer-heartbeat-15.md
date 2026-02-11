@@ -1,5 +1,5 @@
 # Overseer Heartbeat 15
 
-**Time:** 2026-02-11T05:04:03.447Z
-**Summary:** Task erdos728b-co5 closed successfully; erdos728b-9pu is in progress. Sorry count decreased to 15.
-**Details:** 1. Sorry count: 15. 2. Task erdos728b-co5 closed successfully, proving valuation_ge_high_digits. 3. Task erdos728b-9pu (count_few_high_digits) is currently in progress. 4. Backlog has 11 open tasks, Tier 0 remains unblocked with tasks: bu3, vtv, at0, hga, 2zs. 5. System is healthy and following the 4-tier DAG.
+**Time:** 2026-02-11T13:34:50.730Z
+**Summary:** No intervention needed. Erdős 728b is complete and sorry-free. Erdős 729 is underway.
+**Details:** Erdős 728b is verified sorry-free. Erdős 729 formalization has started: sumDigits_le_log is proved, delta_le_sumDigits is currently in progress (reopened), and a_lt_two_n is unblocked in the backlog. Sorry count is 4 (all in Problem 729).
