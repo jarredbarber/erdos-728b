@@ -128,6 +128,38 @@ Both proofs are valid. Our proof is more modular — each lemma is self-containe
 
 The MCTS approach (Aristotle) is likely more efficient at closing individual Lean goals — it searches the tactic space directly. Our agents fight the compiler iteratively, which is slower but uses only general-purpose LLMs with no Lean-specific training. The fact that both systems converged on the same mathematical strategy suggests the bottleneck is proof discovery, not formalization.
 
+## Comparison with DeepMind's Aletheia (Gemini Deep Think)
+
+The [Aletheia paper](https://arxiv.org/abs/2601.22401) (DeepMind, 2026) ran Gemini Deep Think on 700 open Erdős problems. **Aletheia did not solve 728.** The 728 result came separately from K. Barreto using GPT-5.2 Pro + Aristotle (Harmonic). Barreto is a co-author on both papers.
+
+The two efforts represent fundamentally different approaches to AI-assisted mathematics:
+
+| | Aletheia (DeepMind) | Our system (timtam) |
+|---|---|---|
+| **Model** | Gemini Deep Think | Claude Opus 4.6 + Gemini 3 Pro (randomized) |
+| **Scale** | 700 problems, broad sweep | Single problem, deep focus |
+| **Output** | Natural language proofs | Formal Lean 4 proofs |
+| **Verification** | Human expert evaluation (15+ mathematicians) | Lean compiler (`lake build`) |
+| **Correctness rate** | 31.5% technically correct, 6.5% meaningfully correct | Binary: compiles or doesn't |
+| **Focus** | "Can AI solve open problems?" | "Can AI produce reusable formalized infrastructure?" |
+| **Biggest challenge** | Literature search + problem misinterpretation | Lean/Mathlib friction (casting, simp failures) |
+
+### What Aletheia found that we can't
+
+- **Problem misinterpretation**: 50 of their 63 correct solutions answered the wrong question (definitional ambiguity, Erdős's intent vs literal statement). Formal verification can't catch this — if the theorem statement is wrong, a correct proof of the wrong statement still compiles.
+- **Literature identification**: 9 of their 13 results were already in the literature. Determining originality requires human expertise that no formal system provides.
+- **"Subconscious plagiarism"**: LLMs may reproduce training data without attribution. They flag this explicitly.
+
+### What we found that Aletheia can't
+
+- **Guaranteed correctness**: Their 68.5% false-positive rate (137/200 solutions were wrong) is eliminated by compiler verification. Our proof either compiles with 0 sorrys or it doesn't.
+- **Reusable formalized infrastructure**: Our proof produced 8 standalone lemma files now in [OpenLemma](https://github.com/jarredbarber/openlemma) — Kummer criterion, carry dominance, Chernoff over digit spaces — that future proofs can import.
+- **Agent failure transcripts**: 269 worker logs documenting exactly how agents fail with Lean/Mathlib, useful for improving both agents and Mathlib's API ([friction report](https://gist.github.com/jarredbarber/c541d6d7f35582d97fffc227b2dde692)).
+
+### The complementarity
+
+Aletheia is better at breadth: sweep 700 problems, find the low-hanging fruit, identify literature gaps. Our system is better at depth: take one problem and produce a compiler-verified proof with reusable infrastructure. Neither system catches both mathematical errors AND problem misformulation. The ideal pipeline would combine NL exploration (Aletheia-style) with formal verification (our style), with human experts auditing the theorem statement.
+
 ## Key Findings
 
 - **Agents independently discovered Kummer's theorem** as the key tool (confirmed by clean replication — no technique hints given)
