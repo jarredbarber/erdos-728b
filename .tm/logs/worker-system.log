@@ -20549,3 +20549,25 @@ Strategy:
 
 Helper lemma div_mul_div_le proves (a/c)*(b/a) ≤ b/c in ℕ.
 lake build succeeds with no new sorrys."
+[2026-02-11T06:37:30.355Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-gaa --status "Completed: sorry closed, lake build succeeds"
+[2026-02-11T06:37:39.505Z] 
+
+📝 Agent response complete.
+
+[2026-02-11T06:37:39.505Z] 📄 Log saved to .tm/logs/worker-erdos728b-gaa.md
+[2026-02-11T06:37:39.505Z] 
+📊 Task erdos728b-gaa completed:
+[2026-02-11T06:37:39.506Z]    Summary: Closed sorry in count_bad_interval. lake build succeeds.
+[2026-02-11T06:37:39.506Z]    Details: Proved #{m ∈ [m0,2m0) : v_p(C(m+k,k)) > v_p(C(2m,m))} ≤ 2m0/2^(D/36) + 2p^D/2^(D/36).
+
+Proof strategy:
+1. Defined residue sets R1 (large cascade, from bad_residue_sets) and R2 (few high digits)
+2. Showed the bad filter is contained in {m : m % p^D ∈ R1 ∪ R2} via the threshold argument: either v_p(C(m+k,k)) > D/6 or v_p(C(2m,m)) < D/6
+3. Applied residue_count_interval for interval-to-residue reduction: count ≤ |R| * (m0/p^D + 1)
+4. Bounded |R1| ≤ p^D/2^(D/36) using count_large_cascade and the key fact p^(D/6-s) ≥ 2^(D/36) (from D ≥ 16*log_p(k+1)+16)
+5. Bounded |R2| ≤ p^D/2^(D/36) using count_few_high_digits
+6. Combined: |R| ≤ 2*p^D/2^(D/36)
+7. Final arithmetic: (2*p^D/2^x) * (m0/p^D + 1) ≤ 2*m0/2^x + 2*p^D/2^x, using a helper lemma div_mul_div_le proving (a/c)*(b/a) ≤ b/c in ℕ
+
+No new sorrys introduced. The remaining sorrys in the file (exists_m_for_fixed_k, threshold_subpolynomial) are in separate lemmas.

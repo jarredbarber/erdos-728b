@@ -846,3 +846,26 @@ Strategy:
 Helper lemma div_mul_div_le proves (a/c)*(b/a) ≤ b/c in ℕ.
 lake build succeeds with no new sorrys."
 ```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-gaa --status "Completed: sorry closed, lake build succeeds"
+```
+```json
+{
+  "status": "completed",
+  "summary": "Closed sorry in count_bad_interval. lake build succeeds.",
+  "details": "Proved #{m ∈ [m0,2m0) : v_p(C(m+k,k)) > v_p(C(2m,m))} ≤ 2m0/2^(D/36) + 2p^D/2^(D/36).\n\nProof strategy:\n1. Defined residue sets R1 (large cascade, from bad_residue_sets) and R2 (few high digits)\n2. Showed the bad filter is contained in {m : m % p^D ∈ R1 ∪ R2} via the threshold argument: either v_p(C(m+k,k)) > D/6 or v_p(C(2m,m)) < D/6\n3. Applied residue_count_interval for interval-to-residue reduction: count ≤ |R| * (m0/p^D + 1)\n4. Bounded |R1| ≤ p^D/2^(D/36) using count_large_cascade and the key fact p^(D/6-s) ≥ 2^(D/36) (from D ≥ 16*log_p(k+1)+16)\n5. Bounded |R2| ≤ p^D/2^(D/36) using count_few_high_digits\n6. Combined: |R| ≤ 2*p^D/2^(D/36)\n7. Final arithmetic: (2*p^D/2^x) * (m0/p^D + 1) ≤ 2*m0/2^x + 2*p^D/2^x, using a helper lemma div_mul_div_le proving (a/c)*(b/a) ≤ b/c in ℕ\n\nNo new sorrys introduced. The remaining sorrys in the file (exists_m_for_fixed_k, threshold_subpolynomial) are in separate lemmas."
+}
+```
+
+## Final Result
+
+```json
+{
+  "status": "completed",
+  "summary": "Closed sorry in count_bad_interval. lake build succeeds.",
+  "details": "Proved #{m ∈ [m0,2m0) : v_p(C(m+k,k)) > v_p(C(2m,m))} ≤ 2m0/2^(D/36) + 2p^D/2^(D/36).\n\nProof strategy:\n1. Defined residue sets R1 (large cascade, from bad_residue_sets) and R2 (few high digits)\n2. Showed the bad filter is contained in {m : m % p^D ∈ R1 ∪ R2} via the threshold argument: either v_p(C(m+k,k)) > D/6 or v_p(C(2m,m)) < D/6\n3. Applied residue_count_interval for interval-to-residue reduction: count ≤ |R| * (m0/p^D + 1)\n4. Bounded |R1| ≤ p^D/2^(D/36) using count_large_cascade and the key fact p^(D/6-s) ≥ 2^(D/36) (from D ≥ 16*log_p(k+1)+16)\n5. Bounded |R2| ≤ p^D/2^(D/36) using count_few_high_digits\n6. Combined: |R| ≤ 2*p^D/2^(D/36)\n7. Final arithmetic: (2*p^D/2^x) * (m0/p^D + 1) ≤ 2*m0/2^x + 2*p^D/2^x, using a helper lemma div_mul_div_le proving (a/c)*(b/a) ≤ b/c in ℕ\n\nNo new sorrys introduced. The remaining sorrys in the file (exists_m_for_fixed_k, threshold_subpolynomial) are in separate lemmas."
+}
+```
+
+End Time: 2026-02-11T06:37:39.505Z
