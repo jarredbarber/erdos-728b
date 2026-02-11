@@ -131,7 +131,10 @@ section HighDigits
 variable {p : ℕ} (hp : p.Prime) (D : ℕ)
 
 lemma valuation_ge_high_digits (hp : p.Prime) (m : ℕ) (h_log : log p (2*m) < D + 1) :
-    padicValNat p ((2*m).choose m) ≥ count_high_digits p m D := sorry
+    padicValNat p ((2*m).choose m) ≥ count_high_digits p m D := by
+  have h := lower_bound_valuation_by_high_digits p m D hp h_log
+  rw [Nat.factorization_def _ hp] at h
+  exact h
 
 lemma highDigitCount_eq (m : Fin (p^D)) :
     highDigitCount (toDigitSpace hp D m) = count_high_digits p m D := by
