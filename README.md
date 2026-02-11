@@ -1,31 +1,12 @@
-# Erdős 728: Formal Proof by Autonomous AI Agents
+# Erdős 728: Agent-Discovered Proof ✅ (erdos-728b experiment)
 
-## Motivation
+**Context:** This proof was discovered and fully formalized by LLM agents (Gemini 3 Pro + Claude Opus 4.6, randomized per task) using the [timtam](https://github.com/jarredbarber/timtam) multi-agent workflow. No hints about proof techniques were provided — agents were given only the problem statement and told "this has been proved."
 
-In January 2026, GPT-5.2 + Aristotle resolved Erdős Problem 728 ([arXiv:2601.07421](https://arxiv.org/abs/2601.07421)). That system used a tight loop between GPT-5.2 (proof strategy) and Aristotle/Harmonic (MCTS-based tactic search over Lean proof states) — a purpose-built pipeline with specialized Lean search.
+**Result:** 2,906 lines of Lean 4, **0 sorrys, 0 axioms**, `lake build` passes. 66 tasks, all closed.
 
-We wanted to know: **can general-purpose LLMs do this without specialized search?** No MCTS, no tactic-level tree search, no Lean-specific training. Just off-the-shelf models writing Lean as text, iterating against the compiler, coordinated by a task management system.
+**Problem:** For sufficiently small ε > 0 and any 0 < C < C', show there exist a, b, n ∈ ℕ with a, b > εn such that a!b! | n!(a+b-n)! and C log n < a+b-n < C' log n.
 
-**Result:** 2,906 lines of Lean 4, **0 sorrys, 0 axioms**, verified by `lake build`. The agents found a different construction for the hardest step — Chernoff + union bound instead of carry-rich/spike-free counting — with no access to the published proof.
-
-## The Problem
-
-**Erdős Problem 728:** For sufficiently small ε > 0 and any 0 < C < C', show there exist a, b, n ∈ ℕ with a, b > εn such that a!b! | n!(a+b-n)! and C log n < a+b-n < C' log n.
-
-## Experimental Design
-
-- **Zero human mathematical input.** No hints about proof techniques. Agents received only the problem statement.
-- **No web search.** No access to arXiv, Mathlib docs, or external references.
-- **The compiler is the only reviewer.** `lake build` with 0 sorrys and 0 axioms is the sole acceptance criterion.
-- **Models:** Claude Opus 4.6 (Anthropic), Gemini 3 Pro, and Gemini 3 Flash (Google), randomly assigned per task.
-- **Formalization:** LLMs generate Lean code, get compiler errors back, fix and retry. No specialized search.
-- **Workflow:** [timtam](https://github.com/jarredbarber/timtam) multi-agent system — explore agents discover NL proofs, verify agents review them, formalize agents write Lean. A planner decomposes problems into tasks.
-- **Lean:** 4.27.0 + Mathlib 4.27.0
-- **Effort:** 66 tasks, all closed
-
-This is one of several Erdős problems attacked in this experiment:
-- [**Proof strategy details for this problem**](https://gist.github.com/jarredbarber/5b49a172290564e281b8676b9f8402d0) — construction, lemmas, comparison with GPT-5.2 approach
-- [**Full experiment writeup**](https://gist.github.com/jarredbarber/10dff24643366d160e80e75766ae4df1) — results across all problems (728, 729, 1094, 410)
+**Repo:** [github.com/jarredbarber/erdos-728b](https://github.com/jarredbarber/erdos-728b)
 
 ---
 
@@ -88,13 +69,24 @@ Therefore there exists m ∈ [m₀, 2m₀] with C(m+k,k) | C(2m,m), giving the d
 
 ---
 
+## Prior Human Work
+
+The high-level proof strategy traces back to human work on divisors of the central binomial coefficient:
+
+- **Pomerance (2015)**, ["Divisors of the Middle Binomial Coefficient"](https://math.dartmouth.edu/~carlp/catalan5.pdf), *Amer. Math. Monthly*. Proved that for each fixed k ≥ 1, the set of n for which (n+k) | C(2n,n) has asymptotic density 1, using Kummer's theorem and the heuristic that base-p digit patterns behave "randomly."
+- **Ford & Konyagin (2021)**, "Divisibility of the central binomial coefficient C(2n,n)," *Trans. AMS*. Extended Pomerance's methods to determine the density of n where n^ℓ | C(2n,n).
+
+Our proof and the GPT-5.2/Aristotle proof both extend Pomerance's approach from fixed k to growing k ≍ log n. As the [Aletheia paper](https://arxiv.org/abs/2601.22401) (DeepMind, 2026) notes, these AI solutions "closely follow prior human arguments" by Pomerance.
+
+**On originality:** We cannot distinguish whether agents independently discovered this strategy (Kummer → digit counting is arguably the natural approach once you know Kummer's theorem) or reproduced it from training data. Pomerance 2015 appeared in the widely-read *American Mathematical Monthly* and is almost certainly in LLM training corpora. This is the "subconscious plagiarism" problem identified by the Aletheia team: formal verification confirms correctness but cannot confirm originality.
+
 ## Comparison with Published Proof (GPT-5.2 / Aristotle)
 
 The published proof is [arXiv:2601.07421](https://arxiv.org/abs/2601.07421) by Sothanaphan (writeup of a proof by GPT-5.2 Pro + Aristotle/Harmonic, operated by Barreto). Our agents had no access to this paper.
 
 ### What's the same
 
-Both proofs share the same high-level architecture:
+Both proofs share the same high-level architecture (also shared with Pomerance 2015):
 
 | Step | Published | Ours (728b) |
 |------|-----------|-------------|
