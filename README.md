@@ -1,12 +1,27 @@
-# Erdős 728: Agent-Discovered Proof ✅ (erdos-728b experiment)
+# Erdős 728: Formal Proof by Autonomous AI Agents
 
-**Context:** This proof was discovered and fully formalized by LLM agents (Gemini 3 Pro + Claude Opus 4.6, randomized per task) using the [timtam](https://github.com/jarredbarber/timtam) multi-agent workflow. No hints about proof techniques were provided — agents were given only the problem statement and told "this has been proved."
+## Motivation
 
-**Result:** 2,906 lines of Lean 4, **0 sorrys, 0 axioms**, `lake build` passes. 66 tasks, all closed.
+In January 2026, GPT-5.2 + Aristotle resolved Erdős Problem 728 ([arXiv:2601.07421](https://arxiv.org/abs/2601.07421)). That system used a tight loop between GPT-5.2 (proof strategy) and Aristotle/Harmonic (MCTS-based tactic search over Lean proof states) — a purpose-built pipeline with specialized Lean search.
 
-**Problem:** For sufficiently small ε > 0 and any 0 < C < C', show there exist a, b, n ∈ ℕ with a, b > εn such that a!b! | n!(a+b-n)! and C log n < a+b-n < C' log n.
+We wanted to know: **can general-purpose LLMs do this without specialized search?** No MCTS, no tactic-level tree search, no Lean-specific training. Just off-the-shelf models writing Lean as text, iterating against the compiler, coordinated by a task management system.
 
-**Repo:** [github.com/jarredbarber/erdos-728b](https://github.com/jarredbarber/erdos-728b)
+**Result:** 2,906 lines of Lean 4, **0 sorrys, 0 axioms**, verified by `lake build`. The agents found a different construction for the hardest step — Chernoff + union bound instead of carry-rich/spike-free counting — with no access to the published proof.
+
+## The Problem
+
+**Erdős Problem 728:** For sufficiently small ε > 0 and any 0 < C < C', show there exist a, b, n ∈ ℕ with a, b > εn such that a!b! | n!(a+b-n)! and C log n < a+b-n < C' log n.
+
+## Experimental Design
+
+- **Zero human mathematical input.** No hints about proof techniques. Agents received only the problem statement.
+- **No web search.** No access to arXiv, Mathlib docs, or external references.
+- **The compiler is the only reviewer.** `lake build` with 0 sorrys and 0 axioms is the sole acceptance criterion.
+- **Models:** Claude Opus 4.6 (Anthropic), Gemini 3 Pro, and Gemini 3 Flash (Google), randomly assigned per task.
+- **Formalization:** LLMs generate Lean code, get compiler errors back, fix and retry. No specialized search.
+- **Workflow:** Multi-agent system — explore agents discover NL proofs, verify agents review them, formalize agents write Lean. A planner decomposes problems into tasks.
+- **Lean:** 4.27.0 + Mathlib 4.27.0
+- **Effort:** 66 tasks, all closed
 
 ---
 
@@ -110,23 +125,7 @@ The proofs diverge on **how they handle small primes (p ≤ 2k)**:
 | **Combining primes** | Deterministic counting: show "good" m is nonempty | Probabilistic: count bad m per prime, sum < m₀ |
 | **Flavor** | Combinatorial counting / sieve | Probabilistic method (Chernoff + union bound) |
 
-### Assessment
-
-Both proofs are valid. Our proof is more modular — each lemma is self-contained — which made it possible for agents to formalize in pieces. The Chernoff bound over digit spaces (328 lines) is reusable infrastructure. The carry dominance lemma is a clean standalone result about p-adic valuations of binomial coefficients.
-
----
-
-## Architectural Comparison: Agent Systems
-
-| | GPT-5.2 + Aristotle | Our system (timtam) |
-|---|---|---|
-| **Strategy generation** | GPT-5.2 Pro | Gemini 3 Pro / Claude Opus 4.6 (randomized) |
-| **Formalization** | Aristotle (MCTS over Lean tactic states) | Same LLMs writing Lean as text, iterating against compiler |
-| **Search method** | Tree search in tactic space | Generate-compile-fix loop |
-| **Workflow** | Unclear (likely iterative NL→formal) | Explicit multi-agent pipeline: explore→verify→formalize with planner/advisor oversight |
-| **Proof discovery** | Single system with tight NL↔formal loop | Role separation: explorers never see Lean, formalizers never invent math |
-
-The MCTS approach (Aristotle) is likely more efficient at closing individual Lean goals — it searches the tactic space directly. Our agents fight the compiler iteratively, which is slower but uses only general-purpose LLMs with no Lean-specific training. The fact that both systems converged on the same mathematical strategy suggests the bottleneck is proof discovery, not formalization.
+Both proofs are valid. Our proof is more modular — each lemma is self-contained — which made it possible for agents to formalize in pieces.
 
 ## Comparison with DeepMind's Aletheia (Gemini Deep Think)
 
@@ -134,7 +133,7 @@ The [Aletheia paper](https://arxiv.org/abs/2601.22401) (DeepMind, 2026) ran Gemi
 
 The two efforts represent fundamentally different approaches to AI-assisted mathematics:
 
-| | Aletheia (DeepMind) | Our system (timtam) |
+| | Aletheia (DeepMind) | Our system |
 |---|---|---|
 | **Model** | Gemini Deep Think | Claude Opus 4.6 + Gemini 3 Pro (randomized) |
 | **Scale** | 700 problems, broad sweep | Single problem, deep focus |
@@ -153,12 +152,18 @@ The two efforts represent fundamentally different approaches to AI-assisted math
 ### What we found that Aletheia can't
 
 - **Guaranteed correctness**: Their 68.5% false-positive rate (137/200 solutions were wrong) is eliminated by compiler verification. Our proof either compiles with 0 sorrys or it doesn't.
-- **Reusable formalized infrastructure**: Our proof produced 8 standalone lemma files now in [OpenLemma](https://github.com/jarredbarber/openlemma) — Kummer criterion, carry dominance, Chernoff over digit spaces — that future proofs can import.
+- **Reusable formalized infrastructure**: The proof produced standalone lemma files — Kummer criterion, carry dominance, Chernoff over digit spaces — that future proofs can import directly.
 - **Agent failure transcripts**: 269 worker logs documenting exactly how agents fail with Lean/Mathlib, useful for improving both agents and Mathlib's API ([friction report](https://gist.github.com/jarredbarber/c541d6d7f35582d97fffc227b2dde692)).
 
 ### The complementarity
 
 Aletheia is better at breadth: sweep 700 problems, find the low-hanging fruit, identify literature gaps. Our system is better at depth: take one problem and produce a compiler-verified proof with reusable infrastructure. Neither system catches both mathematical errors AND problem misformulation. The ideal pipeline would combine NL exploration (Aletheia-style) with formal verification (our style), with human experts auditing the theorem statement.
+
+## Limitations and Honest Assessment
+
+This is an **AI systems contribution, not a mathematics contribution.** The mathematical content — extending Pomerance's density-1 result from fixed k to growing k ≍ log n — is incremental. Any number theorist familiar with Pomerance's work could likely produce this proof. The contribution is demonstrating that general-purpose LLMs can discover and formally verify such proofs autonomously.
+
+We are not mathematicians. We cannot evaluate the significance of the individual lemmas or whether they represent genuinely novel abstractions vs. recombination of training data. A number theorist's evaluation would be needed for that determination.
 
 ## Key Findings
 
