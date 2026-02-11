@@ -12,5 +12,6 @@
 - [2026-02-11 05:17] erdos728b-at0 CLOSED. Proved h_T_val arithmetic.
 - [2026-02-11 05:47] erdos728b-hga CLOSED. bad_residue_sets fully proved with no new sorries.
 - [2026-02-11 06:03] erdos728b-bu3 CLOSED. Proved count_digits_fixed.
-- [2026-02-11 06:15] Sorry count: 11 total.
-- [2026-02-11 06:15] Tier 0 status: vtv (in_progress), nqx, g8b, 2zs unblocked. No intervention needed.
+- [2026-02-11 12:35] Erdos 728b is COMPLETE. All sorries in Erdos/Basic.lean and Erdos/Lemma3Counting.lean are closed.
+- [2026-02-11 12:35] Transitioning to Erdos 729. Planner (erdos728b-3ey) is drafting the plan.
+- [2026-02-11 12:35] Sorry count: 0 (excluding scratch file reproduce_lemma.lean).
