@@ -903,11 +903,112 @@ lemma bad_residue_sets (hp : p.Prime) (hD : D ≥ 16 * (log p (k + 1)) + 16) :
     · rw [count_high_digits_mod_eq p m D hp_pos]
       exact Nat.lt_of_le_of_lt (count_high_le_valuation hp m D) hv
 
+private lemma div_mul_div_le (a b c : ℕ) (hc : c > 0) :
+    (a / c) * (b / a) ≤ b / c := by
+  rw [Nat.le_div_iff_mul_le hc]
+  calc (a / c) * (b / a) * c
+      = (c * (a / c)) * (b / a) := by ring
+    _ ≤ a * (b / a) := Nat.mul_le_mul_right _ (Nat.mul_div_le a c)
+    _ ≤ b := Nat.mul_div_le b a
+
 lemma count_bad_interval (m0 : ℕ) (hm0 : m0 ≥ p^D) (hD : D ≥ 16 * (log p (k + 1)) + 16)
     (hp : p.Prime) (hp_ge_3 : p ≥ 3) (hk : k ≥ 1) :
     ((Ico m0 (2 * m0)).filter (fun m => padicValNat p ((m + k).choose k) > padicValNat p ((2 * m).choose m))).card
     ≤ (2 * m0) / 2 ^ (D / 36) + (2 * p^D) / 2 ^ (D / 36) := by
-  sorry
+  -- Basic facts
+  have hp2 : p ≥ 2 := hp.two_le
+  have hp_pos : p > 0 := hp.pos
+  have hpD_pos : p ^ D > 0 := Nat.pos_of_ne_zero (by positivity)
+  have h2x_pos : 2 ^ (D / 36) > 0 := Nat.pos_of_ne_zero (by positivity)
+  set s := log p k
+  set x := D / 36
+  -- Step 1: Define the residue sets R1, R2
+  let R1 := (range (p ^ D)).filter
+    (fun r => cascade_length (p := p) k D r ≥ D / 6 - s)
+  let R2 := (range (p ^ D)).filter
+    (fun r => count_high_digits p r D < D / 6)
+  let R := R1 ∪ R2
+  -- Step 2: Show bad set ⊆ filter by residue membership
+  have hR_mem : ∀ r ∈ R, r < p ^ D := by
+    intro r hr; rw [mem_union] at hr
+    rcases hr with hr1 | hr2
+    · exact mem_range.mp (mem_filter.mp hr1).1
+    · exact mem_range.mp (mem_filter.mp hr2).1
+  have h_bad_residues := bad_residue_sets D k hp hD
+  have h_subset : (Ico m0 (2 * m0)).filter
+      (fun m => padicValNat p ((m + k).choose k) >
+        padicValNat p ((2 * m).choose m)) ⊆
+      (Ico m0 (2 * m0)).filter (fun m => m % p ^ D ∈ R) := by
+    intro m hm
+    rw [mem_filter] at hm ⊢
+    refine ⟨hm.1, ?_⟩
+    -- Either v_p(C(m+k,k)) > D/6 or v_p(C(2m,m)) < D/6
+    by_cases h1 : padicValNat p ((m + k).choose k) > D / 6
+    · exact mem_union_left R2 (h_bad_residues.1 m h1)
+    · push_neg at h1
+      have h2 : padicValNat p ((2 * m).choose m) < D / 6 := by omega
+      exact mem_union_right R1 (h_bad_residues.2 m h2)
+  -- Step 3: Apply residue_count_interval
+  have hm0_le : m0 ≤ 2 * m0 := Nat.le_mul_of_pos_left m0 (by omega)
+  have h_resid := residue_count_interval D hp hR_mem m0 (2 * m0) hm0_le
+  -- Step 4: Bound |R| ≤ |R1| + |R2|
+  have h_card_R : R.card ≤ R1.card + R2.card := card_union_le R1 R2
+  -- Step 5: Bound |R1| and |R2|
+  -- |R1| = cascade filter ≤ p^(D - (D/6 - s))
+  have hD_ge : D ≥ 16 := by omega
+  have hs_le : s ≤ (D - 16) / 16 := by
+    have : s ≤ log p (k + 1) := Nat.log_mono_right (by omega)
+    omega
+  have hT_le : D / 6 - s ≤ D - (s + 1) := by omega
+  have h_R1 := count_large_cascade k D hp (D / 6 - s) hT_le
+  -- |R2| ≤ p^D / 2^(D/36)
+  have h_R2 := count_few_high_digits D hp (D / 6) (le_refl _) hp_ge_3
+  -- Step 6: Show p^(D/6-s) ≥ 2^(D/36), hence |R1| ≤ p^D / 2^(D/36)
+  have h_exp_ge : D / 6 - s ≥ D / 36 := by omega
+  have h_pow_ge : p ^ (D / 6 - s) ≥ 2 ^ (D / 36) :=
+    calc p ^ (D / 6 - s) ≥ 2 ^ (D / 6 - s) := Nat.pow_le_pow_left (by omega) _
+      _ ≥ 2 ^ (D / 36) := Nat.pow_le_pow_right (by omega) h_exp_ge
+  have h_R1_bound : R1.card ≤ p ^ D / 2 ^ x := by
+    calc R1.card ≤ p ^ (D - (D / 6 - s)) := h_R1
+      _ = p ^ D / p ^ (D / 6 - s) := by
+          rw [Nat.pow_div (by omega) (by omega)]
+      _ ≤ p ^ D / 2 ^ x := Nat.div_le_div_left h_pow_ge h2x_pos
+  -- Step 7: Combine: |R| ≤ 2 * p^D / 2^x
+  have h_mul_div : 2 * (p ^ D / 2 ^ x) ≤ 2 * p ^ D / 2 ^ x := by
+    rw [Nat.le_div_iff_mul_le h2x_pos]
+    calc 2 * (p ^ D / 2 ^ x) * 2 ^ x
+        = 2 * (2 ^ x * (p ^ D / 2 ^ x)) := by ring
+      _ ≤ 2 * p ^ D := Nat.mul_le_mul_left 2 (Nat.mul_div_le _ _)
+  have h_R_bound : R.card ≤ 2 * p ^ D / 2 ^ x := by
+    calc R.card ≤ R1.card + R2.card := h_card_R
+      _ ≤ p ^ D / 2 ^ x + p ^ D / 2 ^ x := Nat.add_le_add h_R1_bound h_R2
+      _ = 2 * (p ^ D / 2 ^ x) := by ring
+      _ ≤ 2 * p ^ D / 2 ^ x := h_mul_div
+  -- Step 8: Main inequality
+  -- count ≤ |R| * (m0/p^D + 1)
+  -- ≤ (2*p^D/2^x) * (m0/p^D + 1)
+  -- = (2*p^D/2^x) * (m0/p^D) + (2*p^D/2^x)
+  -- ≤ 2*m0/2^x + 2*p^D/2^x
+  have h_interval_len : 2 * m0 - m0 = m0 := by omega
+  calc ((Ico m0 (2 * m0)).filter
+        (fun m => padicValNat p ((m + k).choose k) >
+          padicValNat p ((2 * m).choose m))).card
+      ≤ ((Ico m0 (2 * m0)).filter (fun m => m % p ^ D ∈ R)).card :=
+        card_le_card h_subset
+    _ ≤ R.card * (m0 / p ^ D + 1) := by
+        rw [h_interval_len] at h_resid; exact h_resid
+    _ ≤ (2 * p ^ D / 2 ^ x) * (m0 / p ^ D + 1) :=
+        Nat.mul_le_mul_right _ h_R_bound
+    _ = (2 * p ^ D / 2 ^ x) * (m0 / p ^ D) + (2 * p ^ D / 2 ^ x) := by
+        ring
+    _ ≤ 2 * m0 / 2 ^ x + 2 * p ^ D / 2 ^ x := by
+        apply Nat.add_le_add_right
+        -- (2*p^D/2^x) * (m0/p^D) ≤ 2*m0/2^x
+        -- Rewrite: m0/p^D = 2*m0/(2*p^D) by mul_div_mul_left
+        conv_lhs => rw [show m0 / p ^ D = 2 * m0 / (2 * p ^ D) from
+          (Nat.mul_div_mul_left m0 (p ^ D) (by omega : 2 > 0)).symm]
+        -- Now: (2*p^D/2^x) * (2*m0/(2*p^D)) ≤ 2*m0/2^x
+        exact div_mul_div_le (2 * p ^ D) (2 * m0) (2 ^ x) h2x_pos
 
 end ResidueCounting
 

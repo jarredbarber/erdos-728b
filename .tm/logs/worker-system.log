@@ -20094,3 +20094,458 @@ $ cd /home/jarred/code/erdos-728b && tm close erdos728b-g8b
 📊 Task erdos728b-g8b completed:
 [2026-02-11T06:26:36.543Z]    Summary: Closed sorry in count_bad_single_prime (Bad2 bound). lake build succeeds.
 [2026-02-11T06:26:36.543Z]    Details: Proved that Bad2 = #{m < p^D : v_p(C(2m,m)) < D/6} ≤ p^D / 2^(D/36). The proof has three steps: (1) For m < p^D with p ≥ 3, show log_p(2m) < D+1 since 2m < 2·p^D ≤ p^(D+1). (2) Apply valuation_ge_high_digits to get count_high_digits p m D ≤ v_p(C(2m,m)), so Bad2 ⊆ {m : count_high_digits < D/6}. (3) Apply count_few_high_digits with t = D/6 to get the bound p^D / 2^(D/36). This completes count_bad_single_prime — no sorrys remain in that lemma. No new sorry holes introduced.
+[2026-02-11T06:26:36.548Z] ✅ Closed task erdos728b-g8b
+
+[2026-02-11T06:26:36.619Z] 🔄 Checking git status...
+[2026-02-11T06:26:36.639Z] 📝 Committing changes...
+[2026-02-11T06:26:36.702Z] 🚀 Pushing to remote...
+[2026-02-11T06:26:38.298Z] 
+================================================================================
+[2026-02-11T06:26:38.298Z] 📌 Processing task: erdos728b-gaa - Close sorry: count_bad_interval (L3C:149)
+[2026-02-11T06:26:38.298Z]    Role: formalize | Priority: 1 
+[2026-02-11T06:26:38.298Z] ================================================================================
+
+[2026-02-11T06:26:38.302Z] ✓ Claimed task erdos728b-gaa
+
+[2026-02-11T06:26:38.302Z] 🤖 Using agent: formalize with models: google-antigravity/claude-opus-4-6-thinking, google-antigravity/gemini-3-pro-high:high
+
+[2026-02-11T06:26:38.302Z] 💭 Starting pi agent session with model: google-antigravity/claude-opus-4-6-thinking...
+[2026-02-11T06:26:38.344Z] 📸 Capturing file state before agent execution...
+[2026-02-11T06:26:38.363Z] ✓ Captured state: 170 tracked, 1 untracked files
+
+[2026-02-11T06:26:42.032Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-gaa --status "Reading source files and understanding the sorry"
+[2026-02-11T06:26:44.246Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:26:47.557Z] 
+$ cd /home/jarred/code/erdos-728b && ls proofs/
+[2026-02-11T06:26:49.575Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:26:53.044Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:26:55.989Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:26:58.466Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:27:00.928Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:27:04.762Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:27:08.067Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:27:10.937Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:27:14.121Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:27:24.430Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-gaa --status "Planning proof: residue class reduction using bad_residue_sets + residue_count_interval + count_bad_single_prime"
+[2026-02-11T06:27:46.308Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T06:27:46.311Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T06:28:09.594Z] 
+$ cd /home/jarred/code/erdos-728b && lake build 2>&1 | tail -20
+[2026-02-11T06:28:19.753Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-gaa --status "Writing proof: split into Bad1/Bad2 intervals, reduce to residues, apply counting bounds"
+[2026-02-11T06:28:24.053Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "lemma count_large_cascade\|lemma count_few_high_digits\|lemma bad_residue_sets\|lemma residue_count_interval\|lemma count_congruent_le\|lemma count_bad_single_prime" Erdos/Lemma3Counting.lean Erdos/Lemma3Residue.lean
+[2026-02-11T06:28:26.152Z] 
+$ cd /home/jarred/code/erdos-728b && sed -n '687,692p' Erdos/Lemma3Counting.lean
+[2026-02-11T06:28:49.697Z] [overseer] 💓 Heartbeat #38 complete: No intervention needed. Task erdos728b-vtv is in progress, and the system is moving forward through the dependency graph. Sorry count is 11.
+[2026-02-11T06:29:24.193Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_bad.lean << 'EOF'
+-- Test: Nat.div_add_one_le style fact
+-- a/b + 1 ≤ (a + b)/b
+example (a b : ℕ) (hb : b > 0) : a / b + 1 ≤ (a + b) / b := by
+  rw [Nat.add_div_right _ hb]
+
+-- Test: a/c * (b/a) ≤ ?
+-- (a*b) / (b*c) ≤ a/c when b > 0
+example (a b c : ℕ) (hb : b > 0) (hc : c > 0) : (a / c) * (b / a) ≤ b / c := by
+  sorry
+EOF
+lake env lean /tmp/test_count_bad.lean 2>&1
+[2026-02-11T06:29:30.283Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_bad.lean << 'EOF'
+import Mathlib
+
+-- Test: a/b + 1 ≤ (a + b)/b
+example (a b : ℕ) (hb : b > 0) : a / b + 1 ≤ (a + b) / b := by
+  rw [Nat.add_div_right _ hb]
+
+-- Nat.div_le_div_right
+example (a b c : ℕ) (h : a ≤ b) : a / c ≤ b / c := by
+  exact Nat.div_le_div_right h
+EOF
+lake env lean /tmp/test_count_bad.lean 2>&1
+[2026-02-11T06:30:01.244Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_bad2.lean << 'EOF'
+import Mathlib
+
+-- Test: Nat.mul_div_le
+-- a * (b / a) ≤ b
+example (a b : ℕ) : a * (b / a) ≤ b := Nat.mul_div_le b a
+
+-- Nat.div_mul_le_self
+example (a b : ℕ) : a / b * b ≤ a := Nat.div_mul_le_self a b
+
+-- a/c ≤ b/c * (a/b + 1) ... hmm
+-- Actually: let me think of what we need.
+-- We need: |R| * (m0/pD + 1) ≤ 2*m0/2^x + 2*pD/2^x
+-- where |R| ≤ pD/p^y + pD/2^x and y ≥ x (so pD/p^y ≤ pD/2^x)
+-- So |R| ≤ 2*pD/2^x.
+-- Then |R| * (m0/pD + 1) ≤ (2*pD/2^x) * (m0/pD + 1)
+-- We need: (2*pD/2^x) * (m0/pD + 1) ≤ 2*m0/2^x + 2*pD/2^x
+-- = (2*pD/2^x) * m0/pD + (2*pD/2^x)
+-- Need: (2*pD/2^x) * (m0/pD) ≤ 2*m0/2^x
+-- i.e., (pD/2^x) * (m0/pD) ≤ m0/2^x ... but this doesn't hold in general!
+-- E.g., pD = 6, 2^x = 3, m0 = 10:
+-- LHS = (6/3) * (10/6) = 2 * 1 = 2
+-- RHS = 10/3 = 3. OK this works.
+-- But: pD = 5, 2^x = 3, m0 = 7:
+-- LHS = (5/3) * (7/5) = 1 * 1 = 1
+-- RHS = 7/3 = 2. OK works too.
+
+-- General: (a/b) * (c/a) ≤ c/b for a,b,c ≥ 0
+-- Proof: a/b * c/a ≤ a/b * c/a. And a/b ≤ a/b, c/a ≤ c/a.
+-- (⌊a/b⌋)(⌊c/a⌋) ≤ ⌊c/b⌋?
+-- Not obvious. Let me try: a = 7, b = 3, c = 20.
+-- LHS = (7/3)(20/7) = 2*2 = 4, RHS = 20/3 = 6. OK.
+-- a = 7, b = 3, c = 14.
+-- LHS = (7/3)(14/7) = 2*2 = 4, RHS = 14/3 = 4. Tight.
+-- a = 7, b = 3, c = 13.
+-- LHS = (7/3)(13/7) = 2*1 = 2, RHS = 13/3 = 4. OK.
+-- Seems to hold. Can we prove it?
+
+-- Actually: ⌊a/b⌋ * ⌊c/a⌋ ≤ ⌊a/b⌋ * c/a ≤ c/b * a/a ... no.
+-- Better: ⌊a/b⌋ ≤ a/b, ⌊c/a⌋ ≤ c/a.
+-- ⌊a/b⌋⌊c/a⌋ ≤ (a/b)(c/a) = c/b ≤ ... 
+-- But this is in ℝ, and we need it in ℕ.
+-- In ℕ: (a/b)*(c/a) ≤ c/b because:
+-- (a/b)*(c/a) ≤ (a/b)*(c/a) and b * ((a/b)*(c/a)) ≤ b*(a/b)*(c/a) ≤ a*(c/a) ≤ c.
+-- So (a/b)*(c/a) ≤ c/b by Nat.le_div_iff_mul_le.
+
+-- Let me verify:
+-- b * ((a/b) * (c/a)) ≤ a * (c/a) ≤ c
+-- First: b * (a/b) ≤ a (Nat.mul_div_le), so b * (a/b) * (c/a) ≤ a * (c/a) ≤ c
+-- Wait: b * ((a/b) * (c/a)) = (b * (a/b)) * (c/a) ≤ a * (c/a) ≤ c. Yes!
+
+example (a b c : ℕ) (hb : b > 0) : (a / b) * (c / a) ≤ c / b := by
+  rw [Nat.le_div_iff_mul_le hb]
+  calc b * ((a / b) * (c / a)) = (b * (a / b)) * (c / a) := by ring
+    _ ≤ a * (c / a) := Nat.mul_le_mul_right _ (Nat.mul_div_le a b)
+    _ ≤ c := Nat.mul_div_le c a
+EOF
+lake env lean /tmp/test_count_bad2.lean 2>&1
+[2026-02-11T06:30:12.627Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_bad2.lean << 'EOF'
+import Mathlib
+
+example (a b c : ℕ) (hb : b > 0) : (a / b) * (c / a) ≤ c / b := by
+  rw [Nat.le_div_iff_mul_le hb]
+  calc (a / b) * (c / a) * b = (b * (a / b)) * (c / a) := by ring
+    _ ≤ a * (c / a) := Nat.mul_le_mul_right _ (Nat.mul_div_le a b)
+    _ ≤ c := Nat.mul_div_le c a
+EOF
+lake env lean /tmp/test_count_bad2.lean 2>&1
+[2026-02-11T06:30:36.232Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_bad3.lean << 'EOF'
+import Mathlib
+
+-- Nat.mul_div_mul_left
+example (a b : ℕ) (c : ℕ) (hc : c > 0) : (c * a) / (c * b) = a / b :=
+  Nat.mul_div_mul_left a b hc
+
+-- So (2*m0)/(2*pD) = m0/pD. Good.
+
+-- Now the main inequality chain:
+-- (2*pD/x) * (m0/pD) = (2*pD/x) * ((2*m0)/(2*pD))  [by mul_div_mul_left]
+-- ≤ (2*m0)/x  [by (A/B)*(C/A) ≤ C/B]
+
+example (m0 pD x : ℕ) (hx : x > 0) (hpD : pD > 0) :
+    (2 * pD / x) * (m0 / pD) ≤ 2 * m0 / x := by
+  have h2pD : 2 * pD > 0 := by omega
+  conv_lhs => rw [show m0 / pD = 2 * m0 / (2 * pD) from
+    (Nat.mul_div_mul_left m0 pD (by omega : 2 > 0)).symm]
+  exact Nat.div_mul_div_comm_le hx
+
+-- Hmm let me check if Nat.div_mul_div_comm_le exists
+EOF
+lake env lean /tmp/test_count_bad3.lean 2>&1
+[2026-02-11T06:30:49.886Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_bad3.lean << 'EOF'
+import Mathlib
+
+-- Let me just use the lemma I proved above inline
+example (m0 pD x : ℕ) (hx : x > 0) (hpD : pD > 0) :
+    (2 * pD / x) * (m0 / pD) ≤ 2 * m0 / x := by
+  conv_lhs => rw [show m0 / pD = 2 * m0 / (2 * pD) from
+    (Nat.mul_div_mul_left m0 pD (by omega : 2 > 0)).symm]
+  -- now: (2*pD/x) * (2*m0/(2*pD)) ≤ 2*m0/x
+  -- this is (A/B) * (C/A) ≤ C/B
+  rw [Nat.le_div_iff_mul_le hx]
+  calc (2 * pD / x) * (2 * m0 / (2 * pD)) * x
+      = (x * (2 * pD / x)) * (2 * m0 / (2 * pD)) := by ring
+    _ ≤ (2 * pD) * (2 * m0 / (2 * pD)) := Nat.mul_le_mul_right _ (Nat.mul_div_le _ _)
+    _ ≤ 2 * m0 := Nat.mul_div_le _ _
+EOF
+lake env lean /tmp/test_count_bad3.lean 2>&1
+[2026-02-11T06:31:40.337Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_bad4.lean << 'EOF'
+import Mathlib
+
+-- Key: D/6 - s ≥ D/36 when D ≥ 16*(s+1) + 16 (i.e., s ≤ (D-32)/16)
+-- But we have hD : D ≥ 16 * (log p (k + 1)) + 16
+-- and s = log p k ≤ log p (k+1) (for k ≥ 1)
+
+-- Step 1: D/6 - s ≥ D/36
+-- From D ≥ 16*s + 16 (roughly), D/6 ≥ 8s/3 + 8/3 ≥ s + 2 (for s ≥ 0)
+-- So D/6 - s ≥ 2 ≥ D/36 for small D... not quite.
+-- Better: D/6 - s ≥ D/6 - (D-16)/16 (since s ≤ (D-16)/16)
+-- And D/6 - (D-16)/16 = (8D - 3(D-16))/48 = (5D+48)/48 ≥ D/36 
+-- since 36*(5D+48) = 180D + 1728 ≥ 48D = 48D.
+
+-- Actually let me just check: with s ≤ (D-16)/16:
+-- D/6 - s ≥ D/6 - (D-16)/16
+-- In ℕ: need D/6 - (D-16)/16 ≥ D/36
+-- This is equivalent to D/6 ≥ (D-16)/16 + D/36
+
+-- Let me try concrete: D = 48:
+-- D/6 = 8, (D-16)/16 = 2, D/36 = 1.
+-- 8 - 2 = 6 ≥ 1. ✓
+
+-- D = 36:
+-- D/6 = 6, (D-16)/16 = 1, D/36 = 1.
+-- 6 - 1 = 5 ≥ 1. ✓
+
+-- D = 32:
+-- D/6 = 5, (D-16)/16 = 1, D/36 = 0.
+-- 5 - 1 = 4 ≥ 0. ✓
+
+-- OK, seems fine. But proving this in ℕ with floor division...
+-- Let me try omega after establishing the right hypotheses.
+
+example (D s : ℕ) (hDs : s ≤ (D - 16) / 16) (hD : D ≥ 32) : D / 6 - s ≥ D / 36 := by
+  omega
+
+example (D s : ℕ) (hDs : s ≤ (D - 16) / 16) (hD : D ≥ 16) : D / 6 - s ≥ D / 36 := by
+  omega
+EOF
+lake env lean /tmp/test_count_bad4.lean 2>&1
+[2026-02-11T06:31:49.700Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T06:31:49.703Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T06:31:57.449Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_bad5.lean << 'EOF'
+import Mathlib
+
+-- p^a ≥ 2^a when p ≥ 2
+example (p a : ℕ) (hp : p ≥ 2) : p ^ a ≥ 2 ^ a := Nat.pow_le_pow_left hp a
+
+-- If p^(D/6 - s) ≥ 2^(D/36) and p ≥ 2 and D/6 - s ≥ D/36:
+-- p^(D/6-s) ≥ 2^(D/6-s) ≥ 2^(D/36)
+example (p D s : ℕ) (hp : p ≥ 2) (h : D / 6 - s ≥ D / 36) :
+    p ^ (D / 6 - s) ≥ 2 ^ (D / 36) := by
+  calc p ^ (D / 6 - s) ≥ 2 ^ (D / 6 - s) := Nat.pow_le_pow_left hp _
+    _ ≥ 2 ^ (D / 36) := Nat.pow_le_pow_right (by omega) h
+
+-- So p^D / p^(D/6-s) ≤ p^D / 2^(D/36)
+example (pD : ℕ) (p D s : ℕ) (hp : p ≥ 2) (h : D / 6 - s ≥ D / 36) :
+    pD / p ^ (D / 6 - s) ≤ pD / 2 ^ (D / 36) := by
+  apply Nat.div_le_div_left
+  calc p ^ (D / 6 - s) ≥ 2 ^ (D / 6 - s) := Nat.pow_le_pow_left hp _
+    _ ≥ 2 ^ (D / 36) := Nat.pow_le_pow_right (by omega) h
+  exact Nat.pos_of_ne_zero (by positivity)
+EOF
+lake env lean /tmp/test_count_bad5.lean 2>&1
+[2026-02-11T06:32:22.318Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_bad6.lean << 'EOF'
+import Mathlib
+
+-- (a + b) * c ≤ a * c + b * c for ℕ — just Nat.add_mul or left_distrib
+-- And we need: if a ≤ A and b ≤ B then a + b ≤ A + B (obvious)
+
+-- And: a * c ≤ A → b * c ≤ B → (a + b) * c ≤ A + B? No, this is wrong.
+-- (a + b) * c = a*c + b*c ≤ A + B. OK if a*c ≤ A and b*c ≤ B.
+
+-- Main: (|R1| + |R2|) * (m0/pD + 1) ≤ 2*m0/2^x + 2*pD/2^x
+-- where |R1| ≤ pD/2^x, |R2| ≤ pD/2^x
+
+-- Let S = |R1| + |R2| ≤ 2*pD/2^x
+-- S * (m0/pD + 1) = S * (m0/pD) + S
+-- S*(m0/pD) ≤ (2*pD/2^x)*(m0/pD) ≤ 2*m0/2^x [by the division lemma]
+-- S ≤ 2*pD/2^x
+
+-- So total ≤ 2*m0/2^x + 2*pD/2^x. ✓
+
+-- But wait, we need Nat.add_mul_le or similar
+-- (a + b) * c = a * c + b * c
+-- We need the fact: Nat.left_distrib
+
+-- Monotonicity of multiplication:
+-- a ≤ b → a * c ≤ b * c : Nat.mul_le_mul_right
+
+-- OK, the plan works. Let me verify the key steps.
+
+-- Step: |R1| + |R2| ≤ 2 * (p^D / 2^(D/36))
+-- If |R1| ≤ p^D / 2^(D/36) and |R2| ≤ p^D / 2^(D/36), then:
+-- |R1| + |R2| ≤ 2 * (p^D / 2^(D/36))
+example (a b c : ℕ) (ha : a ≤ c) (hb : b ≤ c) : a + b ≤ 2 * c := by omega
+
+-- Step: (2 * pD / 2^x) * (m0 / pD) ≤ 2 * m0 / 2^x
+-- We proved this above.
+
+-- Final: S * (m0/pD + 1) = S * m0/pD + S * 1
+-- Since S ≤ 2*pD/2^x:
+-- S * (m0/pD) ≤ (2*pD/2^x) * (m0/pD) ≤ 2*m0/2^x
+-- S * 1 ≤ 2*pD/2^x
+
+-- Total: ≤ 2*m0/2^x + 2*pD/2^x ✓
+
+-- But we need to carefully handle the ℕ multiplication:
+-- S * (m0/pD + 1) = S * (m0/pD) + S * 1 = S * (m0/pD) + S
+-- This is just Nat.mul_add or right_distrib.
+example (S q : ℕ) : S * (q + 1) = S * q + S := by ring
+
+-- And S*(m0/pD) ≤ (2*pD/2^x) * (m0/pD) by Nat.mul_le_mul_right
+-- And (2*pD/2^x) * (m0/pD) ≤ 2*m0/2^x by the division lemma  
+EOF
+lake env lean /tmp/test_count_bad6.lean 2>&1
+[2026-02-11T06:32:36.677Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_bad7.lean << 'EOF'
+import Mathlib
+
+-- count_large_cascade needs: T ≤ D - (log p k + 1)
+-- We use T = D/6 - log p k
+-- Need: D/6 - log p k ≤ D - (log p k + 1)
+-- i.e., D/6 ≤ D - 1 (for D ≥ 6)
+-- which holds for D ≥ 2
+example (D s : ℕ) (hD : D ≥ 16) : D / 6 - s ≤ D - (s + 1) := by omega
+
+-- count_few_high_digits needs: t ≤ D/6 and hp_ge_3
+-- We use t = D/6, so t ≤ D/6 trivially
+EOF
+lake env lean /tmp/test_count_bad7.lean 2>&1
+[2026-02-11T06:32:51.912Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_bad8.lean << 'EOF'
+import Mathlib
+
+example (p k : ℕ) (hp : p ≥ 2) (hk : k ≥ 1) : Nat.log p k ≤ Nat.log p (k + 1) := by
+  exact Nat.log_mono_right (by omega)
+  
+-- Nat.log_mono_right : a ≤ b → Nat.log p a ≤ Nat.log p b
+
+-- And: (D - 16) / 16 ≥ Nat.log p (k + 1) from D ≥ 16 * Nat.log p (k+1) + 16
+-- i.e., Nat.log p (k+1) ≤ (D - 16) / 16
+
+example (D s_plus_1 : ℕ) (hD : D ≥ 16 * s_plus_1 + 16) :
+    s_plus_1 ≤ (D - 16) / 16 := by omega
+
+-- And s ≤ s_plus_1 - 1 isn't right...
+-- We have s = log p k ≤ log p (k+1). And D ≥ 16 * log p (k+1) + 16.
+-- So s ≤ log p (k+1) ≤ (D-16)/16.
+EOF
+lake env lean /tmp/test_count_bad8.lean 2>&1
+[2026-02-11T06:32:53.888Z] [overseer] 💓 Heartbeat #39 complete: No intervention needed. Task erdos728b-vtv is in progress, and the system is moving forward through the dependency graph. Sorry count is 11.
+[2026-02-11T06:33:06.372Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_count_bad9.lean << 'EOF'
+import Mathlib
+
+open Finset Nat
+
+-- Testing: subset of filter based on membership in union
+example (S : Finset ℕ) (R1 R2 : Finset ℕ) 
+    (h1 : ∀ m ∈ S, m % 10 ∈ R1 ∨ m % 10 ∈ R2) :
+    S ⊆ S.filter (fun m => m % 10 ∈ R1 ∪ R2) := by
+  intro m hm
+  rw [mem_filter]
+  exact ⟨hm, by rw [mem_union]; exact h1 m hm⟩
+
+-- residue_count_interval needs R ⊆ range(p^D) and a ≤ b
+-- We have R1 ∪ R2 where R1, R2 ⊆ range(p^D)
+-- So elements of R1 ∪ R2 are < p^D
+
+-- card_union_le
+#check Finset.card_union_le
+EOF
+lake env lean /tmp/test_count_bad9.lean 2>&1
+[2026-02-11T06:33:58.238Z] 
+🛠️  Executing tool: edit...
+[2026-02-11T06:34:00.873Z] 
+$ cd /home/jarred/code/erdos-728b && lake build 2>&1 | tail -30
+[2026-02-11T06:34:41.771Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_arith.lean << 'EOF'
+import Mathlib
+
+-- 2 * (a / b) ≤ (2 * a) / b
+-- This follows from Nat.mul_div_le or similar
+-- k * (n / k) ≤ n, so 2 * (a / b) ≤ ???
+-- Actually: Nat.mul_div_le_iff?
+-- c * (a / b) ≤ (c * a) / b?
+
+-- Hmm, this is NOT always true. E.g., a = 5, b = 3, c = 2:
+-- LHS = 2 * 1 = 2, RHS = 10 / 3 = 3. OK works.
+-- a = 5, b = 3, c = 3:
+-- LHS = 3 * 1 = 3, RHS = 15 / 3 = 5. OK.
+-- But is it always true? a / b = ⌊a/b⌋. c * ⌊a/b⌋ vs ⌊c*a/b⌋.
+-- Since a = ⌊a/b⌋ * b + (a%b), c*a = c*⌊a/b⌋ * b + c*(a%b).
+-- ⌊c*a/b⌋ = c*⌊a/b⌋ + ⌊c*(a%b)/b⌋ ≥ c*⌊a/b⌋. Yes!
+
+example (a b c : ℕ) : c * (a / b) ≤ (c * a) / b := by
+  exact Nat.le_div_iff_mul_le_comm -- ?
+  sorry
+
+-- Let me search
+#check Nat.mul_div_le
+-- Nat.mul_div_le (n k : ℕ) : k * (n / k) ≤ n
+
+-- What about c * (a / b) ≤ (c * a) / b?
+-- b * (c * (a / b)) = c * (b * (a / b)) ≤ c * a (by Nat.mul_div_le)
+-- So c * (a / b) ≤ (c * a) / b by Nat.le_div_iff_mul_le
+example (a b c : ℕ) (hb : b > 0) : c * (a / b) ≤ (c * a) / b := by
+  rw [Nat.le_div_iff_mul_le hb]
+  calc c * (a / b) * b = c * (b * (a / b)) := by ring
+    _ ≤ c * a := Nat.mul_le_mul_left c (Nat.mul_div_le a b)
+EOF
+lake env lean /tmp/test_arith.lean 2>&1
+[2026-02-11T06:34:51.936Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:34:54.616Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:35:01.026Z] 
+🛠️  Executing tool: edit...
+[2026-02-11T06:35:03.425Z] 
+$ cd /home/jarred/code/erdos-728b && lake build 2>&1 | tail -20
+[2026-02-11T06:35:39.454Z] 
+🛠️  Executing tool: edit...
+[2026-02-11T06:35:53.890Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T06:35:53.893Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T06:35:59.636Z] 
+🛠️  Executing tool: edit...
+[2026-02-11T06:36:01.757Z] 
+$ cd /home/jarred/code/erdos-728b && lake build 2>&1 | tail -20
+[2026-02-11T06:36:52.447Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "sorry" Erdos/Lemma3Counting.lean
+[2026-02-11T06:36:55.993Z] 
+$ cd /home/jarred/code/erdos-728b && lake build 2>&1 | grep -i "Lemma3Counting"
+[2026-02-11T06:36:58.620Z] [overseer] 💓 Heartbeat #40 complete: No intervention needed. Task erdos728b-vtv is in progress, and the system is moving forward through the dependency graph. Sorry count is 11.
+[2026-02-11T06:37:07.154Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:37:13.057Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:37:15.936Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:37:27.286Z] 
+$ cd /home/jarred/code/erdos-728b && git add -A && git commit -m "Close sorry: count_bad_interval (Lemma3Counting)
+
+Proved that #{m in [m0,2m0) : v_p(C(m+k,k)) > v_p(C(2m,m))}
+  ≤ 2m0/2^(D/36) + 2p^D/2^(D/36)
+
+Strategy:
+1. Define residue sets R1 (large cascade) and R2 (few high digits)
+2. Show bad set ⊆ {m : m % p^D ∈ R1 ∪ R2} via bad_residue_sets
+3. Apply residue_count_interval for interval-to-residue reduction
+4. Bound |R1| ≤ p^D/2^(D/36) via p^(D/6-s) ≥ 2^(D/36)
+5. Bound |R2| ≤ p^D/2^(D/36) via count_few_high_digits
+6. Combined: |R| ≤ 2*p^D/2^(D/36)
+7. Arithmetic: |R|*(m0/p^D + 1) ≤ 2m0/2^x + 2p^D/2^x
+
+Helper lemma div_mul_div_le proves (a/c)*(b/a) ≤ b/c in ℕ.
+lake build succeeds with no new sorrys."
