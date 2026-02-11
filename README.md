@@ -4,7 +4,7 @@
 
 In January 2026, GPT-5.2 + Aristotle resolved Erdős Problem 728 ([arXiv:2601.07421](https://arxiv.org/abs/2601.07421)). That system used a tight loop between GPT-5.2 (proof strategy) and Aristotle/Harmonic (MCTS-based tactic search over Lean proof states) — a purpose-built pipeline with specialized Lean search.
 
-We wanted to know: **can general-purpose LLMs do this without specialized search?** No MCTS, no tactic-level tree search, no Lean-specific training. Just off-the-shelf models writing Lean as text, iterating against the compiler, coordinated by a task management system.
+We wanted to know: **can general-purpose LLMs do this without specialized search?** No MCTS, no tactic-level tree search, no Lean-specific training. Just off-the-shelf models writing Lean as text, iterating against the compiler, coordinated by a custom agent orchestrator.
 
 **Result:** 2,906 lines of Lean 4, **0 sorrys, 0 axioms**, verified by `lake build`. The agents found a different construction for the hardest step — Chernoff + union bound instead of carry-rich/spike-free counting — with no access to the published proof.
 
@@ -170,7 +170,7 @@ We are not mathematicians. We cannot evaluate the significance of the individual
 - **Agents independently discovered Kummer's theorem** as the key tool (confirmed by clean replication — no technique hints given)
 - **Agents CAN formalize probabilistic arguments** given sufficient task decomposition. The 1,510-line counting argument was the hardest part. It succeeded because it was decomposed into digit manipulation, residue classes, concentration bounds, and the main counting — each tractable alone
 - **Decomposition is the meta-strategy.** 66 tasks, broken into focused pieces. Monolithic attempts at the probabilistic bound failed; decomposed attempts succeeded
-- **Multi-model randomization** (Gemini + Claude, randomized per task) may contribute different strengths to different subtasks
+- **Multi-model randomization** (Gemini + Claude, randomized per task) may contribute different strengths to different subtasks. This was ultimately done to "load balance" over model usage quotas, but we conjecture there may be value in this by e.g. reducing failure mode correlations.
 
 ---
 
