@@ -18854,3 +18854,487 @@ Changes:
 - Added 'include hp in' before count_digits_fixed (proof needs toDigitSpace_bijective which requires hp : p.Prime)
 - Replaced sorry with 3-step proof
 - No new sorry holes introduced
+[2026-02-11T06:03:56.106Z] ✅ Closed task erdos728b-bu3
+
+[2026-02-11T06:03:56.177Z] 🔄 Checking git status...
+[2026-02-11T06:03:56.195Z] 📝 Committing changes...
+[2026-02-11T06:03:56.257Z] 🚀 Pushing to remote...
+[2026-02-11T06:03:57.888Z] 
+================================================================================
+[2026-02-11T06:03:57.888Z] 📌 Processing task: erdos728b-vtv - Close sorry: valuation_le_cascade (L3C:45)
+[2026-02-11T06:03:57.888Z]    Role: formalize | Priority: 1 
+[2026-02-11T06:03:57.888Z] ================================================================================
+
+[2026-02-11T06:03:57.892Z] ✓ Claimed task erdos728b-vtv
+
+[2026-02-11T06:03:57.892Z] 🤖 Using agent: formalize with models: google-antigravity/claude-opus-4-6-thinking, google-antigravity/gemini-3-pro-high:high
+
+[2026-02-11T06:03:57.892Z] 💭 Starting pi agent session with model: google-antigravity/claude-opus-4-6-thinking...
+[2026-02-11T06:03:57.929Z] 📸 Capturing file state before agent execution...
+[2026-02-11T06:03:57.946Z] ✓ Captured state: 164 tracked, 1 untracked files
+
+[2026-02-11T06:04:01.305Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-vtv --status "Reading source files and understanding context"
+[2026-02-11T06:04:03.175Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:04:06.171Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "valuation_le_cascade" Erdos/Lemma3Counting.lean
+[2026-02-11T06:04:08.725Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:04:11.879Z] 
+$ cd /home/jarred/code/erdos-728b && ls proofs/
+[2026-02-11T06:04:14.484Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n -i "valuation_le_cascade\|valuation.*cascade\|cascade.*bound\|kummer.*cascade" proofs/lemma3-counting.md | head -30
+[2026-02-11T06:04:16.155Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n -i "cascade" proofs/lemma3-counting.md | head -30
+[2026-02-11T06:04:18.858Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:04:21.920Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-vtv --status "Understanding proof approach: Kummer's theorem + carry cascade structure"
+[2026-02-11T06:04:28.484Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:04:32.861Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "factorization_choose" .lake/packages/mathlib/Mathlib/Data/Nat/Choose/Factorization.lean | head -20
+[2026-02-11T06:04:34.791Z] 
+$ cd /home/jarred/code/erdos-728b && sed -n '114,140p' .lake/packages/mathlib/Mathlib/Data/Nat/Choose/Factorization.lean
+[2026-02-11T06:04:44.817Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "cascade_length\|carry_cond\|carry_propagate\|no_carry_beyond\|cascade_digit_neq" Erdos/Lemma3Counting.lean | head -20
+[2026-02-11T06:04:47.939Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T06:04:47.942Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T06:05:17.640Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:05:31.067Z] [overseer] 📝 Cleared poke messages
+[2026-02-11T06:05:31.068Z] [overseer] 💓 Heartbeat #32 complete: Task bu3 (count_digits_fixed) closed successfully. Task vtv (valuation_le_cascade) is now in progress. Sorry count decreased to 11.
+[2026-02-11T06:05:44.698Z] 
+$ cd /home/jarred/code/erdos-728b && grep -rn "digit.*lt\|digit.*zero\|digit.*pow\|digits_lt" Erdos/Digits.lean | head -20
+[2026-02-11T06:05:46.576Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:05:55.303Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_digit.lean << 'EOF'
+import Mathlib.Data.Nat.Digits.Lemmas
+import Mathlib.Data.Nat.Log
+
+open Nat
+
+-- digit p m i = (m / p^i) % p
+-- For m < p^D and i ≥ D: m / p^i = 0 since m < p^D ≤ p^i
+
+example (p m D i : ℕ) (hp : p > 0) (hm : m < p ^ D) (hi : i ≥ D) : (m / p ^ i) % p = 0 := by
+  have : p ^ D ≤ p ^ i := Nat.pow_le_pow_right hp hi
+  have : m < p ^ i := lt_of_lt_of_le hm this
+  rw [Nat.div_eq_zero_iff (by positivity : p ^ i > 0) |>.mpr this, Nat.zero_mod]
+EOF
+lake env lean /tmp/test_digit.lean 2>&1
+[2026-02-11T06:06:02.111Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_digit.lean << 'EOF'
+import Mathlib.Data.Nat.Digits.Lemmas
+import Mathlib.Data.Nat.Log
+
+open Nat
+
+example (p m D i : ℕ) (hp : p > 0) (hm : m < p ^ D) (hi : i ≥ D) : (m / p ^ i) % p = 0 := by
+  have h1 : p ^ D ≤ p ^ i := Nat.pow_le_pow_right hp hi
+  have h2 : m < p ^ i := lt_of_lt_of_le hm h1
+  have h3 : m / p ^ i = 0 := Nat.div_eq_of_lt h2
+  rw [h3, Nat.zero_mod]
+EOF
+lake env lean /tmp/test_digit.lean 2>&1
+[2026-02-11T06:06:08.533Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-vtv --status "Writing proof for valuation_le_cascade"
+[2026-02-11T06:06:16.131Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_choose.lean << 'EOF'
+import Mathlib.Data.Nat.Choose.Factorization
+
+#check @Nat.factorization_choose_le_log
+-- (choose n k).factorization p ≤ log p n
+EOF
+lake env lean /tmp/test_choose.lean 2>&1
+[2026-02-11T06:06:38.098Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_bound.lean << 'EOF'
+import Mathlib.Data.Nat.Choose.Factorization
+import Mathlib.Data.Nat.Log
+
+open Nat
+
+-- log_p(m + k) ≤ D when m < p^D and k < p^D and p ≥ 2
+example (p m k D : ℕ) (hp : p ≥ 2) (hm : m < p ^ D) (hk : k < p ^ D) (hD : D > 0) :
+    Nat.log p (m + k) ≤ D := by
+  apply Nat.log_lt_of_lt_pow (by omega)
+  calc m + k < p ^ D + p ^ D := by omega
+    _ = 2 * p ^ D := by ring
+    _ ≤ p * p ^ D := by nlinarith
+    _ = p ^ (D + 1) := by rw [pow_succ]
+EOF
+lake env lean /tmp/test_bound.lean 2>&1
+[2026-02-11T06:06:45.274Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_bound.lean << 'EOF'
+import Mathlib.Data.Nat.Choose.Factorization
+import Mathlib.Data.Nat.Log
+
+open Nat
+
+example (p m k D : ℕ) (hp : p ≥ 2) (hm : m < p ^ D) (hk : k < p ^ D) (hD : D > 0) :
+    Nat.log p (m + k) ≤ D := by
+  have : m + k < p ^ (D + 1) := by
+    calc m + k < p ^ D + p ^ D := by omega
+      _ = 2 * p ^ D := by ring
+      _ ≤ p * p ^ D := by nlinarith
+      _ = p ^ (D + 1) := by rw [pow_succ]
+  exact Nat.lt_succ_iff.mp (Nat.log_lt_of_lt_pow (by omega) this)
+EOF
+lake env lean /tmp/test_bound.lean 2>&1
+[2026-02-11T06:06:53.271Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_bound.lean << 'EOF'
+import Mathlib.Data.Nat.Choose.Factorization
+import Mathlib.Data.Nat.Log
+
+open Nat
+
+example (p m k D : ℕ) (hp : p ≥ 2) (hm : m < p ^ D) (hk : k < p ^ D) (hD : D > 0) :
+    Nat.log p (m + k) ≤ D := by
+  have h1 : m + k < p ^ (D + 1) := by
+    have : 2 * p ^ D ≤ p ^ (D + 1) := by
+      rw [pow_succ]; nlinarith [Nat.one_le_pow D p (by omega)]
+    omega
+  have h2 : Nat.log p (m + k) < D + 1 :=
+    Nat.log_lt_of_lt_pow (by omega) h1
+  omega
+EOF
+lake env lean /tmp/test_bound.lean 2>&1
+[2026-02-11T06:06:59.362Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_bound.lean << 'EOF'
+import Mathlib.Data.Nat.Choose.Factorization
+import Mathlib.Data.Nat.Log
+
+open Nat
+
+#check @Nat.log_lt_of_lt_pow
+EOF
+lake env lean /tmp/test_bound.lean 2>&1
+[2026-02-11T06:07:07.011Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_bound.lean << 'EOF'
+import Mathlib.Data.Nat.Choose.Factorization
+import Mathlib.Data.Nat.Log
+
+open Nat
+
+example (p m k D : ℕ) (hp : p ≥ 2) (hm : m < p ^ D) (hk : k < p ^ D) (hD : D > 0) :
+    Nat.log p (m + k) ≤ D := by
+  have h1 : m + k < p ^ (D + 1) := by
+    have : p ^ (D + 1) = p * p ^ D := pow_succ p D
+    nlinarith [Nat.one_le_pow D p (by omega)]
+  by_cases hmk : m + k = 0
+  · simp [hmk]
+  have h2 : Nat.log p (m + k) < D + 1 :=
+    Nat.log_lt_of_lt_pow (by omega) h1
+  omega
+EOF
+lake env lean /tmp/test_bound.lean 2>&1
+[2026-02-11T06:07:14.506Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_bound.lean << 'EOF'
+import Mathlib.Data.Nat.Choose.Factorization
+import Mathlib.Data.Nat.Log
+
+open Nat
+
+example (p m k D : ℕ) (hp : p ≥ 2) (hm : m < p ^ D) (hk : k < p ^ D) (hD : D > 0) :
+    Nat.log p (m + k) ≤ D := by
+  have h1 : m + k < p ^ (D + 1) := by
+    have h := pow_succ p D  -- p^(D+1) = p^D * p
+    nlinarith [Nat.one_le_pow D p (by omega)]
+  by_cases hmk : m + k = 0
+  · simp [hmk]
+  have h2 : Nat.log p (m + k) < D + 1 :=
+    Nat.log_lt_of_lt_pow (by omega) h1
+  omega
+EOF
+lake env lean /tmp/test_bound.lean 2>&1
+[2026-02-11T06:07:25.719Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_bound2.lean << 'EOF'
+import Mathlib.Data.Nat.Choose.Factorization
+import Mathlib.Data.Nat.Log
+
+open Nat
+
+-- When s + 1 > D, i.e. log p k ≥ D, we have p^D ≤ k, so m < p^D ≤ k
+-- Thus m + k ≤ 2k (approximately), and log_p(m+k) ≤ log_p(2k) ≤ s + 1
+-- Actually: m + k < p^D + k ≤ k + k = 2k ≤ 2*p^{s+1} ≤ p*p^{s+1} = p^{s+2}
+-- So log_p(m+k) ≤ s+1
+
+example (p m k : ℕ) (hp : p ≥ 2) (hm : m < p ^ D) (hk : k ≥ 1) (hD : D ≤ Nat.log p k) :
+    Nat.log p (m + k) ≤ Nat.log p k + 1 := by
+  sorry
+EOF
+lake env lean /tmp/test_bound2.lean 2>&1
+[2026-02-11T06:07:35.723Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_valuation.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat BigOperators Finset Real
+
+namespace Erdos728
+
+section TestCascade
+
+variable {p : ℕ} (k : ℕ) (D : ℕ)
+
+-- Test: can we access the definitions and lemmas?
+#check @cascade_length
+#check @cascade_digit_neq
+#check @no_carry_beyond
+#check @carry_propagate
+
+end TestCascade
+
+end Erdos728
+EOF
+lake env lean /tmp/test_valuation.lean 2>&1
+[2026-02-11T06:07:51.973Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_val.lean << 'EOF'
+import Erdos.Digits
+import Erdos.Lemma3Common
+
+open Nat BigOperators Finset
+
+namespace Erdos728
+
+-- Minimal standalone test to verify the proof approach
+-- The actual proof goes in Lemma3Counting.lean where private lemmas are accessible
+
+-- We need to show:
+-- padicValNat p ((m + k).choose k) ≤ (log p k + 1) + cascade_length k D m
+-- 
+-- Strategy:
+-- Case 1: cascade_length < D - (s+1) → carry analysis bounds v_p ≤ s+1+L
+-- Case 2: cascade_length ≥ D - (s+1) → factorization_choose_le_log bounds v_p ≤ log_p(m+k) ≤ D ≤ s+1+L
+
+end Erdos728
+EOF
+lake env lean /tmp/test_val.lean 2>&1
+[2026-02-11T06:08:09.791Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_val2.lean << 'EOF'
+import Mathlib.Data.Nat.Choose.Factorization
+import Mathlib.Data.Nat.Log
+
+open Nat
+
+-- Test: digit p m i = 0 for m < p^D and i ≥ D
+lemma digit_zero_of_lt_pow (p m D i : ℕ) (hp : p > 0) (hm : m < p ^ D) (hi : i ≥ D) :
+    (m / p ^ i) % p = 0 := by
+  have h1 : p ^ D ≤ p ^ i := Nat.pow_le_pow_right hp hi
+  have h2 : m < p ^ i := lt_of_lt_of_le hm h1
+  rw [Nat.div_eq_of_lt h2, Nat.zero_mod]
+
+-- Test: log bound when both m and k are < p^D  
+lemma log_mk_le_D (p m k D : ℕ) (hp : p ≥ 2) (hm : m < p ^ D) (hk_lt : k < p ^ D) :
+    Nat.log p (m + k) ≤ D := by
+  by_cases hmk : m + k = 0
+  · simp [hmk]
+  have h1 : m + k < p ^ (D + 1) := by
+    have h := pow_succ p D
+    nlinarith [Nat.one_le_pow D p (by omega)]
+  exact Nat.lt_succ_iff.mp (Nat.log_lt_of_lt_pow (by omega) h1)
+EOF
+lake env lean /tmp/test_val2.lean 2>&1
+[2026-02-11T06:08:31.071Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T06:08:31.073Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T06:08:34.342Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_full.lean << 'EOF'
+import Mathlib.Data.Nat.Choose.Factorization
+import Mathlib.Data.Nat.Log
+
+open Nat
+
+-- Needed helper: log_p(m+k) ≤ s+1 when m < p^D and D ≤ s
+lemma log_add_le_log_succ (p m k : ℕ) (hp : p ≥ 2) (hm : m < p ^ D) (hk : k ≥ 1)
+    (hDs : D ≤ Nat.log p k) :
+    Nat.log p (m + k) ≤ Nat.log p k + 1 := by
+  have hs := Nat.log_lt_of_lt_pow (by omega : k ≠ 0) (Nat.lt_pow_succ_log_self (by omega) k)
+  -- k < p^{s+1}
+  -- m < p^D ≤ p^s ≤ k
+  have hpD_le : p ^ D ≤ k := le_trans (Nat.pow_le_pow_right (by omega) hDs) (Nat.log_le_self_of_pos)
+  sorry
+EOF
+lake env lean /tmp/test_full.lean 2>&1
+[2026-02-11T06:08:40.514Z] 
+$ cd /home/jarred/code/erdos-728b && grep -r "log.*le.*self\|pow_log_le" .lake/packages/mathlib/Mathlib/Data/Nat/Log.lean | head -10
+[2026-02-11T06:08:50.545Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_full.lean << 'EOF'
+import Mathlib.Data.Nat.Choose.Factorization
+import Mathlib.Data.Nat.Log
+
+open Nat
+
+-- log_p(m+k) ≤ s+1 when m < p^D, D ≤ s, k ≥ 1
+lemma log_add_le_succ_log (p m k D : ℕ) (hp : p ≥ 2) (hm : m < p ^ D) (hk : k ≥ 1)
+    (hDs : D ≤ Nat.log p k) :
+    Nat.log p (m + k) ≤ Nat.log p k + 1 := by
+  set s := Nat.log p k
+  -- k < p^{s+1}
+  have hk_lt : k < p ^ (s + 1) := Nat.lt_pow_succ_log_self (by omega) k
+  -- p^D ≤ p^s ≤ k
+  have hpD_le_ps : p ^ D ≤ p ^ s := Nat.pow_le_pow_right (by omega) hDs
+  -- m + k < p^D + k ≤ k + k = 2k
+  have hmk_lt : m + k < 2 * k := by omega
+  -- 2k ≤ 2 * (p^{s+1} - 1) < 2 * p^{s+1} ≤ p * p^{s+1} = p^{s+2}
+  have h2k_lt : 2 * k < p ^ (s + 2) := by
+    calc 2 * k < 2 * p ^ (s + 1) := by omega
+      _ ≤ p * p ^ (s + 1) := by nlinarith
+      _ = p ^ (s + 2) := by rw [pow_succ p (s + 1)]
+  have hmk_lt_pow : m + k < p ^ (s + 2) := by omega
+  by_cases hmk : m + k = 0
+  · simp [hmk]
+  exact Nat.lt_succ_iff.mp (Nat.log_lt_of_lt_pow (by omega) hmk_lt_pow)
+EOF
+lake env lean /tmp/test_full.lean 2>&1
+[2026-02-11T06:09:02.052Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_full.lean << 'EOF'
+import Mathlib.Data.Nat.Choose.Factorization
+import Mathlib.Data.Nat.Log
+
+open Nat
+
+-- log_p(m+k) ≤ s+1 when m < p^D, D ≤ s, k ≥ 1
+lemma log_add_le_succ_log (p m k D : ℕ) (hp : p ≥ 2) (hm : m < p ^ D) (hk : k ≥ 1)
+    (hDs : D ≤ Nat.log p k) :
+    Nat.log p (m + k) ≤ Nat.log p k + 1 := by
+  set s := Nat.log p k
+  have hk_lt : k < p ^ (s + 1) := Nat.lt_pow_succ_log_self (by omega) k
+  have hpD_le_ps : p ^ D ≤ p ^ s := Nat.pow_le_pow_right (by omega) hDs
+  have hps_le_k : p ^ s ≤ k := Nat.pow_log_le_self p (by omega)
+  have hmk_lt : m + k < 2 * k := by omega
+  have h2k_lt : 2 * k < p ^ (s + 2) := by
+    have : 2 * p ^ (s + 1) ≤ p * p ^ (s + 1) := Nat.mul_le_mul_right _ (by omega)
+    rw [← pow_succ] at this
+    omega
+  have hmk_lt_pow : m + k < p ^ (s + 2) := by omega
+  by_cases hmk : m + k = 0
+  · simp [hmk]
+  exact Nat.lt_succ_iff.mp (Nat.log_lt_of_lt_pow (by omega) hmk_lt_pow)
+EOF
+lake env lean /tmp/test_full.lean 2>&1
+[2026-02-11T06:09:12.021Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_full.lean << 'EOF'
+import Mathlib.Data.Nat.Choose.Factorization
+import Mathlib.Data.Nat.Log
+
+open Nat
+
+lemma log_add_le_succ_log (p m k D : ℕ) (hp : p ≥ 2) (hm : m < p ^ D) (hk : k ≥ 1)
+    (hDs : D ≤ Nat.log p k) :
+    Nat.log p (m + k) ≤ Nat.log p k + 1 := by
+  set s := Nat.log p k
+  have hk_lt : k < p ^ (s + 1) := Nat.lt_pow_succ_log_self (by omega) k
+  have hps_le_k : p ^ s ≤ k := Nat.pow_log_le_self p (by omega)
+  have hmk_lt : m + k < 2 * k := by
+    calc m + k < p ^ D + k := by omega
+      _ ≤ p ^ s + k := by omega
+      _ ≤ k + k := by omega
+      _ = 2 * k := by ring
+  have hmk_lt_pow : m + k < p ^ (s + 2) := by
+    have h1 : p ^ (s + 2) = p ^ (s + 1) * p := pow_succ p (s + 1)
+    nlinarith [Nat.one_le_pow (s + 1) p (by omega)]
+  by_cases hmk : m + k = 0
+  · simp [hmk]
+  exact Nat.lt_succ_iff.mp (Nat.log_lt_of_lt_pow (by omega) hmk_lt_pow)
+EOF
+lake env lean /tmp/test_full.lean 2>&1
+[2026-02-11T06:09:15.316Z] [overseer] 💓 Heartbeat #33 complete: No intervention needed. Task erdos728b-vtv is in progress, and the backlog is well-structured and unblocked. 6 tasks closed in the last 2 hours.
+[2026-02-11T06:09:22.655Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_full.lean << 'EOF'
+import Mathlib.Data.Nat.Choose.Factorization
+import Mathlib.Data.Nat.Log
+
+open Nat
+
+lemma log_add_le_succ_log (p m k D : ℕ) (hp : p ≥ 2) (hm : m < p ^ D) (hk : k ≥ 1)
+    (hDs : D ≤ Nat.log p k) :
+    Nat.log p (m + k) ≤ Nat.log p k + 1 := by
+  set s := Nat.log p k
+  have hk_lt : k < p ^ (s + 1) := Nat.lt_pow_succ_log_self (by omega) k
+  have hps_le_k : p ^ s ≤ k := Nat.pow_log_le_self p (by omega)
+  have hpD_le_ps : p ^ D ≤ p ^ s := Nat.pow_le_pow_right (by omega) hDs
+  have hmk_lt : m + k ≤ 2 * k := by linarith
+  have hmk_lt_pow : m + k < p ^ (s + 2) := by
+    have h1 : p ^ (s + 2) = p ^ (s + 1) * p := pow_succ p (s + 1)
+    nlinarith [Nat.one_le_pow (s + 1) p (by omega)]
+  by_cases hmk : m + k = 0
+  · simp [hmk]
+  exact Nat.lt_succ_iff.mp (Nat.log_lt_of_lt_pow (by omega) hmk_lt_pow)
+EOF
+lake env lean /tmp/test_full.lean 2>&1
+[2026-02-11T06:09:32.557Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_case2a.lean << 'EOF'
+import Mathlib.Data.Nat.Choose.Factorization
+import Mathlib.Data.Nat.Log
+
+open Nat
+
+lemma log_mk_le_D (p m k D : ℕ) (hp : p ≥ 2) (hm : m < p ^ D) (hk_lt : k < p ^ D) :
+    Nat.log p (m + k) ≤ D := by
+  by_cases hmk : m + k = 0
+  · simp [hmk]
+  have h1 : m + k < p ^ (D + 1) := by
+    have h := pow_succ p D -- p^(D+1) = p^D * p
+    nlinarith [Nat.one_le_pow D p (by omega)]
+  exact Nat.lt_succ_iff.mp (Nat.log_lt_of_lt_pow (by omega) h1)
+EOF
+lake env lean /tmp/test_case2a.lean 2>&1
+[2026-02-11T06:09:42.358Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_main.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat BigOperators Finset
+
+-- Test that factorization_choose_le_log can bound v_p
+-- We can't test with private lemmas, but we verify the math is right
+
+example (p m k : ℕ) (hp : Nat.Prime p) :
+    padicValNat p ((m + k).choose k) ≤ Nat.log p (m + k) := by
+  rw [← Nat.factorization_def _ hp]
+  exact Nat.factorization_choose_le_log
+EOF
+lake env lean /tmp/test_main.lean 2>&1
+[2026-02-11T06:10:18.073Z] 
+🛠️  Executing tool: edit...
+[2026-02-11T06:10:20.735Z] 
+$ cd /home/jarred/code/erdos-728b && lake build 2>&1
+[2026-02-11T06:10:50.016Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "^section\|^end\|cascade_digit_neq\|valuation_le_cascade\|no_carry_beyond" Erdos/Lemma3Counting.lean | head -30
+[2026-02-11T06:10:58.004Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:11:02.380Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "not_pred_at_takeWhile_length" Erdos/Lemma3Counting.lean
+[2026-02-11T06:11:09.068Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:11:12.322Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:12:15.017Z] 
+🛠️  Executing tool: edit...
+[2026-02-11T06:12:15.319Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T06:12:15.322Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T06:12:18.141Z] 
+$ cd /home/jarred/code/erdos-728b && lake build 2>&1 | grep -E "error:|warning.*sorry|Building Erdos" | head -20
+[2026-02-11T06:12:37.616Z] [overseer] 💓 Heartbeat #34 complete: No intervention needed. Task erdos728b-vtv is in progress, and the system is moving forward through the dependency graph. Sorry count is 11.
+[2026-02-11T06:13:06.722Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "sorry" Erdos/Lemma3Counting.lean
+[2026-02-11T06:13:09.093Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "valuation_le_cascade" Erdos/Lemma3Counting.lean
+[2026-02-11T06:13:12.319Z] 
+$ cd /home/jarred/code/erdos-728b && lake build 2>&1 | tail -5
+[2026-02-11T06:13:27.512Z] 
+$ cd /home/jarred/code/erdos-728b && git add -A && git commit -m "Close sorry: valuation_le_cascade
+
+Prove v_p(C(m+k,k)) ≤ (log_p(k)+1) + cascade_length using Kummer's
+theorem and carry cascade analysis.
+
+Proof structure:
+- Case 1 (cascade terminates within D digits): Use carry_propagate
+  to show no carries exist beyond position s+1+L, then count carries
+  in Ico 1 (s+2+L) to get bound s+1+L.
+- Case 2 (cascade fills remaining digits): Use factorization_choose_le_log
+  to get v_p ≤ log_p(m+k) ≤ D ≤ (s+1)+L.
+
+Added helper lemmas in Cascade section (primed versions of private lemmas
+from ResidueCounting): cascade_digit_neq', no_carry_beyond',
+not_pred_at_takeWhile_length', digit_zero_of_lt_pow."

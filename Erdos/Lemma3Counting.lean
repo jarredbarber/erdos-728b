@@ -189,8 +189,135 @@ lemma carry_propagate (hp : p.Prime) (m i : ℕ) (hi : i > log p k + 1) (h_carry
       rw [← Nat.mul_succ]; congr 1; omega
     omega
 
+/-- If `takeWhile` has length `L < l.length`, then `l[L]` does NOT satisfy the predicate. -/
+private lemma not_pred_at_takeWhile_length' {α : Type*} {p : α → Bool} :
+    ∀ (l : List α) (h : (l.takeWhile p).length < l.length),
+    p l[(l.takeWhile p).length] = false := by
+  intro l; induction l with
+  | nil => intro h; simp at h
+  | cons a t ih =>
+    intro h; by_cases ha : p a = true
+    · have htw_len : (List.takeWhile p (a :: t)).length =
+          (List.takeWhile p t).length + 1 := by simp [ha]
+      have h' : (List.takeWhile p t).length < t.length := by
+        simp [List.length_cons] at h; omega
+      have h_idx : (a :: t)[(List.takeWhile p (a :: t)).length] =
+          t[(List.takeWhile p t).length] := by
+        simp only [htw_len, List.getElem_cons_succ]
+      simp only [h_idx]; exact ih h'
+    · have htw_len : (List.takeWhile p (a :: t)).length = 0 := by
+        simp [Bool.eq_false_iff.mpr ha]
+      have h_idx : (a :: t)[(List.takeWhile p (a :: t)).length] = a := by
+        simp only [htw_len, List.getElem_cons_zero]
+      simp only [h_idx]; exact Bool.eq_false_iff.mpr ha
+
+/-- If `cascade_length = L < D - (s+1)`, the digit at position `s+1+L` is NOT `p-1`. -/
+private lemma cascade_digit_neq' (k D m : ℕ)
+    (hL_lt : cascade_length (p := p) k D m < D - (log p k + 1)) :
+    digit p m (log p k + 1 + cascade_length (p := p) k D m) ≠ p - 1 := by
+  unfold cascade_length; simp only
+  set s := log p k; set limit := D - (s + 1)
+  set pred := fun i => decide (digit p m (s + 1 + i) = p - 1)
+  set tw := (List.range limit).takeWhile pred
+  have h_tw_lt : tw.length < (List.range limit).length := by
+    simp only [List.length_range]; exact hL_lt
+  have h_not := not_pred_at_takeWhile_length' (List.range limit) h_tw_lt
+  have h_range_eq : (List.range limit)[tw.length] = tw.length := by
+    simp [List.getElem_range]
+  rw [h_range_eq] at h_not
+  simp only [pred, decide_eq_false_iff_not] at h_not; exact h_not
+
+/-- No carry exists at any position beyond the cascade boundary. -/
+private lemma no_carry_beyond' (hp : p.Prime) (k m j : ℕ)
+    (hk : k ≥ 1) (hj : j ≥ log p k + 1) (h_digit : digit p m j ≠ p - 1)
+    (i : ℕ) (hi : i > j) (h_carry : carry_cond p k m i) : False := by
+  obtain ⟨d, rfl⟩ : ∃ d, i = j + 1 + d := ⟨i - (j + 1), by omega⟩
+  clear hi; induction d with
+  | zero =>
+    have : j + 1 > log p k + 1 := by omega
+    obtain ⟨h_dig, _⟩ := carry_propagate k hp m (j + 1) this h_carry hk
+    simp at h_dig; exact h_digit h_dig
+  | succ d ih =>
+    have h_pos : j + 1 + (d + 1) > log p k + 1 := by omega
+    obtain ⟨_, h_carry_prev⟩ :=
+      carry_propagate k hp m (j + 1 + (d + 1)) h_pos h_carry hk
+    have h_sub : j + 1 + (d + 1) - 1 = j + 1 + d := by omega
+    rw [h_sub] at h_carry_prev; exact ih h_carry_prev
+
+/-- For m < p^D, the digit at position i ≥ D is 0. -/
+private lemma digit_zero_of_lt_pow (m i : ℕ) (hp_pos : p > 0)
+    (hm : m < p ^ D) (hi : i ≥ D) :
+    digit p m i = 0 := by
+  unfold digit
+  have h1 : p ^ D ≤ p ^ i := Nat.pow_le_pow_right hp_pos hi
+  rw [Nat.div_eq_of_lt (lt_of_lt_of_le hm h1), Nat.zero_mod]
+
 lemma valuation_le_cascade (hp : p.Prime) (m : ℕ) (hk : k ≥ 1) (hm : m < p ^ D) :
-    padicValNat p ((m + k).choose k) ≤ (log p k + 1) + cascade_length (p:=p) k D m := sorry
+    padicValNat p ((m + k).choose k) ≤ (log p k + 1) + cascade_length (p:=p) k D m := by
+  set s := log p k
+  set L := cascade_length (p:=p) k D m
+  have hp2 : p ≥ 2 := hp.two_le
+  have hp_pos : p > 0 := by omega
+  -- Case split: cascade terminates within D digits, or fills all remaining digits
+  by_cases hL_lt : L < D - (s + 1)
+  · -- Case 1: cascade terminates within D → carry analysis
+    -- The digit at position s+1+L ≠ p-1 (cascade boundary)
+    have h_digit := cascade_digit_neq' k D m hL_lt
+    -- Express v_p using factorization_choose'
+    set b := max (D + 1) (log p (m + k) + 1) with hb_def
+    have hb : log p (m + k) < b := by show _ < max _ _; omega
+    rw [← Nat.factorization_def _ hp, Nat.factorization_choose' hp hb]
+    -- All carry positions are ≤ s+1+L (no carry beyond cascade)
+    set boundary := s + 1 + L
+    have h_subset :
+        (Ico 1 b).filter (fun i => p ^ i ≤ k % p ^ i + m % p ^ i) ⊆
+          Ico 1 (boundary + 1) := by
+      intro i hi; rw [mem_filter, mem_Ico] at hi; rw [mem_Ico]
+      refine ⟨hi.1.1, ?_⟩
+      by_contra h_not; push_neg at h_not
+      exact no_carry_beyond' hp k m (s + 1 + L) hk
+        (by omega) h_digit i (by omega) hi.2
+    calc ((Ico 1 b).filter (fun i => p ^ i ≤ k % p ^ i + m % p ^ i)).card
+        ≤ (Ico 1 (boundary + 1)).card := card_le_card h_subset
+      _ = boundary := by simp [Nat.card_Ico]
+      _ = (s + 1) + L := by ring
+  · -- Case 2: cascade fills remaining digits → use factorization_choose_le_log
+    push_neg at hL_lt  -- L ≥ D - (s + 1)
+    -- v_p ≤ log_p(m + k) by factorization_choose_le_log
+    have hv_le_log : padicValNat p ((m + k).choose k) ≤ log p (m + k) := by
+      rw [← Nat.factorization_def _ hp]; exact Nat.factorization_choose_le_log
+    -- Show log_p(m + k) ≤ (s + 1) + L
+    suffices h : log p (m + k) ≤ (s + 1) + L from le_trans hv_le_log h
+    by_cases hDs : s + 1 ≤ D
+    · -- Sub-case 2a: s + 1 ≤ D, so (s+1) + L ≥ D ≥ log_p(m+k)
+      -- k < p^{s+1} ≤ p^D
+      have hk_lt_pD : k < p ^ D :=
+        lt_of_lt_of_le (Nat.lt_pow_succ_log_self (by omega) k)
+          (Nat.pow_le_pow_right hp_pos hDs)
+      -- m + k < 2*p^D ≤ p^{D+1}, so log_p(m+k) ≤ D ≤ (s+1)+L
+      by_cases hmk : m + k = 0
+      · simp [hmk]
+      have hmk_lt : m + k < p ^ (D + 1) := by
+        have h := pow_succ p D -- p^(D+1) = p^D * p
+        nlinarith [Nat.one_le_pow D p hp_pos]
+      have hlog_le : log p (m + k) ≤ D :=
+        Nat.lt_succ_iff.mp (Nat.log_lt_of_lt_pow (by omega) hmk_lt)
+      omega
+    · -- Sub-case 2b: s + 1 > D, so D ≤ s, cascade_length adds D-(s+1) = 0
+      push_neg at hDs
+      -- k ≥ p^s ≥ p^D > m, so m+k ≤ 2k < 2*p^{s+1} ≤ p^{s+2}
+      have hps_le_k : p ^ s ≤ k := Nat.pow_log_le_self p (by omega)
+      have hpD_le_ps : p ^ D ≤ p ^ s := Nat.pow_le_pow_right hp_pos (by omega : D ≤ s)
+      have hmk_le : m + k ≤ 2 * k := by linarith
+      have hk_lt_ps1 : k < p ^ (s + 1) := Nat.lt_pow_succ_log_self (by omega) k
+      by_cases hmk : m + k = 0
+      · simp [hmk]
+      have hmk_lt_pow : m + k < p ^ (s + 2) := by
+        have h1 : p ^ (s + 2) = p ^ (s + 1) * p := pow_succ p (s + 1)
+        nlinarith [Nat.one_le_pow (s + 1) p hp_pos]
+      have hlog_le : log p (m + k) ≤ s + 1 :=
+        Nat.lt_succ_iff.mp (Nat.log_lt_of_lt_pow (by omega) hmk_lt_pow)
+      omega
 
 lemma count_large_cascade (hp : p.Prime) (T : ℕ) (hT : T ≤ D - (log p k + 1)) :
     ((range (p^D)).filter (fun m => cascade_length (p:=p) k D m ≥ T)).card ≤ p ^ (D - T) := sorry
