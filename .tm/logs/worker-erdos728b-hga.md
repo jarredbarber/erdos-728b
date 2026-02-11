@@ -2801,3 +2801,34 @@ Key lemmas proved:
 
 No new sorrys introduced. lake build succeeds."
 ```
+Now let me update the task:
+```bash
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-hga --status "Completed - bad_residue_sets fully proved with no new sorrys"
+```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm close erdos728b-hga
+```
+## Summary
+
+```json
+{
+  "status": "completed",
+  "summary": "Closed sorry in bad_residue_sets. lake build succeeds with no new sorrys.",
+  "details": "Proved bad_residue_sets (Lemma3Counting.lean:586) — both 'bad' conditions depend only on m mod p^D. Key contributions:\n\n1. **digit_mod_pow_eq**: digit p (m % p^D) i = digit p m i for i < D (using Nat.mod_mul_right_div_self and Nat.mod_mod_of_dvd)\n\n2. **cascade_length_mod_eq**: cascade_length is invariant under mod p^D (all digit lookups are at positions < D)\n\n3. **count_high_digits_mod_eq**: count_high_digits is invariant under mod p^D\n\n4. **valuation_gt_implies_cascade** (the main mathematical content): v_p(C(m+k,k)) > D/6 → cascade_length ≥ D/6 - log p k. Proved via contrapositive using:\n   - cascade_digit_neq: if cascade terminates within D, the boundary digit ≠ p-1\n   - no_carry_beyond: descending induction via carry_propagate shows no carry exists past the cascade boundary\n   - factorization_choose': Kummer's theorem to express v_p as #{carry positions}\n   - The carry set is contained in Ico 1 (s+2+L), bounding v_p ≤ s+1+L ≤ D/6\n\n5. **count_high_le_valuation**: count_high_digits ≤ v_p(C(2m,m)) for arbitrary m (removed the log bound restriction from valuation_ge_high_digits by using factorization_choose with b = max(D+1, log p (2m)+1))\n\nNo new sorry holes introduced. All 8 remaining sorrys in the file are pre-existing."
+}
+```
+
+## Final Result
+
+## Summary
+
+```json
+{
+  "status": "completed",
+  "summary": "Closed sorry in bad_residue_sets. lake build succeeds with no new sorrys.",
+  "details": "Proved bad_residue_sets (Lemma3Counting.lean:586) — both 'bad' conditions depend only on m mod p^D. Key contributions:\n\n1. **digit_mod_pow_eq**: digit p (m % p^D) i = digit p m i for i < D (using Nat.mod_mul_right_div_self and Nat.mod_mod_of_dvd)\n\n2. **cascade_length_mod_eq**: cascade_length is invariant under mod p^D (all digit lookups are at positions < D)\n\n3. **count_high_digits_mod_eq**: count_high_digits is invariant under mod p^D\n\n4. **valuation_gt_implies_cascade** (the main mathematical content): v_p(C(m+k,k)) > D/6 → cascade_length ≥ D/6 - log p k. Proved via contrapositive using:\n   - cascade_digit_neq: if cascade terminates within D, the boundary digit ≠ p-1\n   - no_carry_beyond: descending induction via carry_propagate shows no carry exists past the cascade boundary\n   - factorization_choose': Kummer's theorem to express v_p as #{carry positions}\n   - The carry set is contained in Ico 1 (s+2+L), bounding v_p ≤ s+1+L ≤ D/6\n\n5. **count_high_le_valuation**: count_high_digits ≤ v_p(C(2m,m)) for arbitrary m (removed the log bound restriction from valuation_ge_high_digits by using factorization_choose with b = max(D+1, log p (2m)+1))\n\nNo new sorry holes introduced. All 8 remaining sorrys in the file are pre-existing."
+}
+```
+
+End Time: 2026-02-11T05:47:25.354Z

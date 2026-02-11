@@ -16973,3 +16973,32 @@ Key lemmas proved:
   (descending induction using carry_propagate)
 
 No new sorrys introduced. lake build succeeds."
+[2026-02-11T05:47:12.157Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-hga --status "Completed - bad_residue_sets fully proved with no new sorrys"
+[2026-02-11T05:47:14.356Z] 
+$ cd /home/jarred/code/erdos-728b && tm close erdos728b-hga
+[2026-02-11T05:47:25.354Z] 
+
+📝 Agent response complete.
+
+[2026-02-11T05:47:25.354Z] 📄 Log saved to .tm/logs/worker-erdos728b-hga.md
+[2026-02-11T05:47:25.354Z] 
+📊 Task erdos728b-hga completed:
+[2026-02-11T05:47:25.354Z]    Summary: Closed sorry in bad_residue_sets. lake build succeeds with no new sorrys.
+[2026-02-11T05:47:25.354Z]    Details: Proved bad_residue_sets (Lemma3Counting.lean:586) — both 'bad' conditions depend only on m mod p^D. Key contributions:
+
+1. **digit_mod_pow_eq**: digit p (m % p^D) i = digit p m i for i < D (using Nat.mod_mul_right_div_self and Nat.mod_mod_of_dvd)
+
+2. **cascade_length_mod_eq**: cascade_length is invariant under mod p^D (all digit lookups are at positions < D)
+
+3. **count_high_digits_mod_eq**: count_high_digits is invariant under mod p^D
+
+4. **valuation_gt_implies_cascade** (the main mathematical content): v_p(C(m+k,k)) > D/6 → cascade_length ≥ D/6 - log p k. Proved via contrapositive using:
+   - cascade_digit_neq: if cascade terminates within D, the boundary digit ≠ p-1
+   - no_carry_beyond: descending induction via carry_propagate shows no carry exists past the cascade boundary
+   - factorization_choose': Kummer's theorem to express v_p as #{carry positions}
+   - The carry set is contained in Ico 1 (s+2+L), bounding v_p ≤ s+1+L ≤ D/6
+
+5. **count_high_le_valuation**: count_high_digits ≤ v_p(C(2m,m)) for arbitrary m (removed the log bound restriction from valuation_ge_high_digits by using factorization_choose with b = max(D+1, log p (2m)+1))
+
+No new sorry holes introduced. All 8 remaining sorrys in the file are pre-existing.
