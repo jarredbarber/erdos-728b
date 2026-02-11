@@ -1,12 +1,31 @@
-# Erdős 728: Agent-Discovered Proof ✅ (erdos-728b experiment)
+# Erdős 728: Formal Proof by Autonomous AI Agents
 
-**Context:** This proof was discovered and fully formalized by LLM agents (Gemini 3 Pro + Claude Opus 4.6, randomized per task) using the [timtam](https://github.com/jarredbarber/timtam) multi-agent workflow. No hints about proof techniques were provided — agents were given only the problem statement and told "this has been proved."
+## The Experiment
 
-**Result:** 2,906 lines of Lean 4, **0 sorrys, 0 axioms**, `lake build` passes. 66 tasks, all closed.
+Can autonomous LLM agents discover and formally verify a proof of an Erdős problem — with zero human mathematical input?
 
-**Problem:** For sufficiently small ε > 0 and any 0 < C < C', show there exist a, b, n ∈ ℕ with a, b > εn such that a!b! | n!(a+b-n)! and C log n < a+b-n < C' log n.
+This repo contains the answer: **yes.** 2,906 lines of Lean 4, **0 sorrys, 0 axioms**, verified by `lake build`. The entire proof — strategy, lemma design, and Lean formalization — was produced by agents. A human (who deliberately did not learn the mathematics) selected the problem, set up infrastructure, and pressed go.
 
-**Repo:** [github.com/jarredbarber/erdos-728b](https://github.com/jarredbarber/erdos-728b)
+### Rules
+
+- **Zero human mathematical input.** No hints about proof techniques. Agents received only the problem statement.
+- **No web search.** Agents had no access to arXiv, Mathlib docs, or external references.
+- **The compiler is the only reviewer.** `lake build` with 0 sorrys and 0 axioms is the sole acceptance criterion. Everything else is intermediate.
+
+### Setup
+
+- **Models:** Gemini 3 Pro (Google) and Claude Opus 4.6 (Anthropic), randomly assigned per task
+- **Workflow:** [timtam](https://github.com/jarredbarber/timtam) multi-agent system — explore agents discover NL proofs, verify agents review them, formalize agents write Lean. A planner decomposes problems into tasks. An overseer monitors progress.
+- **Lean:** 4.27.0 + Mathlib 4.27.0
+- **Effort:** 66 tasks, all closed
+
+### The Problem
+
+**Erdős Problem 728:** For sufficiently small ε > 0 and any 0 < C < C', show there exist a, b, n ∈ ℕ with a, b > εn such that a!b! | n!(a+b-n)! and C log n < a+b-n < C' log n.
+
+This was previously resolved by GPT-5.2 + Aristotle ([arXiv:2601.07421](https://arxiv.org/abs/2601.07421)). Our agents had no access to that paper and found a different construction for the hardest step.
+
+This is one of several Erdős problems attacked in this experiment. See the [full experiment writeup](https://gist.github.com/jarredbarber/10dff24643366d160e80e75766ae4df1) for results across all problems.
 
 ---
 
