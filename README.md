@@ -1,30 +1,27 @@
 # Erdős 728: Formal Proof by Autonomous AI Agents
 
-## The Experiment
+## Motivation
 
-Can autonomous LLM agents discover and formally verify a proof of an Erdős problem — with zero human mathematical input?
+In January 2026, GPT-5.2 + Aristotle resolved Erdős Problem 728 ([arXiv:2601.07421](https://arxiv.org/abs/2601.07421)). That system used a tight loop between GPT-5.2 (proof strategy) and Aristotle/Harmonic (MCTS-based tactic search over Lean proof states) — a purpose-built pipeline with specialized Lean search.
 
-This repo contains the answer: **yes.** 2,906 lines of Lean 4, **0 sorrys, 0 axioms**, verified by `lake build`. The entire proof — strategy, lemma design, and Lean formalization — was produced by agents. A human (who deliberately did not learn the mathematics) selected the problem, set up infrastructure, and pressed go.
+We wanted to know: **can general-purpose LLMs do this without specialized search?** No MCTS, no tactic-level tree search, no Lean-specific training. Just off-the-shelf models writing Lean as text, iterating against the compiler, coordinated by a task management system.
 
-### Rules
+**Result:** 2,906 lines of Lean 4, **0 sorrys, 0 axioms**, verified by `lake build`. The agents found a different construction for the hardest step — Chernoff + union bound instead of carry-rich/spike-free counting — with no access to the published proof.
 
-- **Zero human mathematical input.** No hints about proof techniques. Agents received only the problem statement.
-- **No web search.** Agents had no access to arXiv, Mathlib docs, or external references.
-- **The compiler is the only reviewer.** `lake build` with 0 sorrys and 0 axioms is the sole acceptance criterion. Everything else is intermediate.
-
-### Setup
-
-- **Models:** Claude Opus 4.6 (Anthropic), Gemini 3 Pro, and Gemini 3 Flash (Google), randomly assigned per task
-- **Workflow:** [timtam](https://github.com/jarredbarber/timtam) multi-agent system — explore agents discover NL proofs, verify agents review them, formalize agents write Lean. A planner decomposes problems into tasks. An overseer monitors progress.
-- **Formalization:** Standard LLMs writing Lean as text, iterating against the compiler. No MCTS, no tactic-level search, no Lean-specific training. Just general-purpose models and `lake build`.
-- **Lean:** 4.27.0 + Mathlib 4.27.0
-- **Effort:** 66 tasks, all closed
-
-### The Problem
+## The Problem
 
 **Erdős Problem 728:** For sufficiently small ε > 0 and any 0 < C < C', show there exist a, b, n ∈ ℕ with a, b > εn such that a!b! | n!(a+b-n)! and C log n < a+b-n < C' log n.
 
-Previously resolved by GPT-5.2 + Aristotle ([arXiv:2601.07421](https://arxiv.org/abs/2601.07421)), which used MCTS-based tactic search (Aristotle/Harmonic) for formalization. Our agents had no access to that paper, used no specialized search — just LLMs generating Lean code and fixing compiler errors — and found a different construction for the hardest step (Chernoff + union bound vs. carry-rich/spike-free counting).
+## Experimental Design
+
+- **Zero human mathematical input.** No hints about proof techniques. Agents received only the problem statement.
+- **No web search.** No access to arXiv, Mathlib docs, or external references.
+- **The compiler is the only reviewer.** `lake build` with 0 sorrys and 0 axioms is the sole acceptance criterion.
+- **Models:** Claude Opus 4.6 (Anthropic), Gemini 3 Pro, and Gemini 3 Flash (Google), randomly assigned per task.
+- **Formalization:** LLMs generate Lean code, get compiler errors back, fix and retry. No specialized search.
+- **Workflow:** [timtam](https://github.com/jarredbarber/timtam) multi-agent system — explore agents discover NL proofs, verify agents review them, formalize agents write Lean. A planner decomposes problems into tasks.
+- **Lean:** 4.27.0 + Mathlib 4.27.0
+- **Effort:** 66 tasks, all closed
 
 This is one of several Erdős problems attacked in this experiment:
 - [**Proof strategy details for this problem**](https://gist.github.com/jarredbarber/5b49a172290564e281b8676b9f8402d0) — construction, lemmas, comparison with GPT-5.2 approach
