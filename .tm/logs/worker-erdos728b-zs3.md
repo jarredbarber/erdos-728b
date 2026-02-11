@@ -633,3 +633,26 @@ m % p^(j+1) = m % p^j + p^j * d where d = digit(p,m,j), a simple
 counting argument shows d must be p-1 (otherwise the sum is too small
 to satisfy carry_cond), and carry_cond propagates downward."
 ```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-zs3 --status "Completed — sorry closed, lake build succeeds"
+```
+```json
+{
+  "status": "completed",
+  "summary": "Closed sorry in carry_propagate. lake build succeeds.",
+  "details": "Proved carry_propagate in Erdos/Lemma3Counting.lean (Lemma A1 from proofs/lemma3-counting.md). The proof works by:\n\n1. Rewriting i as (i-1)+1 to avoid natural subtraction issues and enable use of Nat.mod_pow_succ.\n2. Showing k < p^(i-1) since i-1 ≥ log_p(k)+1, so k % p^j = k for j = i-1.\n3. Decomposing m % p^(j+1) = m % p^j + p^j * d where d = digit(p,m,j) via Nat.mod_pow_succ.\n4. Proving d = p-1 by contradiction: if d ≤ p-2, the total k + m%p^j + p^j*d ≤ p^j*p - 2 < p^(j+1), contradicting carry_cond.\n5. Deriving carry_cond at j from p^(j+1) ≤ k + m%p^j + p^j*(p-1), which gives p^j ≤ k + m%p^j.\n\nAlso added explicit `(hp : p.Prime)` parameter since the section variable wasn't auto-included (not referenced in the type signature). No new sorry holes introduced."
+}
+```
+
+## Final Result
+
+```json
+{
+  "status": "completed",
+  "summary": "Closed sorry in carry_propagate. lake build succeeds.",
+  "details": "Proved carry_propagate in Erdos/Lemma3Counting.lean (Lemma A1 from proofs/lemma3-counting.md). The proof works by:\n\n1. Rewriting i as (i-1)+1 to avoid natural subtraction issues and enable use of Nat.mod_pow_succ.\n2. Showing k < p^(i-1) since i-1 ≥ log_p(k)+1, so k % p^j = k for j = i-1.\n3. Decomposing m % p^(j+1) = m % p^j + p^j * d where d = digit(p,m,j) via Nat.mod_pow_succ.\n4. Proving d = p-1 by contradiction: if d ≤ p-2, the total k + m%p^j + p^j*d ≤ p^j*p - 2 < p^(j+1), contradicting carry_cond.\n5. Deriving carry_cond at j from p^(j+1) ≤ k + m%p^j + p^j*(p-1), which gives p^j ≤ k + m%p^j.\n\nAlso added explicit `(hp : p.Prime)` parameter since the section variable wasn't auto-included (not referenced in the type signature). No new sorry holes introduced."
+}
+```
+
+End Time: 2026-02-11T04:59:48.654Z

@@ -13445,3 +13445,22 @@ are 0, so k % p^i = k % p^(i-1). Using Nat.mod_pow_succ to decompose
 m % p^(j+1) = m % p^j + p^j * d where d = digit(p,m,j), a simple
 counting argument shows d must be p-1 (otherwise the sum is too small
 to satisfy carry_cond), and carry_cond propagates downward."
+[2026-02-11T04:59:39.952Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-zs3 --status "Completed — sorry closed, lake build succeeds"
+[2026-02-11T04:59:48.654Z] 
+
+📝 Agent response complete.
+
+[2026-02-11T04:59:48.654Z] 📄 Log saved to .tm/logs/worker-erdos728b-zs3.md
+[2026-02-11T04:59:48.655Z] 
+📊 Task erdos728b-zs3 completed:
+[2026-02-11T04:59:48.655Z]    Summary: Closed sorry in carry_propagate. lake build succeeds.
+[2026-02-11T04:59:48.655Z]    Details: Proved carry_propagate in Erdos/Lemma3Counting.lean (Lemma A1 from proofs/lemma3-counting.md). The proof works by:
+
+1. Rewriting i as (i-1)+1 to avoid natural subtraction issues and enable use of Nat.mod_pow_succ.
+2. Showing k < p^(i-1) since i-1 ≥ log_p(k)+1, so k % p^j = k for j = i-1.
+3. Decomposing m % p^(j+1) = m % p^j + p^j * d where d = digit(p,m,j) via Nat.mod_pow_succ.
+4. Proving d = p-1 by contradiction: if d ≤ p-2, the total k + m%p^j + p^j*d ≤ p^j*p - 2 < p^(j+1), contradicting carry_cond.
+5. Deriving carry_cond at j from p^(j+1) ≤ k + m%p^j + p^j*(p-1), which gives p^j ≤ k + m%p^j.
+
+Also added explicit `(hp : p.Prime)` parameter since the section variable wasn't auto-included (not referenced in the type signature). No new sorry holes introduced.
