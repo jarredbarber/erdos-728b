@@ -1030,28 +1030,348 @@ so a single M₀ works for all valid k.
 noncomputable def union_bound_threshold (k : ℕ) : ℕ :=
   (2 * k) ^ (72 * (Nat.log 2 (16 * k) + 1) + 72)
 
+/-- `count_few_high_digits` extended to all primes (including p = 2).
+    The existing version requires `p ≥ 3` but the proof only uses `p ≥ 2`. -/
+private lemma count_few_high_digits_all {p : ℕ} (D : ℕ) (hp : p.Prime) (t : ℕ) (ht : t ≤ D/6) :
+    ((range (p^D)).filter (fun m => count_high_digits p m D < t)).card ≤
+    p^D / 2^(D/36) := by
+  by_cases hp3 : p ≥ 3
+  · exact count_few_high_digits D hp t ht hp3
+  · -- p = 2 case (identical proof with probHigh 2 = 1/2)
+    have hp_val : p = 2 := by have := hp.two_le; omega
+    subst hp_val
+    by_cases ht0 : t = 0; · simp [ht0]
+    have ht_pos : t ≥ 1 := Nat.pos_of_ne_zero ht0
+    have hD_ge_6 : D ≥ 6 := by omega
+    have hD_pos : D > 0 := by omega
+    have h_card_eq_fin :
+        ((range (2^D)).filter (fun m => count_high_digits 2 m D < t)).card =
+        ((Finset.univ : Finset (Fin (2^D))).filter
+          (fun m : Fin (2^D) => count_high_digits 2 m.val D < t)).card := by
+      apply Finset.card_bij
+        (fun m hm => ⟨m, by rw [mem_filter] at hm; exact mem_range.mp hm.1⟩)
+      · intro m hm; rw [mem_filter] at hm ⊢; exact ⟨mem_univ _, hm.2⟩
+      · intro a _ b _ h; simp at h; exact h
+      · intro b hb; refine ⟨b.val, ?_, Fin.ext rfl⟩
+        rw [mem_filter]; exact ⟨mem_range.mpr b.isLt, (mem_filter.mp hb).2⟩
+    have h_card_eq_ds :
+        ((Finset.univ : Finset (Fin (2^D))).filter
+          (fun m : Fin (2^D) => count_high_digits 2 m.val D < t)).card =
+        ((Finset.univ : Finset (DigitSpace D 2)).filter
+          (fun m : DigitSpace D 2 => highDigitCount m < t)).card := by
+      have hbij := toDigitSpace_bijective hp D
+      apply Finset.card_bij (fun m _ => toDigitSpace hp D m)
+      · intro m hm; rw [mem_filter] at hm ⊢
+        exact ⟨mem_univ _, by rw [highDigitCount_eq hp D m]; exact hm.2⟩
+      · intro a _ b _ h; exact hbij.1 h
+      · intro b hb; obtain ⟨a, ha⟩ := hbij.2 b
+        refine ⟨a, ?_, ha⟩; rw [mem_filter]
+        exact ⟨mem_univ _, by rw [← highDigitCount_eq hp D a, ha]; exact (mem_filter.mp hb).2⟩
+    have h_subset :
+        (Finset.univ.filter (fun m : DigitSpace D 2 => highDigitCount m < t)) ⊆
+        (Finset.univ.filter (fun m : DigitSpace D 2 => (highDigitCount m : ℝ) ≤ ↑t)) := by
+      intro m; simp only [mem_filter, mem_univ, true_and]
+      exact fun h => by exact_mod_cast le_of_lt h
+    have hph : probHigh 2 = 1/2 := by unfold probHigh; norm_num
+    have h_t_lt : (t : ℝ) < ↑D * probHigh 2 := by
+      rw [hph]; linarith [show (↑t : ℝ) ≤ ↑D / 6 from by
+        have : (↑(t * 6) : ℝ) ≤ (↑D : ℝ) := by exact_mod_cast (show t * 6 ≤ D by omega)
+        push_cast at this; linarith, show (↑D : ℝ) > 0 from by exact_mod_cast hD_pos]
+    have hne : NeZero (2 : ℕ) := ⟨by omega⟩
+    have h_chernoff := @count_few_high_digits_bound_chernoff D 2 hne (↑t) h_t_lt
+    have h_exp_bound :
+        exp (-2 * ((↑D * probHigh 2 - ↑t)^2) / (↑D : ℝ)) ≤ ((2 : ℝ)^(D/36))⁻¹ := by
+      rw [hph]
+      have h_gap : ↑D * ((1:ℝ)/2) - ↑t ≥ ↑D / 6 := by
+        linarith [show (↑t : ℝ) ≤ ↑D / 6 from by
+          have : (↑(t * 6) : ℝ) ≤ (↑D : ℝ) := by exact_mod_cast (show t * 6 ≤ D by omega)
+          push_cast at this; linarith]
+      have hD_r : (↑D : ℝ) > 0 := by exact_mod_cast hD_pos
+      calc exp (-2 * ((↑D * ((1:ℝ)/2) - ↑t)^2) / ↑D)
+          ≤ exp (-(↑D : ℝ) / 18) := by
+            rw [exp_le_exp]
+            calc -2 * (↑D * ((1:ℝ)/2) - ↑t)^2 / ↑D
+                ≤ -2 * ((↑D : ℝ) / 6)^2 / ↑D := by
+                  apply div_le_div_of_nonneg_right _ (le_of_lt hD_r)
+                  nlinarith [sq_le_sq' (by linarith) h_gap]
+              _ = -(↑D : ℝ) / 18 := by field_simp; ring
+        _ ≤ ((2 : ℝ)^(D/36))⁻¹ := by
+            rw [show ((2 : ℝ)^(D/36))⁻¹ = exp (-(↑(D/36) * Real.log 2)) from by
+              rw [exp_neg]; congr 1; rw [← rpow_natCast,
+                rpow_def_of_pos (by norm_num : (0:ℝ) < 2)]; ring_nf]
+            rw [exp_le_exp]
+            nlinarith [
+              show Real.log 2 ≤ 1 from by
+                rw [← Real.log_exp 1]; exact Real.log_le_log (by norm_num)
+                  (by linarith [add_one_le_exp 1]),
+              show (↑(D/36) : ℝ) ≤ (D : ℝ) / 18 from by
+                have : (↑(D/36) : ℝ) ≤ (D : ℝ) / 36 := by
+                  rw [le_div_iff₀ (by norm_num : (0:ℝ) < 36)]
+                  exact_mod_cast Nat.div_mul_le_self D 36
+                linarith [show (D:ℝ) / 36 ≤ (D:ℝ) / 18 from by
+                  apply div_le_div_of_nonneg_left _ (by norm_num) (by norm_num)
+                  exact_mod_cast Nat.zero_le D],
+              show (↑(D/36) : ℝ) ≥ 0 from by exact_mod_cast Nat.zero_le _]
+    rw [h_card_eq_fin, h_card_eq_ds]
+    have h2_pos : (2 : ℕ)^(D/36) > 0 := by positivity
+    rw [Nat.le_div_iff_mul_le h2_pos]
+    have h_card_le := card_le_card h_subset
+    suffices h : ((((Finset.univ.filter (fun m : DigitSpace D 2 =>
+        highDigitCount m < t)).card * 2^(D/36) : ℕ) : ℝ) ≤ ↑(2^D)) from by
+      exact_mod_cast h
+    push_cast
+    calc ↑((Finset.univ.filter (fun m : DigitSpace D 2 =>
+          highDigitCount m < t)).card) * (2:ℝ)^(D/36)
+        ≤ ↑((Finset.univ.filter (fun m : DigitSpace D 2 =>
+          (highDigitCount m : ℝ) ≤ ↑t)).card) * (2:ℝ)^(D/36) := by
+          apply mul_le_mul_of_nonneg_right (by exact_mod_cast h_card_le) (by positivity)
+      _ ≤ ((2:ℝ) ^ D * exp (-2 * ((↑D * probHigh 2 - ↑t)^2) / ↑D)) *
+          (2:ℝ)^(D/36) := by
+          apply mul_le_mul_of_nonneg_right h_chernoff (by positivity)
+      _ ≤ ((2:ℝ) ^ D * ((2 : ℝ)^(D/36))⁻¹) * (2:ℝ)^(D/36) := by
+          apply mul_le_mul_of_nonneg_right _ (by positivity)
+          exact mul_le_mul_of_nonneg_left h_exp_bound (by positivity)
+      _ = (2:ℝ) ^ D := by
+          rw [mul_assoc, inv_mul_cancel₀
+            (by positivity : (2:ℝ)^(D/36) ≠ 0), mul_one]
+
+/-- `count_bad_interval` extended to all primes (including p = 2).
+    The existing version requires `p ≥ 3`; we extend it using
+    `count_few_high_digits_all`. -/
+private lemma count_bad_interval_all {p : ℕ} (D k m0 : ℕ)
+    (hm0 : m0 ≥ p^D) (hD : D ≥ 16 * (log p (k + 1)) + 16)
+    (hp : p.Prime) (hk : k ≥ 1) :
+    ((Ico m0 (2 * m0)).filter (fun m => padicValNat p ((m + k).choose k) >
+      padicValNat p ((2 * m).choose m))).card
+    ≤ (2 * m0) / 2 ^ (D / 36) + (2 * p^D) / 2 ^ (D / 36) := by
+  by_cases hp3 : p ≥ 3
+  · exact count_bad_interval D k m0 hm0 hD hp hp3 hk
+  · -- p = 2 case: identical to count_bad_interval but using count_few_high_digits_all
+    have hp2 : p ≥ 2 := hp.two_le
+    have hp_pos : p > 0 := hp.pos
+    have hpD_pos : p ^ D > 0 := Nat.pos_of_ne_zero (by positivity)
+    have h2x_pos : 2 ^ (D / 36) > 0 := Nat.pos_of_ne_zero (by positivity)
+    set s := log p k; set x := D / 36
+    let R1 := (range (p ^ D)).filter
+      (fun r => cascade_length (p := p) k D r ≥ D / 6 - s)
+    let R2 := (range (p ^ D)).filter
+      (fun r => count_high_digits p r D < D / 6)
+    let R := R1 ∪ R2
+    have hR_mem : ∀ r ∈ R, r < p ^ D := by
+      intro r hr; rw [mem_union] at hr
+      rcases hr with hr1 | hr2
+      · exact mem_range.mp (mem_filter.mp hr1).1
+      · exact mem_range.mp (mem_filter.mp hr2).1
+    have h_bad_residues := bad_residue_sets D k hp hD
+    have h_subset : (Ico m0 (2 * m0)).filter
+        (fun m => padicValNat p ((m + k).choose k) >
+          padicValNat p ((2 * m).choose m)) ⊆
+        (Ico m0 (2 * m0)).filter (fun m => m % p ^ D ∈ R) := by
+      intro m hm; rw [mem_filter] at hm ⊢; refine ⟨hm.1, ?_⟩
+      by_cases h1 : padicValNat p ((m + k).choose k) > D / 6
+      · exact mem_union_left R2 (h_bad_residues.1 m h1)
+      · push_neg at h1
+        exact mem_union_right R1 (h_bad_residues.2 m (by omega))
+    have hm0_le : m0 ≤ 2 * m0 := Nat.le_mul_of_pos_left m0 (by omega)
+    have h_resid := residue_count_interval D hp hR_mem m0 (2 * m0) hm0_le
+    have hD_ge : D ≥ 16 := by omega
+    have hs_le : s ≤ (D - 16) / 16 := by
+      have : s ≤ log p (k + 1) := Nat.log_mono_right (by omega); omega
+    have hT_le : D / 6 - s ≤ D - (s + 1) := by omega
+    have h_R1 := count_large_cascade k D hp (D / 6 - s) hT_le
+    have h_R2 := count_few_high_digits_all D hp (D / 6) (le_refl _)
+    have h_exp_ge : D / 6 - s ≥ D / 36 := by omega
+    have h_pow_ge : p ^ (D / 6 - s) ≥ 2 ^ (D / 36) :=
+      calc p ^ (D / 6 - s) ≥ 2 ^ (D / 6 - s) :=
+            Nat.pow_le_pow_left (by omega) _
+        _ ≥ 2 ^ (D / 36) := Nat.pow_le_pow_right (by omega) h_exp_ge
+    have h_R1_bound : R1.card ≤ p ^ D / 2 ^ x := by
+      calc R1.card ≤ p ^ (D - (D / 6 - s)) := h_R1
+        _ = p ^ D / p ^ (D / 6 - s) := by
+            rw [Nat.pow_div (by omega) (by omega)]
+        _ ≤ p ^ D / 2 ^ x := Nat.div_le_div_left h_pow_ge h2x_pos
+    have h_mul_div : 2 * (p ^ D / 2 ^ x) ≤ 2 * p ^ D / 2 ^ x := by
+      rw [Nat.le_div_iff_mul_le h2x_pos]
+      calc 2 * (p ^ D / 2 ^ x) * 2 ^ x
+          = 2 * (2 ^ x * (p ^ D / 2 ^ x)) := by ring
+        _ ≤ 2 * p ^ D := Nat.mul_le_mul_left 2 (Nat.mul_div_le _ _)
+    have h_R_bound : R.card ≤ 2 * p ^ D / 2 ^ x := by
+      calc R.card ≤ R1.card + R2.card := card_union_le R1 R2
+        _ ≤ p ^ D / 2 ^ x + p ^ D / 2 ^ x :=
+            Nat.add_le_add h_R1_bound h_R2
+        _ = 2 * (p ^ D / 2 ^ x) := by ring
+        _ ≤ 2 * p ^ D / 2 ^ x := h_mul_div
+    have h_interval_len : 2 * m0 - m0 = m0 := by omega
+    calc ((Ico m0 (2 * m0)).filter _).card
+        ≤ ((Ico m0 (2 * m0)).filter
+            (fun m => m % p ^ D ∈ R)).card :=
+          card_le_card h_subset
+      _ ≤ R.card * (m0 / p ^ D + 1) := by
+          rw [h_interval_len] at h_resid; exact h_resid
+      _ ≤ (2 * p ^ D / 2 ^ x) * (m0 / p ^ D + 1) :=
+          Nat.mul_le_mul_right _ h_R_bound
+      _ = (2 * p ^ D / 2 ^ x) * (m0 / p ^ D) +
+          (2 * p ^ D / 2 ^ x) := by ring
+      _ ≤ 2 * m0 / 2 ^ x + 2 * p ^ D / 2 ^ x := by
+          apply Nat.add_le_add_right
+          conv_lhs => rw [show m0 / p ^ D = 2 * m0 / (2 * p ^ D) from
+            (Nat.mul_div_mul_left m0 (p ^ D)
+              (by omega : 2 > 0)).symm]
+          exact div_mul_div_le (2 * p ^ D) (2 * m0) (2 ^ x) h2x_pos
+
+/-- D_p for each prime p: the digit-space dimension used in the counting argument. -/
+private noncomputable def D_p_val (k p : ℕ) : ℕ :=
+  36 * (Nat.log 2 (16 * k) + 1) + 36 * (Nat.log p (k + 1)) + 36
+
+private lemma D_p_val_ge_threshold (k p : ℕ) :
+    D_p_val k p ≥ 16 * (Nat.log p (k + 1)) + 16 := by
+  unfold D_p_val; omega
+
+private lemma pow_D_p_val_le_threshold (k p : ℕ) (hk : k ≥ 1)
+    (hp : p.Prime) (hp_le : p ≤ 2 * k) :
+    p ^ (D_p_val k p) ≤ union_bound_threshold k := by
+  unfold union_bound_threshold D_p_val
+  have h_pS_le : p ^ (Nat.log p (k + 1)) ≤ k + 1 :=
+    Nat.pow_log_le_self p (by omega)
+  have h1 : p ^ (36 * (Nat.log 2 (16 * k) + 1) + 36 * Nat.log p (k + 1) + 36) =
+      p ^ (36 * (Nat.log 2 (16 * k) + 1)) *
+      (p ^ Nat.log p (k + 1)) ^ 36 * p ^ 36 := by
+    rw [show 36 * Nat.log p (k + 1) = Nat.log p (k + 1) * 36 from by ring,
+        ← pow_mul, ← pow_add, ← pow_add]
+  rw [h1]
+  calc p ^ (36 * (Nat.log 2 (16 * k) + 1)) *
+        (p ^ Nat.log p (k + 1)) ^ 36 * p ^ 36
+      ≤ (2 * k) ^ (36 * (Nat.log 2 (16 * k) + 1)) *
+        (k + 1) ^ 36 * (2 * k) ^ 36 :=
+        Nat.mul_le_mul (Nat.mul_le_mul
+          (Nat.pow_le_pow_left hp_le _)
+          (Nat.pow_le_pow_left h_pS_le _))
+          (Nat.pow_le_pow_left hp_le _)
+    _ ≤ (2 * k) ^ (36 * (Nat.log 2 (16 * k) + 1)) *
+        (2 * k) ^ 36 * (2 * k) ^ 36 :=
+        Nat.mul_le_mul_right _
+          (Nat.mul_le_mul_left _
+            (Nat.pow_le_pow_left (by omega) _))
+    _ = (2 * k) ^ (36 * (Nat.log 2 (16 * k) + 1) + 36 + 36) := by
+        rw [← pow_add, ← pow_add]
+    _ ≤ (2 * k) ^ (72 * (Nat.log 2 (16 * k) + 1) + 72) :=
+        Nat.pow_le_pow_right (by omega) (by omega)
+
+private lemma decay_estimate_val (k p : ℕ) (hk : k ≥ 1) :
+    2 ^ (D_p_val k p / 36) ≥ 32 * k := by
+  unfold D_p_val
+  have hD36 : (36 * (Nat.log 2 (16 * k) + 1) +
+      36 * Nat.log p (k + 1) + 36) / 36 =
+      Nat.log 2 (16 * k) + 1 + Nat.log p (k + 1) + 1 := by omega
+  rw [hD36]
+  have h2L : 2 ^ (Nat.log 2 (16 * k) + 1) ≥ 16 * k + 1 :=
+    Nat.lt_pow_succ_log_self (by norm_num : 1 < 2) (16 * k)
+  calc 2 ^ (Nat.log 2 (16 * k) + 1 + Nat.log p (k + 1) + 1)
+      ≥ 2 ^ (Nat.log 2 (16 * k) + 1 + 0 + 1) :=
+        Nat.pow_le_pow_right (by omega) (by omega)
+    _ = 2 * 2 ^ (Nat.log 2 (16 * k) + 1) := by ring
+    _ ≥ 2 * (16 * k + 1) := Nat.mul_le_mul_left 2 h2L
+    _ ≥ 32 * k := by omega
+
+/-- Per-prime bad count ≤ m₀/(8k).
+    Combines `count_bad_interval_all` with the D_p arithmetic bounds. -/
+private lemma per_prime_bound (k : ℕ) (hk : k ≥ 1) (q : ℕ)
+    (hq : q.Prime) (hq_le : q ≤ 2 * k)
+    (m₀ : ℕ) (hm₀ : union_bound_threshold k ≤ m₀) :
+    ((Ico m₀ (2 * m₀)).filter
+      (fun m => padicValNat q ((m + k).choose k) >
+        padicValNat q ((2 * m).choose m))).card
+    ≤ m₀ / (8 * k) := by
+  set D := D_p_val k q
+  have hD_ge : D ≥ 16 * (log q (k + 1)) + 16 := D_p_val_ge_threshold k q
+  have hpD_le : q ^ D ≤ m₀ :=
+    le_trans (pow_D_p_val_le_threshold k q hk hq hq_le) hm₀
+  have h_decay : 2 ^ (D / 36) ≥ 32 * k := decay_estimate_val k q hk
+  have h2x_pos : 2 ^ (D / 36) > 0 := by positivity
+  have h_count := count_bad_interval_all D k m₀ hpD_le hD_ge hq hk
+  have h_term1 : 2 * m₀ / 2 ^ (D / 36) ≤ 2 * m₀ / (32 * k) :=
+    Nat.div_le_div_left h_decay (by omega)
+  have h_term2 : 2 * q ^ D / 2 ^ (D / 36) ≤ 2 * m₀ / (32 * k) := by
+    calc 2 * q ^ D / 2 ^ (D / 36)
+        ≤ 2 * m₀ / 2 ^ (D / 36) :=
+          Nat.div_le_div_right (by omega)
+      _ ≤ 2 * m₀ / (32 * k) := h_term1
+  have h_sum : 2 * m₀ / 2 ^ (D / 36) + 2 * q ^ D / 2 ^ (D / 36) ≤
+      2 * (2 * m₀ / (32 * k)) := by omega
+  have h_double : 2 * (2 * m₀ / (32 * k)) ≤ 4 * m₀ / (32 * k) := by
+    rw [Nat.le_div_iff_mul_le (by omega : 32 * k > 0)]
+    calc 2 * (2 * m₀ / (32 * k)) * (32 * k) =
+        2 * ((32 * k) * (2 * m₀ / (32 * k))) := by ring
+      _ ≤ 2 * (2 * m₀) :=
+          Nat.mul_le_mul_left 2 (Nat.mul_div_le _ _)
+      _ = 4 * m₀ := by ring
+  have h_simplify : 4 * m₀ / (32 * k) = m₀ / (8 * k) := by
+    rw [show 32 * k = 4 * (8 * k) from by ring]
+    exact Nat.mul_div_mul_left m₀ (8 * k) (by omega : 4 > 0)
+  linarith [h_count]
+
 /-- For fixed k ≥ 1 and m₀ ≥ union_bound_threshold k, the union bound shows
     that a good m ∈ [m₀, 2m₀) exists: for all primes p ≤ 2k,
     v_p(C(m+k,k)) ≤ v_p(C(2m,m)).
 
-    Proof outline (Part E of proofs/lemma3-counting.md):
-    1. For each prime p ≤ 2k, define D_p with:
-       - D_p ≥ 16·log_p(k+1) + 16 (cascade threshold)
-       - p^{D_p} ≤ m₀ (interval tiling)
-       - 2^{D_p/36} ≥ 32k (per-prime decay)
-    2. Apply count_bad_interval for each prime: |bad_p| ≤ m₀/(8k)
-    3. Union bound: total bad ≤ π(2k) · m₀/(8k) ≤ 2k · m₀/(8k) = m₀/4
-    4. Since m₀/4 < m₀ = |[m₀, 2m₀)|, a good m exists
-
-    Blocked on: count_bad_interval (sorry'd),
-    D_p parameter verification, summation arithmetic. -/
+    Proof: by contradiction. If every m ∈ [m₀, 2m₀) is bad for some prime,
+    then the interval ⊆ ⋃_p bad_p. The union bound gives
+    |⋃_p bad_p| ≤ Σ_p |bad_p| ≤ (2k+1) · m₀/(8k) < m₀ = |interval|,
+    contradiction. -/
 lemma exists_m_for_fixed_k (k : ℕ) (hk : k ≥ 1)
     (m₀ : ℕ) (hm₀ : union_bound_threshold k ≤ m₀) :
     ∃ m : ℕ, m₀ ≤ m ∧ m < 2 * m₀ ∧
       ∀ p : ℕ, p.Prime → p ≤ 2 * k →
         padicValNat p ((m + k).choose k) ≤
           padicValNat p ((2 * m).choose m) := by
-  sorry
+  have hm₀_pos : m₀ > 0 := by
+    have : union_bound_threshold k > 0 := by
+      unfold union_bound_threshold; positivity
+    omega
+  by_contra h_no_good
+  push_neg at h_no_good
+  let primes := (range (2 * k + 1)).filter Nat.Prime
+  let bad (q : ℕ) := (Ico m₀ (2 * m₀)).filter
+    (fun m => padicValNat q ((m + k).choose k) >
+      padicValNat q ((2 * m).choose m))
+  have h_cover : Ico m₀ (2 * m₀) ⊆ primes.biUnion bad := by
+    intro m hm; rw [mem_Ico] at hm; rw [mem_biUnion]
+    obtain ⟨q, hq_prime, hq_le, hq_bad⟩ := h_no_good m hm.1 hm.2
+    exact ⟨q, mem_filter.mpr ⟨mem_range.mpr (by omega), hq_prime⟩,
+           mem_filter.mpr ⟨mem_Ico.mpr hm, hq_bad⟩⟩
+  have h_Ico_card : (Ico m₀ (2 * m₀)).card = m₀ := by
+    simp [Nat.card_Ico]; omega
+  have h_lower : m₀ ≤ ∑ q ∈ primes, (bad q).card :=
+    calc m₀ = (Ico m₀ (2 * m₀)).card := h_Ico_card.symm
+      _ ≤ (primes.biUnion bad).card := card_le_card h_cover
+      _ ≤ ∑ q ∈ primes, (bad q).card := card_biUnion_le
+  have h_per_prime : ∀ q ∈ primes, (bad q).card ≤ m₀ / (8 * k) := by
+    intro q hq
+    have hq_mem := mem_filter.mp hq
+    have hq_lt := mem_range.mp hq_mem.1
+    exact per_prime_bound k hk q hq_mem.2 (by omega) m₀ hm₀
+  have h_sum_bound :
+      ∑ q ∈ primes, (bad q).card ≤ primes.card * (m₀ / (8 * k)) := by
+    have := sum_le_card_nsmul primes
+      (fun q => (bad q).card) (m₀ / (8 * k)) h_per_prime
+    simpa using this
+  have h_primes_card : primes.card ≤ 2 * k + 1 := by
+    calc primes.card ≤ (range (2 * k + 1)).card := card_filter_le _ _
+      _ = 2 * k + 1 := card_range _
+  have h_upper : primes.card * (m₀ / (8 * k)) < m₀ := by
+    calc primes.card * (m₀ / (8 * k))
+        ≤ (2 * k + 1) * (m₀ / (8 * k)) :=
+          Nat.mul_le_mul_right _ h_primes_card
+      _ ≤ (2 * k + 1) * m₀ / (8 * k) := by
+          rw [Nat.le_div_iff_mul_le (by omega : 8 * k > 0)]
+          calc (2 * k + 1) * (m₀ / (8 * k)) * (8 * k) =
+              (2 * k + 1) * ((8 * k) * (m₀ / (8 * k))) := by ring
+            _ ≤ (2 * k + 1) * m₀ :=
+                Nat.mul_le_mul_left _ (Nat.mul_div_le m₀ (8 * k))
+      _ < m₀ := by
+          rw [Nat.div_lt_iff_lt_mul (by omega : 8 * k > 0)]
+          nlinarith
+  linarith [h_lower, h_sum_bound]
 
 /-- For any C_log, there exists N such that for m₀ ≥ N and all k with
     1 ≤ k ≤ C_log · log(2m₀), the union bound threshold is at most m₀.
