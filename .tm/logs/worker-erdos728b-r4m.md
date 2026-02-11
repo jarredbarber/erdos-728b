@@ -2908,3 +2908,26 @@ Proved the core union bound argument (Part E of proofs/lemma3-counting.md):
 
 lake build succeeds. No new sorrys introduced."
 ```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-r4m --status "Completed. Sorry in exists_m_for_fixed_k closed. lake build succeeds."
+```
+```json
+{
+  "status": "completed",
+  "summary": "Closed sorry in exists_m_for_fixed_k. lake build succeeds.",
+  "details": "Proved the core union bound argument (Part E of proofs/lemma3-counting.md, Theorem E2).\n\nThe proof required several supporting lemmas:\n\n1. **count_few_high_digits_all** — Extended the existing `count_few_high_digits` to all primes (including p=2). The existing version required `p ≥ 3` but the only use of that hypothesis was proving `probHigh p ≥ 1/3`, which holds for all primes since `p / 2 * 3 ≥ p` for `p ≥ 2`. For p=2, I replicated the Chernoff bound proof using `probHigh 2 = 1/2`.\n\n2. **count_bad_interval_all** — Extended `count_bad_interval` to all primes. For p ≥ 3, delegates to the existing lemma. For p = 2, replicates the proof using `count_few_high_digits_all`.\n\n3. **D_p parameter arithmetic** — Three helper lemmas:\n   - `D_p_val_ge_threshold`: D_p ≥ 16·log_p(k+1) + 16 (cascade threshold condition)\n   - `pow_D_p_val_le_threshold`: p^{D_p} ≤ union_bound_threshold(k) (using p ≤ 2k and p^{log_p(k+1)} ≤ k+1)\n   - `decay_estimate_val`: 2^{D_p/36} ≥ 32k (using 2^{log₂(16k)+1} ≥ 16k+1)\n\n4. **per_prime_bound** — Combined the above to show each prime's bad count ≤ m₀/(8k). Key arithmetic: with p^D ≤ m₀ and 2^{D/36} ≥ 32k, the count_bad_interval bound (2m₀ + 2p^D)/2^{D/36} ≤ 4m₀/(32k) = m₀/(8k).\n\n5. **exists_m_for_fixed_k** — Proof by contradiction: if every m ∈ [m₀, 2m₀) is bad for some prime, then Ico ⊆ ⋃_p bad_p, giving m₀ ≤ Σ|bad_p| ≤ (2k+1)·m₀/(8k) < m₀ (since 2k+1 < 8k for k ≥ 1), contradiction.\n\nNo new sorry holes introduced. The only remaining sorry in the file is in `threshold_subpolynomial` (a different lemma)."
+}
+```
+
+## Final Result
+
+```json
+{
+  "status": "completed",
+  "summary": "Closed sorry in exists_m_for_fixed_k. lake build succeeds.",
+  "details": "Proved the core union bound argument (Part E of proofs/lemma3-counting.md, Theorem E2).\n\nThe proof required several supporting lemmas:\n\n1. **count_few_high_digits_all** — Extended the existing `count_few_high_digits` to all primes (including p=2). The existing version required `p ≥ 3` but the only use of that hypothesis was proving `probHigh p ≥ 1/3`, which holds for all primes since `p / 2 * 3 ≥ p` for `p ≥ 2`. For p=2, I replicated the Chernoff bound proof using `probHigh 2 = 1/2`.\n\n2. **count_bad_interval_all** — Extended `count_bad_interval` to all primes. For p ≥ 3, delegates to the existing lemma. For p = 2, replicates the proof using `count_few_high_digits_all`.\n\n3. **D_p parameter arithmetic** — Three helper lemmas:\n   - `D_p_val_ge_threshold`: D_p ≥ 16·log_p(k+1) + 16 (cascade threshold condition)\n   - `pow_D_p_val_le_threshold`: p^{D_p} ≤ union_bound_threshold(k) (using p ≤ 2k and p^{log_p(k+1)} ≤ k+1)\n   - `decay_estimate_val`: 2^{D_p/36} ≥ 32k (using 2^{log₂(16k)+1} ≥ 16k+1)\n\n4. **per_prime_bound** — Combined the above to show each prime's bad count ≤ m₀/(8k). Key arithmetic: with p^D ≤ m₀ and 2^{D/36} ≥ 32k, the count_bad_interval bound (2m₀ + 2p^D)/2^{D/36} ≤ 4m₀/(32k) = m₀/(8k).\n\n5. **exists_m_for_fixed_k** — Proof by contradiction: if every m ∈ [m₀, 2m₀) is bad for some prime, then Ico ⊆ ⋃_p bad_p, giving m₀ ≤ Σ|bad_p| ≤ (2k+1)·m₀/(8k) < m₀ (since 2k+1 < 8k for k ≥ 1), contradiction.\n\nNo new sorry holes introduced. The only remaining sorry in the file is in `threshold_subpolynomial` (a different lemma)."
+}
+```
+
+End Time: 2026-02-11T07:06:47.114Z
