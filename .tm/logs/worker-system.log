@@ -19844,3 +19844,150 @@ Proof approach:
 3. Handled degenerate case (s+1 > D) where T must be 0.
 
 No new sorry holes introduced.
+[2026-02-11T06:19:19.450Z] ✅ Closed task erdos728b-nqx
+
+[2026-02-11T06:19:19.520Z] 🔄 Checking git status...
+[2026-02-11T06:19:19.537Z] 📝 Committing changes...
+[2026-02-11T06:19:19.597Z] 🚀 Pushing to remote...
+[2026-02-11T06:19:21.333Z] 
+================================================================================
+[2026-02-11T06:19:21.333Z] 📌 Processing task: erdos728b-v1n - Close sorry: Bad1 bound in count_bad_single_prime (L3C:122)
+[2026-02-11T06:19:21.333Z]    Role: formalize | Priority: 1 
+[2026-02-11T06:19:21.333Z] ================================================================================
+
+[2026-02-11T06:19:21.337Z] ✓ Claimed task erdos728b-v1n
+
+[2026-02-11T06:19:21.337Z] 🤖 Using agent: formalize with models: google-antigravity/claude-opus-4-6-thinking, google-antigravity/gemini-3-pro-high:high
+
+[2026-02-11T06:19:21.338Z] 💭 Starting pi agent session with model: google-antigravity/claude-opus-4-6-thinking...
+[2026-02-11T06:19:21.381Z] 📸 Capturing file state before agent execution...
+[2026-02-11T06:19:21.395Z] ✓ Captured state: 168 tracked, 1 untracked files
+
+[2026-02-11T06:19:24.841Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-v1n --status "Reading task dependencies and source files"
+[2026-02-11T06:19:26.812Z] 
+$ cd /home/jarred/code/erdos-728b && find . -name "Lemma3Counting.lean" -not -path "./.lake/*"
+[2026-02-11T06:19:28.580Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:19:32.621Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "sorry" Erdos/Lemma3Counting.lean
+[2026-02-11T06:19:37.333Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:19:39.914Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-v1n --status "Analyzing Bad1 bound - need cascade argument"
+[2026-02-11T06:19:40.169Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T06:19:40.173Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T06:19:59.934Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_pow.lean << 'EOF'
+import Mathlib
+
+example (p D s : ℕ) (hp : p ≥ 2) (hs : s ≤ D/6) (hD : D ≥ 12 * (s + 1) + 6) :
+    p ^ (D - (D/6 - s)) = p ^ D / p ^ (D/6 - s) := by
+  rw [Nat.pow_div (by omega) (by omega)]
+EOF
+lake env lean /tmp/test_pow.lean 2>&1 | head -20
+[2026-02-11T06:20:13.441Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_bad1.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat BigOperators Finset Real Erdos728
+
+-- Test: v_p > T_val implies cascade_length ≥ T_casc
+example (p k D : ℕ) (hp : p.Prime) (hk : k ≥ 1) (m : ℕ) (hm : m < p^D)
+    (hv : padicValNat p ((m + k).choose k) > D/6) :
+    cascade_length (p:=p) k D m ≥ D/6 - log p k := by
+  have h := valuation_le_cascade hp m hk hm
+  omega
+EOF
+lake env lean /tmp/test_bad1.lean 2>&1 | head -20
+[2026-02-11T06:20:22.728Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "lemma valuation_le_cascade" Erdos/Lemma3Counting.lean
+[2026-02-11T06:20:24.772Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:20:29.918Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_bad1b.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat BigOperators Finset Real Erdos728
+
+-- Test: v_p > T_val implies cascade_length ≥ T_casc
+-- valuation_le_cascade is in section Cascade with variable {p} (hp : p.Prime) (k : ℕ) (D : ℕ)
+example (p k D : ℕ) (hp : p.Prime) (hk : k ≥ 1) (m : ℕ) (hm : m < p^D)
+    (hv : padicValNat p ((m + k).choose k) > D/6) :
+    cascade_length (p:=p) k D m ≥ D/6 - log p k := by
+  have h := valuation_le_cascade k D hp m hk hm
+  omega
+EOF
+lake env lean /tmp/test_bad1b.lean 2>&1 | head -20
+[2026-02-11T06:20:39.384Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "lemma count_large_cascade" Erdos/Lemma3Counting.lean
+[2026-02-11T06:20:41.277Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:20:43.024Z] [overseer] 💓 Heartbeat #36 complete: No intervention needed. Task erdos728b-vtv is in progress, and the system is moving forward through the dependency graph. Sorry count is 11.
+[2026-02-11T06:20:43.598Z] 
+🛠️  Executing tool: read...
+[2026-02-11T06:20:57.675Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_bad1_full.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+open Nat BigOperators Finset Real Erdos728
+
+-- Reproduce the exact proof state
+example (p k D : ℕ) (hp : p.Prime) (hp_ge_3 : p ≥ 3) (hk : k ≥ 1)
+    (hD : D ≥ 12 * (log p k + 1) + 6) :
+    let s := log p k
+    let T_val := D / 6
+    let T_casc := T_val - s
+    let Bad1 := (range (p^D)).filter (fun m => padicValNat p ((m + k).choose k) > T_val)
+    Bad1.card ≤ p^D / p^(D/6 - log p k) := by
+  intro s T_val T_casc Bad1
+  -- Step 1: Bad1 ⊆ {m : cascade_length m ≥ T_casc}
+  have h_subset : Bad1 ⊆ (range (p^D)).filter (fun m => cascade_length (p:=p) k D m ≥ T_casc) := by
+    intro m hm
+    rw [mem_filter] at hm ⊢
+    refine ⟨hm.1, ?_⟩
+    have hm_lt : m < p^D := mem_range.mp hm.1
+    have h_val := valuation_le_cascade k D hp m hk hm_lt
+    omega
+  -- Step 2: Apply count_large_cascade
+  have hT_le : T_casc ≤ D - (s + 1) := by omega
+  have h_count := count_large_cascade k D hp T_casc hT_le
+  -- Step 3: Combine
+  calc Bad1.card
+      ≤ ((range (p^D)).filter (fun m => cascade_length (p:=p) k D m ≥ T_casc)).card :=
+        card_le_card h_subset
+    _ ≤ p ^ (D - T_casc) := h_count
+    _ = p ^ D / p ^ T_casc := by
+        rw [Nat.pow_div (by omega) (by omega)]
+EOF
+lake env lean /tmp/test_bad1_full.lean 2>&1
+[2026-02-11T06:21:11.292Z] 
+$ cd /home/jarred/code/erdos-728b && cat > /tmp/test_in_context.lean << 'EOF'
+import Erdos.Lemma3Counting
+
+-- Test with exact context to make sure the proof works
+-- The sorry is inside count_bad_single_prime after `apply Nat.add_le_add`
+-- Goal should be: Bad1.card ≤ p ^ D / p ^ (D / 6 - Nat.log p k)
+-- where Bad1 is a let binding
+EOF
+lake env lean /tmp/test_in_context.lean 2>&1
+[2026-02-11T06:21:28.277Z] 
+🛠️  Executing tool: edit...
+[2026-02-11T06:21:30.934Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-v1n --status "Building to verify Bad1 proof compiles"
+[2026-02-11T06:21:33.238Z] 
+$ cd /home/jarred/code/erdos-728b && lake build 2>&1 | tail -30
+[2026-02-11T06:22:21.883Z] 
+$ cd /home/jarred/code/erdos-728b && grep -n "sorry" Erdos/Lemma3Counting.lean
+[2026-02-11T06:22:25.489Z] 
+$ cd /home/jarred/code/erdos-728b && sed -n '828,836p' Erdos/Lemma3Counting.lean
+[2026-02-11T06:22:32.415Z] 
+$ cd /home/jarred/code/erdos-728b && git add -A && git commit -m "Close sorry: Bad1 bound in count_bad_single_prime
+
+The Bad1 set {m : v_p(C(m+k,k)) > D/6} is bounded by p^D / p^(D/6 - log_p k).
+
+Proof: By valuation_le_cascade, v_p(C(m+k,k)) ≤ (s+1) + cascade_length,
+so v_p > D/6 implies cascade_length ≥ D/6 - s. Then count_large_cascade
+gives |Bad1| ≤ p^(D - (D/6 - s)) = p^D / p^(D/6 - s).
+
+Closes erdos728b-v1n."

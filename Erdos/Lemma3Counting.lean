@@ -592,8 +592,28 @@ lemma count_bad_single_prime (hD : D ≥ 12 * (log p k + 1) + 6) (hp : p.Prime) 
   apply le_trans (card_union_le Bad1 Bad2)
   apply Nat.add_le_add
 
-  -- Bound Bad1
-  · sorry
+  -- Bound Bad1: #{m : v_p(C(m+k,k)) > D/6} ≤ p^D / p^(D/6 - s)
+  -- Strategy: v_p ≤ (s+1) + cascade_length, so v_p > D/6 implies
+  -- cascade_length ≥ D/6 - s. Then count_large_cascade gives ≤ p^(D - (D/6 - s)).
+  · have h_subset_casc : Bad1 ⊆
+        (range (p^D)).filter (fun m => cascade_length (p:=p) k D m ≥ T_casc) := by
+      intro m hm
+      rw [mem_filter] at hm ⊢
+      refine ⟨hm.1, ?_⟩
+      have hm_lt : m < p^D := mem_range.mp hm.1
+      have h_val := valuation_le_cascade k D hp m hk hm_lt
+      show cascade_length k D m ≥ T_val - s
+      omega
+    have hT_le : T_casc ≤ D - (s + 1) := by show T_val - s ≤ D - (s + 1); omega
+    have h_count := count_large_cascade k D hp T_casc hT_le
+    calc Bad1.card
+        ≤ ((range (p^D)).filter
+            (fun m => cascade_length (p:=p) k D m ≥ T_casc)).card :=
+          card_le_card h_subset_casc
+      _ ≤ p ^ (D - T_casc) := h_count
+      _ = p ^ D / p ^ (D / 6 - log p k) := by
+          show p ^ (D - (T_val - s)) = p ^ D / p ^ (D / 6 - s)
+          rw [Nat.pow_div (by omega) (by omega)]
 
   -- Bound Bad2
   · sorry
