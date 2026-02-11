@@ -1420,3 +1420,30 @@ Proof strategy:
 5. Show exp(-D/18) ≤ 2^(-D/36) since ln 2 ≤ 1 and ⌊D/36⌋ ≤ D/18
 6. Convert real bound to natural number floor division"
 ```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-9pu --status "Sorry closed, lake build succeeds, committed"
+```
+
+```bash
+$ cd /home/jarred/code/erdos-728b && tm close erdos728b-9pu
+```
+```json
+{
+  "status": "completed",
+  "summary": "Closed sorry in count_few_high_digits. lake build succeeds.",
+  "details": "Proved that #{m ∈ {0..p^D-1} : count_high_digits p m D < t} ≤ p^D/2^(D/36) for t ≤ D/6 and p ≥ 3. The proof proceeds in 6 steps:\n\n1. **Bijection**: Relate `range(p^D)` to `DigitSpace D p` via `toDigitSpace_bijective`, preserving the filter predicate via `highDigitCount_eq`.\n\n2. **Filter subset**: The nat filter `highDigitCount m < t` is a subset of the real filter `(highDigitCount m : ℝ) ≤ ↑t`.\n\n3. **Precondition**: Show `(t : ℝ) < D * probHigh p` (needed for Chernoff). Uses `probHigh p ≥ 1/3` for `p ≥ 3` and `t ≤ D/6 < D/3 ≤ D * probHigh p`.\n\n4. **Chernoff application**: Apply `count_few_high_digits_bound_chernoff` from `Erdos/Chernoff.lean`.\n\n5. **Exponent bound**: Show `exp(-2 * gap² / D) ≤ (2^(D/36))⁻¹` by chaining:\n   - gap ≥ D/6, so exponent ≤ -D/18\n   - exp(-D/18) ≤ exp(-⌊D/36⌋ * ln 2) = (2^(D/36))⁻¹ since ln 2 ≤ 1 and ⌊D/36⌋ ≤ D/18\n\n6. **Real-to-nat conversion**: Use `Nat.le_div_iff_mul_le` to convert the real inequality to nat floor division.\n\nNo new sorry holes introduced."
+}
+```
+
+## Final Result
+
+```json
+{
+  "status": "completed",
+  "summary": "Closed sorry in count_few_high_digits. lake build succeeds.",
+  "details": "Proved that #{m ∈ {0..p^D-1} : count_high_digits p m D < t} ≤ p^D/2^(D/36) for t ≤ D/6 and p ≥ 3. The proof proceeds in 6 steps:\n\n1. **Bijection**: Relate `range(p^D)` to `DigitSpace D p` via `toDigitSpace_bijective`, preserving the filter predicate via `highDigitCount_eq`.\n\n2. **Filter subset**: The nat filter `highDigitCount m < t` is a subset of the real filter `(highDigitCount m : ℝ) ≤ ↑t`.\n\n3. **Precondition**: Show `(t : ℝ) < D * probHigh p` (needed for Chernoff). Uses `probHigh p ≥ 1/3` for `p ≥ 3` and `t ≤ D/6 < D/3 ≤ D * probHigh p`.\n\n4. **Chernoff application**: Apply `count_few_high_digits_bound_chernoff` from `Erdos/Chernoff.lean`.\n\n5. **Exponent bound**: Show `exp(-2 * gap² / D) ≤ (2^(D/36))⁻¹` by chaining:\n   - gap ≥ D/6, so exponent ≤ -D/18\n   - exp(-D/18) ≤ exp(-⌊D/36⌋ * ln 2) = (2^(D/36))⁻¹ since ln 2 ≤ 1 and ⌊D/36⌋ ≤ D/18\n\n6. **Real-to-nat conversion**: Use `Nat.le_div_iff_mul_le` to convert the real inequality to nat floor division.\n\nNo new sorry holes introduced."
+}
+```
+
+End Time: 2026-02-11T05:15:50.168Z
