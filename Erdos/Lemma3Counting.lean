@@ -325,7 +325,7 @@ lemma count_bad_single_prime (hD : D ≥ 12 * (log p k + 1) + 6) (hp : p.Prime) 
   let Bad1 := (range (p^D)).filter (fun m => padicValNat p ((m + k).choose k) > T_val)
   let Bad2 := (range (p^D)).filter (fun m => padicValNat p ((2 * m).choose m) < T_val)
 
-  have h_T_val : 2 * s + 3 ≤ T_val := sorry
+  have h_T_val : 2 * s + 3 ≤ T_val := by omega
 
   have h_subset : (range (p^D)).filter (fun m => padicValNat p ((m + k).choose k) > padicValNat p ((2 * m).choose m)) ⊆ Bad1 ∪ Bad2 := by
     intro m hm
