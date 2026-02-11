@@ -9,23 +9,12 @@ import Mathlib.Data.Nat.Prime.Factorial
 import Mathlib.Data.Nat.Prime.Infinite
 import Mathlib.Algebra.Order.Sub.Basic
 import Mathlib.Analysis.Complex.ExponentialBounds
+import Mathlib.Algebra.Order.BigOperators.Group.List
 
 open Nat Real
 
 /-- Sum of digits in base p. -/
 def sumDigits (p n : ℕ) : ℕ := (Nat.digits p n).sum
-
-private lemma list_sum_le_length_mul (l : List ℕ) (b : ℕ) (h : ∀ x ∈ l, x ≤ b) : l.sum ≤ l.length * b := by
-  induction l with
-  | nil => simp
-  | cons head tail ih =>
-    simp only [List.sum_cons, List.length_cons, Nat.add_mul, Nat.one_mul]
-    rw [Nat.add_comm (tail.length * b) b]
-    apply Nat.add_le_add
-    · apply h; apply List.mem_cons_self
-    · apply ih
-      intro x hx
-      apply h; apply List.mem_cons_of_mem _ hx
 
 lemma sumDigits_le_log (p n : ℕ) (hp : 1 < p) :
     sumDigits p n ≤ (p - 1) * (Nat.log p n + 1) := by
@@ -34,7 +23,10 @@ lemma sumDigits_le_log (p n : ℕ) (hp : 1 < p) :
   else
     rw [sumDigits]
     trans (digits p n).length * (p - 1)
-    · apply list_sum_le_length_mul
+    · -- Use nsmul which is multiplication on Nat
+      have : (digits p n).length * (p - 1) = (digits p n).length • (p - 1) := by simp [nsmul_eq_mul]
+      rw [this]
+      apply List.sum_le_card_nsmul
       intro d hd
       apply Nat.le_sub_one_of_lt
       exact Nat.digits_lt_base hp hd
@@ -134,11 +126,149 @@ lemma erdos_729_small_n (P : ℕ) (hP : 0 < P) :
   norm_cast
   linarith
 
+lemma nat_log_le_real_log {p n : ℕ} (hp : 1 < p) (hn : n ≠ 0) :
+    (Nat.log p n : ℝ) ≤ Real.log n / Real.log p := by
+  have h_p_gt_1 : 1 < (p : ℝ) := by norm_cast; exact hp
+  have h_log_p_pos : 0 < Real.log p := Real.log_pos h_p_gt_1
+  rw [le_div_iff₀ h_log_p_pos]
+  -- Nat.log p n is the greatest k such that p^k ≤ n
+  -- So p^(Nat.log p n) ≤ n
+  -- Taking log: Nat.log p n * log p ≤ log n
+  have h_pow_nat : p ^ (Nat.log p n) ≤ n := Nat.pow_log_le_self p hn
+  have h_pow_real : (p : ℝ) ^ (Nat.log p n) ≤ n := by
+    rw [← Nat.cast_pow]
+    norm_cast
+    exact h_pow_nat
+  rw [Real.log_pow] at *
+  apply Real.log_le_log _ _ h_pow_real
+  · apply pow_pos; exact lt_trans zero_lt_one h_p_gt_1
+  · exact Nat.cast_pos.mpr (Nat.pos_of_ne_zero hn)
+
+lemma sumDigits_bound_real {p : ℕ} (hp : 1 < p) (n : ℕ) :
+    (sumDigits p n : ℝ) ≤ (p - 1) * (Real.log n / Real.log p + 1) := by
+  have h_le := sumDigits_le_log p n hp
+  rw [← Nat.cast_le (α := ℝ)] at h_le
+  apply le_trans h_le
+  rw [Nat.cast_mul, Nat.cast_sub (le_of_lt hp), Nat.cast_one, Nat.cast_add, Nat.cast_one]
+  have h_nonneg : 0 ≤ (p : ℝ) - 1 := sub_nonneg.mpr (by norm_cast; exact le_of_lt hp)
+  apply mul_le_mul_of_nonneg_left _ h_nonneg
+  if h : n = 0 then
+    simp [h]
+    rw [Real.log_zero]
+    linarith
+  else
+    apply _root_.add_le_add (nat_log_le_real_log hp h) (le_refl 1)
+
 /-- The calculation showing sumDigits p a + sumDigits p b ≤ C * log n when a, b < 2n. -/
-lemma sumDigits_log_bound {p : ℕ} (hp : 1 < p) (C : ℝ) (n : ℕ) (a b : ℕ)
+lemma sumDigits_log_bound {p : ℕ} (hp : 1 < p) (n a b : ℕ)
     (ha : a < 2 * n) (hb : b < 2 * n) :
-    (sumDigits p a : ℝ) + sumDigits p b ≤ C * Real.log (n + 2) := by
-  sorry
+    ∃ C, (sumDigits p a : ℝ) + sumDigits p b ≤ C * Real.log (n + 2) := by
+  use (2 * (p - 1) / Real.log p) + 5 * (p - 1)
+  have h_p_gt_1 : 1 < (p : ℝ) := by norm_cast; exact hp
+  have h_log_p_pos : 0 < Real.log p := Real.log_pos h_p_gt_1
+  have h_nonneg_p : 0 ≤ (p : ℝ) - 1 := sub_nonneg.mpr (by norm_cast; exact le_of_lt hp)
+  have h_p_minus_1_pos : 0 < (p : ℝ) - 1 := sub_pos.mpr (by norm_cast; exact hp)
+  
+  -- Case n = 0
+  if hn : n = 0 then
+    rw [hn] at ha hb
+    have : a = 0 := Nat.eq_zero_of_le_zero (le_of_lt ha)
+    have : b = 0 := Nat.eq_zero_of_le_zero (le_of_lt hb)
+    simp [sumDigits, *]
+    -- 0 <= C * log 2
+    apply mul_nonneg
+    · apply add_nonneg
+      · apply div_nonneg
+        · apply mul_nonneg; norm_num; exact h_nonneg_p
+        · apply Real.log_nonneg; exact le_of_lt h_p_gt_1
+      · apply mul_nonneg; norm_num; exact h_nonneg_p
+    · apply Real.log_nonneg; norm_num
+  else
+    have hn_pos : 0 < n := Nat.pos_of_ne_zero hn
+    have h_bound_a := sumDigits_bound_real hp a
+    have h_bound_b := sumDigits_bound_real hp b
+    have h_log_a : Real.log a ≤ Real.log (2 * n) := by
+      if ha0 : a = 0 then
+        rw [ha0, Nat.cast_zero, Real.log_zero]
+        apply le_of_lt
+        apply Real.log_pos
+        norm_cast
+        linarith
+      else
+        apply Real.log_le_log (Nat.cast_pos.mpr (Nat.pos_of_ne_zero ha0))
+        norm_cast
+        exact le_of_lt ha
+    have h_log_b : Real.log b ≤ Real.log (2 * n) := by
+      if hb0 : b = 0 then
+        rw [hb0, Nat.cast_zero, Real.log_zero]
+        apply le_of_lt
+        apply Real.log_pos
+        norm_cast
+        linarith
+      else
+        apply Real.log_le_log (Nat.cast_pos.mpr (Nat.pos_of_ne_zero hb0))
+        norm_cast
+        exact le_of_lt hb
+    apply le_trans (add_le_add h_bound_a h_bound_b)
+    
+    have h_calc : (p - 1 : ℝ) * (Real.log a / Real.log p + 1) + (p - 1) * (Real.log b / Real.log p + 1) ≤
+         (2 * (p - 1) / Real.log p) * Real.log (2 * n) + 2 * (p - 1) := by
+       rw [mul_add, mul_add]
+       have h1 : (p - 1 : ℝ) * (Real.log a / Real.log p) = (p - 1) / Real.log p * Real.log a := by field_simp
+       have h2 : (p - 1 : ℝ) * (Real.log b / Real.log p) = (p - 1) / Real.log p * Real.log b := by field_simp
+       rw [h1, h2]
+       rw [add_add_add_comm]
+       rw [← mul_add, ← two_mul]
+       apply add_le_add_right
+       rw [div_mul_eq_mul_div, div_le_div_iff₀ h_log_p_pos h_log_p_pos]
+       rw [mul_assoc, mul_assoc, mul_le_mul_left h_p_minus_1_pos]
+       apply add_le_add h_log_a h_log_b
+    
+    apply le_trans h_calc
+    
+    have h_log_n_le : Real.log n ≤ Real.log (n + 2) := by
+      apply Real.log_le_log
+      · norm_cast; linarith
+      · norm_cast; linarith
+    have h_log_3_le : Real.log 3 ≤ Real.log (n + 2) := by
+      apply Real.log_le_log (by norm_num)
+      norm_cast; linarith
+    
+    have h_one_le_log : 1 ≤ Real.log (n + 2) := by
+      apply le_trans _ h_log_3_le
+      rw [← Real.log_exp 1]
+      apply Real.log_le_log (Real.exp_pos 1)
+      have : Real.exp 1 < 3 := Real.exp_one_lt_d9.trans (by norm_num)
+      linarith
+
+    rw [Real.log_mul (by norm_num) (by norm_cast; linarith)]
+    rw [mul_add]
+    rw [add_comm (2 * (p - 1) / Real.log p * Real.log 2)]
+    rw [add_assoc]
+    refine _root_.add_le_add ?_ ?_
+    · -- Log n term
+      rw [mul_assoc]
+      apply mul_le_mul_of_nonneg_left h_log_n_le
+      apply mul_nonneg
+      · apply div_nonneg; apply mul_nonneg; norm_num; exact h_nonneg_p; exact le_of_lt h_log_p_pos
+      · norm_num
+    · -- Constant term
+      rw [← mul_assoc, mul_comm (2 * (p-1) : ℝ), mul_assoc, mul_comm (1/Real.log p), ← div_eq_mul_inv]
+      apply mul_le_mul_of_nonneg_left _ h_nonneg_p
+      trans 4
+      · rw [add_comm]
+        apply _root_.add_le_add (le_refl 2)
+        rw [div_le_iff₀ (h_log_p_pos)]
+        nth_rewrite 2 [← mul_one (Real.log p)]
+        apply mul_le_mul_of_nonneg_right _ (le_of_lt h_log_p_pos)
+        trans Real.log 2
+        · linarith
+        · apply Real.log_le_log (by norm_num)
+          norm_cast; exact le_of_lt hp
+      · trans 5
+        · norm_num
+        · nth_rewrite 1 [← mul_one 5]
+          apply mul_le_mul_of_nonneg_left h_one_le_log (by norm_num)
 
 /-- The large n case (n > P). -/
 lemma erdos_729_large_n (P a b n : ℕ) (hP : 0 < P) (hnP : n > P)

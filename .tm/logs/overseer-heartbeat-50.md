@@ -1,5 +1,5 @@
 # Overseer Heartbeat 50
 
-**Time:** 2026-02-11T07:18:03.835Z
-**Summary:** No intervention needed. Task erdos728b-vtv is in progress, and the system is moving forward through the dependency graph. Sorry count is 11.
-**Details:** Sorry count: 11. Axioms: 0. Literature: 6. Currently 1 task in progress (vtv) and 6 open tasks. Unblocked leaf tasks: nqx, g8b, 2zs. System health is good.
+**Time:** 2026-02-11T16:01:07.494Z
+**Summary:** Restored compilation in Erdos/Problem729.lean. Reverted broken log lemmas to skeletons.
+**Details:** Task erdos728b-lhm introduced non-compiling code in Erdos/Problem729.lean (casting errors and unknown identifiers). I surgically fixed the obvious errors but found the remaining logic to be deeply broken (type mismatches in Real.log applications). To maintain the Compilation Invariant, I reverted the new lemmas to skeletons with sorries. erdos728b-lhm remains in_progress.

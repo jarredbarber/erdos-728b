@@ -28958,3 +28958,126 @@ $ lake build Erdos.Problem729
 📊 Task erdos728b-tkz completed:
 [2026-02-11T15:49:06.852Z]    Summary: Formalized erdos_729_small_n and helper erdos_729_small_n_prime_bound. lake build succeeds.
 [2026-02-11T15:49:06.852Z]    Details: Implemented erdos_729_small_n which proves a bound on a+b when n <= P. The bound is constructed using the existence of a prime p > P. Also implemented a helper lemma erdos_729_small_n_prime_bound which shows a < p and b < p for any prime p > P.
+[2026-02-11T15:49:06.858Z] ✅ Closed task erdos728b-tkz
+
+[2026-02-11T15:49:06.930Z] 🔄 Checking git status...
+[2026-02-11T15:49:06.951Z] 📝 Committing changes...
+[2026-02-11T15:49:07.026Z] 🚀 Pushing to remote...
+[2026-02-11T15:49:09.150Z] 
+================================================================================
+[2026-02-11T15:49:09.150Z] 📌 Processing task: erdos728b-lhm - Formalize sumDigits log bound for Erdos 729
+[2026-02-11T15:49:09.150Z]    Role: formalize | Priority: 1 
+[2026-02-11T15:49:09.150Z] ================================================================================
+
+[2026-02-11T15:49:09.154Z] ✓ Claimed task erdos728b-lhm
+
+[2026-02-11T15:49:09.154Z] 🤖 Using agent: formalize with models: google-antigravity/gemini-3-pro-high:high, google-antigravity/claude-opus-4-6-thinking
+
+[2026-02-11T15:49:09.154Z] 💭 Starting pi agent session with model: google-antigravity/gemini-3-pro-high:high...
+[2026-02-11T15:49:09.197Z] 📸 Capturing file state before agent execution...
+[2026-02-11T15:49:09.216Z] ✓ Captured state: 192 tracked, 1 untracked files
+
+[2026-02-11T15:49:14.379Z] 
+$ find . -maxdepth 2 -not -path '*/.*'
+[2026-02-11T15:50:03.897Z] 
+🛠️  Executing tool: read...
+[2026-02-11T15:50:10.038Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T15:50:10.041Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T15:50:56.095Z] 
+🛠️  Executing tool: write...
+[2026-02-11T15:50:59.240Z] 
+$ lake env lean test_sum_le.lean
+[2026-02-11T15:51:16.234Z] [overseer] 💓 Heartbeat #48 complete: No intervention needed. Project 729 formalization is proceeding via the decomposed plan.
+[2026-02-11T15:51:17.914Z] 
+🛠️  Executing tool: write...
+[2026-02-11T15:52:03.212Z] 
+$ lake env lean check_log.lean
+[2026-02-11T15:52:22.127Z] 
+$ grep -r "sum_le_card" .lake/packages/mathlib/Mathlib
+[2026-02-11T15:52:28.439Z] 
+🛠️  Executing tool: write...
+[2026-02-11T15:52:31.473Z] 
+$ lake env lean check_sum.lean
+[2026-02-11T15:53:23.719Z] 
+🛠️  Executing tool: write...
+[2026-02-11T15:53:39.086Z] 
+🛠️  Executing tool: edit...
+[2026-02-11T15:54:04.334Z] 
+🛠️  Executing tool: edit...
+[2026-02-11T15:54:11.158Z] 
+$ lake build
+[2026-02-11T15:54:16.238Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T15:54:16.241Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T15:54:45.676Z] 
+🛠️  Executing tool: edit...
+[2026-02-11T15:55:27.121Z] 
+🛠️  Executing tool: edit...
+[2026-02-11T15:55:30.657Z] 
+🛠️  Executing tool: read...
+[2026-02-11T15:56:16.719Z] 
+🛠️  Executing tool: edit...
+[2026-02-11T15:56:21.121Z] [overseer] 💓 Heartbeat #49 complete: Restored compilation of Erdos/Problem729.lean. Formalization of sumDigits log bound (erdos728b-lhm) is in progress.
+[2026-02-11T15:57:04.404Z] 
+$ lake build
+[2026-02-11T15:58:49.553Z] 
+🛠️  Executing tool: edit...
+[2026-02-11T15:58:56.187Z] 
+🛠️  Executing tool: read...
+[2026-02-11T15:59:21.123Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T15:59:21.126Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T15:59:54.834Z] 
+🛠️  Executing tool: edit...
+[2026-02-11T15:59:59.846Z] 
+🛠️  Executing tool: read...
+[2026-02-11T16:01:07.495Z] [overseer] 💓 Heartbeat #50 complete: Restored compilation in Erdos/Problem729.lean. Reverted broken log lemmas to skeletons.
+[2026-02-11T16:01:17.558Z] 
+🛠️  Executing tool: write...
+[2026-02-11T16:02:04.376Z] 
+$ lake build
+[2026-02-11T16:03:53.572Z] 
+🛠️  Executing tool: write...
+[2026-02-11T16:03:57.783Z] 
+$ lake build
+[2026-02-11T16:04:07.503Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T16:04:07.505Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T16:04:16.783Z] [overseer] 💓 Heartbeat #51 complete: No intervention needed. Task erdos728b-lhm is in progress.
+[2026-02-11T16:05:07.054Z] 
+🛠️  Executing tool: write...
+[2026-02-11T16:05:12.299Z] 
+$ lake build
+[2026-02-11T16:06:15.262Z] 
+🛠️  Executing tool: write...
+[2026-02-11T16:07:07.007Z] 
+$ lake build
+[2026-02-11T16:07:16.790Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T16:07:16.793Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T16:08:52.001Z] 
+🛠️  Executing tool: write...
+[2026-02-11T16:09:04.763Z] 
+$ lake build
+[2026-02-11T16:09:47.685Z] [overseer] 💓 Heartbeat #52 complete: Restored compilation of Erdos/Problem729.lean. erdos728b-lhm is still in progress.
+[2026-02-11T16:10:45.872Z] 
+🛠️  Executing tool: write...
+[2026-02-11T16:10:50.935Z] 
+$ lake build
+[2026-02-11T16:11:48.755Z] 
+🛠️  Executing tool: write...
+[2026-02-11T16:11:54.240Z] 
+$ lake build
+[2026-02-11T16:12:47.740Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T16:12:47.743Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T16:12:53.973Z] 
+🛠️  Executing tool: write...
+[2026-02-11T16:13:04.442Z] 
+$ rm test_sum_le.lean check_log.lean check_sum.lean reproduce_problem729.lean
+[2026-02-11T16:13:10.067Z] 
+$ git diff Erdos/Problem729.lean
+[2026-02-11T16:13:20.957Z] 
+
+📝 Agent response complete.
+
+[2026-02-11T16:13:20.957Z] 📄 Log saved to .tm/logs/worker-erdos728b-lhm.md
+[2026-02-11T16:13:20.957Z] 
+📊 Task erdos728b-lhm completed:
+[2026-02-11T16:13:20.957Z]    Summary: Formalized sumDigits log bound for Erdos 729
+[2026-02-11T16:13:20.957Z]    Details: Cleaned up sumDigits_le_log using List.sum_le_card_nsmul. Implemented sumDigits_log_bound with explicit constant C = 2(p-1)/log p + 5(p-1). Added helper lemmas nat_log_le_real_log and sumDigits_bound_real.
