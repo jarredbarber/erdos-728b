@@ -1,6 +1,6 @@
 notify_cmd: "curl -s -H 'Title: {{title}}' -H 'Priority: {{priority}}' -d '{{message}}' https://ntfy.sh/gigahector-vps"
 workflow: math-research
-ecosystem: gemini
+ecosystem: mixed
 git:
   strategy: direct
 models:

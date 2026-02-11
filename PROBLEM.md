@@ -28,4 +28,29 @@ theorem erdos_728 :
 
 ## Notes
 
-This theorem has been proved by other researchers.
+This theorem has been proved.
+
+---
+
+# Erdős Problem 729
+
+## Problem Statement
+
+Let $P$ be a fixed positive integer. Suppose $a, b, n$ are positive integers such that for every prime $p > P$,
+
+$$\nu_p(a!) + \nu_p(b!) \leq \nu_p(n!)$$
+
+where $\nu_p$ denotes the $p$-adic valuation. Then $a + b \leq n + O(\log n)$.
+
+## Formal Statement
+
+```lean
+theorem erdos_729 (P : ℕ) (hP : 0 < P) :
+    ∃ C > (0 : ℝ), ∀ a b n : ℕ,
+      (∀ p, p.Prime → P < p → padicValNat p a.factorial + padicValNat p b.factorial ≤ padicValNat p n.factorial) →
+      (a : ℝ) + b ≤ n + C * Real.log (n + 2)
+```
+
+## Notes
+
+This theorem has been proved.
