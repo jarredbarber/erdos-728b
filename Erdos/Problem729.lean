@@ -3,6 +3,8 @@ import Mathlib.Data.Nat.Digits.Lemmas
 import Mathlib.Data.Nat.Log
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Tactic
+import Mathlib.NumberTheory.Bertrand
+import Mathlib.Data.Nat.Prime.Factorial
 
 open Nat Real
 
@@ -52,7 +54,24 @@ lemma delta_le_sumDigits {p : ℕ} (hp : p.Prime) (a b n : ℕ)
 lemma a_lt_two_n {P a b n : ℕ} (hP : 0 < P) (hnP : n > P)
     (h : ∀ p, p.Prime → P < p → padicValNat p a.factorial + padicValNat p b.factorial ≤ padicValNat p n.factorial) :
     a < 2 * n := by
-  sorry
+  by_contra! h_ge
+  have hn_pos : 0 < n := lt_trans hP hnP
+  have hn_ne_zero : n ≠ 0 := hn_pos.ne'
+  have ⟨p, hp_prime, hn_lt_p, hp_le_2n⟩ := Nat.exists_prime_lt_and_le_two_mul n hn_ne_zero
+  have hp_gt_P : P < p := lt_trans hnP hn_lt_p
+  haveI : Fact p.Prime := ⟨hp_prime⟩
+  specialize h p hp_prime hp_gt_P
+  have h_val_n_zero : padicValNat p n.factorial = 0 := by
+    apply padicValNat.eq_zero_of_not_dvd
+    intro h_dvd
+    have : p ≤ n := (Nat.Prime.dvd_factorial hp_prime).mp h_dvd
+    linarith
+  rw [h_val_n_zero] at h
+  have h_le_a : p ≤ a := le_trans hp_le_2n h_ge
+  have h_dvd_a : p ∣ a.factorial := Nat.dvd_factorial hp_prime.pos h_le_a
+  have h_pos_val_a : 1 ≤ padicValNat p a.factorial :=
+    one_le_padicValNat_of_dvd a.factorial_ne_zero h_dvd_a
+  omega
 
 theorem erdos_729 (P : ℕ) (hP : 0 < P) :
     ∃ C > (0 : ℝ), ∀ a b n : ℕ,
