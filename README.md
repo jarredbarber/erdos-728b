@@ -26,7 +26,9 @@ This repo contains the answer: **yes.** 2,906 lines of Lean 4, **0 sorrys, 0 axi
 
 Previously resolved by GPT-5.2 + Aristotle ([arXiv:2601.07421](https://arxiv.org/abs/2601.07421)), which used MCTS-based tactic search (Aristotle/Harmonic) for formalization. Our agents had no access to that paper, used no specialized search — just LLMs generating Lean code and fixing compiler errors — and found a different construction for the hardest step (Chernoff + union bound vs. carry-rich/spike-free counting).
 
-This is one of several Erdős problems attacked in this experiment. See the [full experiment writeup](https://gist.github.com/jarredbarber/10dff24643366d160e80e75766ae4df1) for results across all problems.
+This is one of several Erdős problems attacked in this experiment:
+- [**Proof strategy details for this problem**](https://gist.github.com/jarredbarber/5b49a172290564e281b8676b9f8402d0) — construction, lemmas, comparison with GPT-5.2 approach
+- [**Full experiment writeup**](https://gist.github.com/jarredbarber/10dff24643366d160e80e75766ae4df1) — results across all problems (728, 729, 1094, 410)
 
 ---
 
