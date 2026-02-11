@@ -2,6 +2,7 @@ import Mathlib.Data.Nat.Digits.Lemmas
 import Mathlib.Data.Nat.Choose.Factorization
 import Mathlib.Data.Fintype.Card
 import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Data.Int.CardIntervalMod
 import Mathlib.NumberTheory.Padics.PadicVal.Basic
@@ -20,7 +21,35 @@ variable {p : ℕ} (hp : p.Prime) (D : ℕ)
 
 def toDigitSpace (m : Fin (p^D)) : DigitSpace D p := fun i => ⟨digit p m i, Nat.mod_lt _ hp.pos⟩
 
-lemma toDigitSpace_bijective : Function.Bijective (toDigitSpace hp D) := sorry
+/-- Two naturals with the same base-p digits at positions 0..D-1 are congruent mod p^D.
+    Proved by induction using Nat.mod_pow_succ. -/
+private lemma mod_pow_eq_of_digits_eq (a b : ℕ)
+    (h : ∀ i, i < D → digit p a i = digit p b i) : a % p ^ D = b % p ^ D := by
+  induction D with
+  | zero => simp [pow_zero, Nat.mod_one]
+  | succ D ih =>
+    rw [Nat.mod_pow_succ, Nat.mod_pow_succ]
+    have h_prev : ∀ i, i < D → digit p a i = digit p b i :=
+      fun i hi => h i (Nat.lt_succ_of_lt hi)
+    have h_D : digit p a D = digit p b D := h D (Nat.lt_succ_iff.mpr le_rfl)
+    unfold digit at h_D
+    rw [ih h_prev, h_D]
+
+lemma toDigitSpace_bijective : Function.Bijective (toDigitSpace hp D) := by
+  rw [Fintype.bijective_iff_injective_and_card]
+  constructor
+  · -- Injectivity: if digits agree, then the underlying naturals agree
+    intro ⟨a, ha⟩ ⟨b, hb⟩ h_eq
+    ext
+    have h_digits : ∀ i, i < D → digit p a i = digit p b i := by
+      intro i hi
+      have h_fi := congr_fun h_eq ⟨i, hi⟩
+      simp only [toDigitSpace, Fin.mk.injEq] at h_fi
+      exact h_fi
+    have := mod_pow_eq_of_digits_eq D a b h_digits
+    rwa [Nat.mod_eq_of_lt ha, Nat.mod_eq_of_lt hb] at this
+  · -- Cardinality: |Fin(p^D)| = |Fin D → Fin p| = p^D
+    simp [Fintype.card_fin]
 
 lemma count_digits_fixed {T : ℕ} (indices : Fin T → Fin D) (values : Fin T → Fin p)
     (h_inj : Function.Injective indices) :
