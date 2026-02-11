@@ -19,5 +19,5 @@
 - [2026-02-11 14:15] erdos728b-yta is nearly complete; lemma a_lt_two_n is fully proved in Erdos/Problem729.lean.
 - [2026-02-11 15:55] erdos728b-tkz CLOSED. Proved small n case (n <= P) for erdos_729.
 - [2026-02-11 16:40] erdos728b-lhm CLOSED (Strategic Failure). Casting death spiral detected.
-- [2026-02-11 16:40] erdos728b-662 OPEN (Planner). Decomposing log bound into bridging lemmas.
-- [2026-02-11 16:40] Backlog: Planner task unblocked to resolve casting issues in Erdos/Problem729.lean.
+- [2026-02-11 16:55] erdos728b-662 CLOSED (Planner). Role violation (writing Lean). Overseer intervened.
+- [2026-02-11 17:05] Backlog: Decomposed log bound task manually into 4 bridging lemmas (4nw, 7pr, ogu, pr5). Unblocked for formalizers.
