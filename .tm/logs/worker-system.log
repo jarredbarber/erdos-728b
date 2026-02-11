@@ -10698,3 +10698,82 @@ $ cd /home/jarred/code/erdos-728b && lake build 2>&1 | tail -5
 $ cd /home/jarred/code/erdos-728b && grep -n "sorry" Erdos/Basic.lean
 [2026-02-11T04:24:22.308Z] 
 $ cd /home/jarred/code/erdos-728b && git add -A && git diff --cached --stat
+[2026-02-11T04:24:35.562Z] 
+$ cd /home/jarred/code/erdos-728b && git commit -m "erdos728b-hwa: Wire Lemma3Counting into exists_m_choose_dvd_uniform
+
+Closed the sorry in exists_m_choose_dvd_uniform with a proper proof that
+decomposes the problem into:
+
+1. dvd_of_padicValNat_le: Converts pointwise p-adic valuation comparisons
+   into divisibility (fully proved, uses factorization_le_iff_dvd).
+
+2. exists_m_small_primes_good_uniform: Union bound over small primes p ≤ 2k
+   (sorry - the arithmetic from Part E of the NL proof).
+
+3. carry_dominance_padicValNat (from Lemmas.lean): Handles large primes
+   p > 2k (already proved).
+
+The proof of exists_m_choose_dvd_uniform is now complete modulo the single
+sorry in exists_m_small_primes_good_uniform. The structure:
+- For each m₀, get m ∈ [m₀, 2m₀) good for all small primes (via union bound)
+- For each prime p, either p > 2k (carry dominance) or p ≤ 2k (union bound)
+- Convert pointwise padicValNat ≤ into C(m+k,k) | C(2m,m)
+
+Also fixed pre-existing build errors:
+- Fixed linarith failures in exists_good_m (added h2m₀_ge_1 hypothesis)
+- Fixed linarith → nlinarith for nonlinear ε * 2m < m in erdos_728
+- Fixed Erdos.lean import collision (Lemma3 → Lemma3Counting)
+
+lake build succeeds with no errors."
+[2026-02-11T04:24:38.479Z] 
+$ cd /home/jarred/code/erdos-728b && tm update erdos728b-hwa --status "Completed: exists_m_choose_dvd_uniform proof wired up, 1 sorry remains in helper"
+[2026-02-11T04:24:51.674Z] 
+$ cd /home/jarred/code/erdos-728b && tm create -t "Close sorry in exists_m_small_primes_good_uniform (union bound)" -r formalize -p 1 \
+  -d "Close the sorry at Erdos/Basic.lean:62 in exists_m_small_primes_good_uniform.
+
+Statement:
+  ∃ M₀ : ℕ, ∀ m₀ : ℕ, M₀ ≤ m₀ → ∀ k : ℕ, 1 ≤ k →
+    (k : ℝ) ≤ C_log * Real.log (2 * m₀) →
+    ∃ m : ℕ, m₀ ≤ m ∧ m < 2 * m₀ ∧
+      ∀ p : ℕ, p.Prime → p ≤ 2 * k →
+        padicValNat p ((m + k).choose k) ≤ padicValNat p ((2 * m).choose m)
+
+This is the union bound argument from Part E of proofs/lemma3-counting.md.
+The proof requires:
+1. For each prime p ≤ 2k, choose D_p and apply count_bad_interval
+2. Sum per-prime bad counts via union bound (Finset.sum over primes ≤ 2k)
+3. Show total bad < m₀ = |[m₀, 2m₀)|, so a good m exists
+4. At the good m, NOT bad for any prime p ≤ 2k means v_p ≤ for all such p
+
+Key challenge: M₀ must be independent of k (since k is quantified after M₀).
+The NL proof gives M₀(k) = (2k)^{O(log k)} per k, but we need M₀(C_log * log(2m₀)).
+Since this is subpolynomial in m₀, a single M₀ works for large enough m₀.
+
+Available lemma: count_bad_interval from Lemma3Counting.lean.
+NL proof: proofs/lemma3-counting.md, Part E (Theorem E2)."
+[2026-02-11T04:24:54.751Z] 
+🛠️  Executing tool: read...
+[2026-02-11T04:24:58.681Z] 
+$ cd /home/jarred/code/erdos-728b && lake build 2>&1 | grep -E "error:|Build"
+[2026-02-11T04:25:18.561Z] 
+
+📝 Agent response complete.
+
+[2026-02-11T04:25:18.562Z] 📄 Log saved to .tm/logs/worker-erdos728b-hwa.md
+[2026-02-11T04:25:18.563Z] 
+📊 Task erdos728b-hwa completed:
+[2026-02-11T04:25:18.563Z]    Summary: Closed the sorry in exists_m_choose_dvd_uniform. lake build succeeds.
+[2026-02-11T04:25:18.563Z]    Details: Replaced the monolithic sorry in exists_m_choose_dvd_uniform (Basic.lean:39) with a complete proof that decomposes the problem into three verified components:
+
+1. **dvd_of_padicValNat_le** (fully proved): Converts pointwise p-adic valuation comparisons (∀ p prime, v_p(a) ≤ v_p(b)) into divisibility (a ∣ b), using Nat.factorization_le_iff_dvd.
+
+2. **carry_dominance_padicValNat** (already proved in Lemmas.lean): For primes p > 2k, v_p(C(m+k,k)) ≤ v_p(C(2m,m)) holds for ALL m unconditionally.
+
+3. **exists_m_small_primes_good_uniform** (sorry — new task erdos728b-48g created): For primes p ≤ 2k, the union bound argument from Part E of the NL proof shows a good m exists in [m₀, 2m₀). This is the remaining sorry.
+
+The proof of exists_m_choose_dvd_uniform itself is sorry-free: it obtains m from the small-primes result, then for each prime p, dispatches to either carry_dominance (p > 2k) or the union bound result (p ≤ 2k), and converts the pointwise inequality to divisibility.
+
+Additional fixes:
+- Fixed pre-existing linarith failures in exists_good_m (needed explicit 1 ≤ 2*m₀ hypothesis)
+- Fixed linarith → nlinarith for nonlinear ε * 2m < m in erdos_728
+- Fixed Erdos.lean import collision (probHigh defined in both Lemma3 and Lemma3Common)
