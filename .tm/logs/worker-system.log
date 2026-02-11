@@ -28800,3 +28800,97 @@ $ tm complete erdos728b-sms
 📊 Task erdos728b-sms completed:
 [2026-02-11T15:38:14.011Z]    Summary: Completed formalization of erdos_729 in Erdos/Problem729.lean.
 [2026-02-11T15:38:14.011Z]    Details: Defined constant C based on the smallest prime p > P. Proved the inequality by splitting into n ≤ P and n > P cases. Used `gcongr`, `nlinarith`, and explicit bounds to handle real-valued inequalities and type casting between Nat and Real. The entire file compiles with zero sorries.
+[2026-02-11T15:38:14.016Z] ✅ Closed task erdos728b-sms
+
+[2026-02-11T15:38:14.086Z] 🔄 Checking git status...
+[2026-02-11T15:38:14.106Z] 📝 Committing changes...
+[2026-02-11T15:38:14.185Z] 🚀 Pushing to remote...
+[2026-02-11T15:38:16.247Z] 
+================================================================================
+[2026-02-11T15:38:16.247Z] 📌 Processing task: erdos728b-vyc - Decompose formalization of erdos_729
+[2026-02-11T15:38:16.247Z]    Role: planner | Priority: 0 
+[2026-02-11T15:38:16.247Z] ================================================================================
+
+[2026-02-11T15:38:16.252Z] ✓ Claimed task erdos728b-vyc
+
+[2026-02-11T15:38:16.252Z] 🤖 Using agent: planner with models: google-antigravity/gemini-3-pro-high:high, google-antigravity/claude-opus-4-6-thinking
+
+[2026-02-11T15:38:16.252Z] 💭 Starting pi agent session with model: google-antigravity/gemini-3-pro-high:high...
+[2026-02-11T15:38:16.297Z] 📸 Capturing file state before agent execution...
+[2026-02-11T15:38:16.314Z] ✓ Captured state: 188 tracked, 1 untracked files
+
+[2026-02-11T15:38:43.944Z] [overseer] 💓 Heartbeat #45 complete: No intervention needed. Planner is actively decomposing the non-compiling monolith for Erdős 729.
+[2026-02-11T15:39:05.162Z] 
+$ ls -R Erdos proofs
+[2026-02-11T15:39:08.363Z] 
+🛠️  Executing tool: read...
+[2026-02-11T15:39:12.143Z] 
+🛠️  Executing tool: read...
+[2026-02-11T15:40:26.688Z] 
+$ /home/jarred/.pi/agent/skills/beehive/bead_state/bead_cli.py list --status ready,in_progress
+[2026-02-11T15:40:32.020Z] 
+$ tm --help
+[2026-02-11T15:40:36.906Z] 
+$ tm list --status in_progress,ready,deferred
+[2026-02-11T15:40:40.666Z] 
+$ tm list --help
+[2026-02-11T15:40:44.545Z] 
+$ tm list --all
+[2026-02-11T15:40:52.229Z] 
+$ tm create -t "Formalize small n case for Erdos 729" -r formalize -p 1 -d "Extract the n <= P case from Erdos/Problem729.lean into a separate lemma 'erdos_729_small_n'. It should state that if n <= P, then a+b is bounded by a constant depending on P."
+[2026-02-11T15:40:56.582Z] 
+$ tm create -t "Formalize sumDigits log bound for Erdos 729" -r formalize -p 1 -d "Extract/clean up the sumDigits_le_log proof and the calculation showing sumDigits p a + sumDigits p b <= C * log n when a, b < 2n in Erdos/Problem729.lean."
+[2026-02-11T15:41:01.178Z] 
+$ tm create -t "Formalize large n case for Erdos 729" -r formalize -p 1 -d "Prove the large n case (n > P) for Erdos 729 in Erdos/Problem729.lean. Assume sumDigits bound is available. Use Legendre's formula to show a+b-n <= C log n." --deps erdos728b-lhm
+[2026-02-11T15:41:05.355Z] 
+$ tm create -t "Assemble Erdos 729 proof" -r formalize -p 1 -d "Combine small n, log bound, and large n lemmas to prove the main theorem erdos_729 in Erdos/Problem729.lean." --deps erdos728b-tkz,erdos728b-yzp
+[2026-02-11T15:41:14.343Z] 
+$ tm update erdos728b-vyc --status "Completed decomposition into 4 sub-tasks"
+[2026-02-11T15:41:43.971Z] [overseer] 💓 Heartbeat starting...
+[2026-02-11T15:41:43.974Z] [overseer] Running with model: google-antigravity/gemini-3-flash
+[2026-02-11T15:42:12.558Z] 
+
+📝 Agent response complete.
+
+[2026-02-11T15:42:12.559Z] 📄 Log saved to .tm/logs/worker-erdos728b-vyc.md
+[2026-02-11T15:42:12.560Z] 
+📊 Task erdos728b-vyc completed:
+[2026-02-11T15:42:12.560Z]    Summary: Decomposed erdos_729 formalization into 4 tasks
+[2026-02-11T15:42:12.560Z]    Details: ```json
+{
+  "status": "completed",
+  "summary": "Decomposed erdos_729 formalization into 4 tasks",
+  "tasks": [
+    {
+      "id": "erdos728b-tkz",
+      "title": "Formalize small n case for Erdos 729",
+      "description": "Extract the n <= P case from Erdos/Problem729.lean into a separate lemma 'erdos_729_small_n'. It should state that if n <= P, then a+b is bounded by a constant depending on P.",
+      "role": "formalize",
+      "priority": 1
+    },
+    {
+      "id": "erdos728b-lhm",
+      "title": "Formalize sumDigits log bound for Erdos 729",
+      "description": "Extract/clean up the sumDigits_le_log proof and the calculation showing sumDigits p a + sumDigits p b <= C * log n when a, b < 2n in Erdos/Problem729.lean.",
+      "role": "formalize",
+      "priority": 1
+    },
+    {
+      "id": "erdos728b-yzp",
+      "title": "Formalize large n case for Erdos 729",
+      "description": "Prove the large n case (n > P) for Erdos 729 in Erdos/Problem729.lean. Assume sumDigits bound is available. Use Legendre's formula to show a+b-n <= C log n.",
+      "role": "formalize",
+      "priority": 1,
+      "dependencies": ["erdos728b-lhm"]
+    },
+    {
+      "id": "erdos728b-6ks",
+      "title": "Assemble Erdos 729 proof",
+      "description": "Combine small n, log bound, and large n lemmas to prove the main theorem erdos_729 in Erdos/Problem729.lean.",
+      "role": "formalize",
+      "priority": 1,
+      "dependencies": ["erdos728b-tkz", "erdos728b-yzp"]
+    }
+  ]
+}
+```
