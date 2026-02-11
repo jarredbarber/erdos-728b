@@ -156,8 +156,41 @@ lemma prob_eq_count_div_total (S : Set (DigitSpace D p)) :
     (probDigitSpace D p S).toReal = (Fintype.card S : ℝ) / (p ^ D : ℝ) := by
   let μ := probDigitSpace D p
   have h_sing_enn (x : DigitSpace D p) : μ {x} = ((p : ℝ≥0∞)⁻¹)^D := by
-    -- Proof blocked by mysterious type class instance failure in Finset.prod_congr
-    sorry
+    dsimp [μ]
+    -- Rewrite {x} as a pi set
+    have h_eq : {x} = Set.pi Set.univ (fun i => {x i}) := by
+      ext y
+      simp only [Set.mem_singleton_iff, Set.mem_pi, Set.mem_univ, forall_true_left]
+      constructor
+      · intro h i; rw [h]
+      · intro h; funext i; apply h
+    
+    unfold probDigitSpace
+    rw [h_eq]
+    
+    -- Ensure SigmaFinite is available
+    haveI : ∀ i : Fin D, SigmaFinite (probFin p) := fun _ => IsFiniteMeasure.toSigmaFinite (probFin p)
+
+    rw [Measure.pi_pi]
+    
+    -- Rewrite RHS as product
+    conv_rhs =>
+      rw [← Fintype.card_fin D]
+      rw [← Finset.card_univ]
+      rw [← Finset.prod_const (s := Finset.univ)]
+    
+    -- Now simplify the product
+    congr
+    ext i
+    
+    -- Compute measure of singleton
+    unfold probFin
+    rw [Measure.smul_apply]
+    
+    -- Measure.count {x i} = 1
+    rw [Measure.count_apply_finite]
+    · simp
+    · exact Set.finite_singleton _
 
   have h_sing (x : DigitSpace D p) : (μ {x}).toReal = 1 / (p ^ D : ℝ) := by
     rw [h_sing_enn]
