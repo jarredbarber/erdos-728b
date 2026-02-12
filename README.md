@@ -15,7 +15,7 @@ I wanted to know: **can general-purpose LLMs do this without specialized search?
 - "Mathematically autonomous": I refined the workflow and unjammed plumbing from time to time, but no assistance was given on math techniques. Agents did not use web search tools.
 - "The compiler is the reviewer": A fully refined lean proof that compiles with zero sorrys/axioms is the acceptance criterion.
 - Workflow: Multi-agent system coordinated by custom dynamic DAG-based orchestration engine. Each task has a "role" (writing NL proofs, verifying, planning, writing Lean, gathering mathlib references); an agent is spun up with the appropriate system prompt, executes the task, updates the task DAG.
-- Models: Gemini 3 Pro/Flash, Claude Opus 4.6/Sonnet 4.5, randomly assigned per task. Pragmatically, this lets me load-balance my token quotas.
+- Models: Gemini 3 Pro/Flash, Claude Opus 4.6/Sonnet 4.5, randomly assigned per task. In theory, this may help improve robustness through error decorrelation (e.g. if gemini is better than claude for a task, the claude run may fail and then a gemini re-run may succeed). Pragmatically, this was really done to help me load-balance my token quotas.
 
 ---
 
